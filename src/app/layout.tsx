@@ -1,5 +1,5 @@
 import '../styles/globals.css';
-import Header from '@/src/components/Header';
+import { Header } from '@/src/components/Header';
 
 export const metadata = {
     title: 'Apologetics Central',

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getServerWixClient } from "../lib/wixClient";
+import { getServerWixClient } from "../app/serverWixClient";
 import { members } from "@wix/members";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
