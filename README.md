@@ -1,88 +1,104 @@
-# Wix Headless Examples
+# Wix Headless Example
 
-This [Next.js](https://nextjs.org/) project provides a minimal example site to demonstrate basic usage of various Wix
-Headless APIs. The implementation focuses on simplicity and readability, rather than feature richness, performance, or
-completeness. This repository can be used as a quick reference for bootstrapping a Wix Headless application.
+This is a Next.js project that demonstrates how to build a headless website using Wix as a backend. It includes features like blog posts, authentication with Google OAuth, and various Wix services integration.
 
-For a more comprehensive example of Wix Headless integration, we recommend checking out
-our [starter templates](https://www.wix.com/developers/headless/templates).
+## Features
 
-You can view the latest version of this repo deployed
-at [https://wix-headless-example.vercel.app/](https://wix-headless-example.vercel.app/).
+- Next.js 13+ with App Router
+- Wix Headless Integration
+- Google OAuth Authentication
+- Blog System
+- TypeScript Support
+- Modern React Components
+- Responsive Design
 
-## Getting Started
+## Prerequisites
 
-There are two ways to experiment with the example site functionality:
+Before you begin, ensure you have the following installed:
+- Node.js (LTS version recommended)
+- Yarn package manager (v3.3.0)
+- A Wix account with API access
+- A Google Cloud Console project with OAuth 2.0 credentials
 
-### Code Sandbox
+## Local Development Setup
 
-1. Fork the CodeSandbox project by click **Fork** in the top right corner.
-2. In [constants/constants.js](./constants/constants.js), replace the existing client ID with your own. You can find
-   your client
-   ID
-   under [headless settings](https://www.wix.com/my-account/site-selector/?buttonText=Select%20Site&title=Select%20a%20Site&autoSelectOnSingleSite=true&actionUrl=https:%2F%2Fwww.wix.com%2Fdashboard%2F%7B%7BmetaSiteId%7D%7D%2Foauth-apps-settings)
-   in your project dashboard.
-3. **Make sure you save any changes in order to see their effect**
+1. Clone the repository:
+```bash
+git clone [repository-url]
+cd wix-headless-example
+```
 
-### Copy the project to your local workspace
+2. Install dependencies:
+```bash
+yarn install
+```
 
-1. Clone the [github repo](https://github.com/wix/wix-headless-example/tree/main).
-2. Run the following commands:
+3. Create a `.env.local` file in the root directory with the following variables:
+```env
+# Wix Configuration
+WIX_API_KEY=your_wix_api_key
+WIX_API_KEY_ADMIN=your_wix_admin_api_key
+WIX_SITE_ID=your_wix_site_id
 
-    ```bash
-    cd wix-headless-example
-    npm install
-    ```
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
-3. In [constants/constants.js](./constants/constants.js), replace the existing client ID with your own. You can find
-   your client
-   ID
-   under [headless settings](https://www.wix.com/my-account/site-selector/?buttonText=Select%20Site&title=Select%20a%20Site&autoSelectOnSingleSite=true&actionUrl=https:%2F%2Fwww.wix.com%2Fdashboard%2F%7B%7BmetaSiteId%7D%7D%2Foauth-apps-settings)
-   in your project dashboard.
+# Wix Client
+NEXT_PUBLIC_WIX_CLIENT_ID=your_wix_client_id
+```
+
 4. Run the development server:
+```bash
+yarn dev
+```
 
-    ```bash
-    npm run dev
-    ```
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+## Available Scripts
 
-## Wix Headless APIs Usage
+- `yarn dev` - Runs the development server
+- `yarn build` - Builds the application for production
+- `yarn start` - Starts the production server
+- `yarn lint` - Runs the linter
+- `yarn test` - Runs the test suite
+- `yarn e2e` - Runs end-to-end tests with Playwright
 
-This project demonstrates the usage of various Wix Headless APIs. Here's a brief overview of each:
+## Deployment to Vercel
 
-### Headless Bookings
+1. Create a new project on [Vercel](https://vercel.com)
 
-The [`pages/booking.js`](./pages/booking.js) file demonstrates how to use
-the [Wix Bookings API](https://dev.wix.com/docs/sdk/backend-modules/bookings/bookings/introduction) to fetch a list of
-services and their availability from your site.
+2. Connect your repository to Vercel
 
-> **[Wix Bookings API](https://dev.wix.com/docs/sdk/backend-modules/bookings/bookings/introduction)**: This API allows
-> you to manage bookings for a site's services. It holds information about the customer and the session or schedule they
-> have booked.
+3. Configure the following environment variables in your Vercel project settings:
+   - `WIX_API_KEY`
+   - `WIX_API_KEY_ADMIN`
+   - `WIX_SITE_ID`
+   - `GOOGLE_CLIENT_ID`
+   - `GOOGLE_CLIENT_SECRET`
+   - `NEXT_PUBLIC_BASE_URL` (set to your production URL)
+   - `NEXT_PUBLIC_WIX_CLIENT_ID`
 
-### Headless eCommerce
+4. Deploy using the Vercel CLI or GitHub integration:
+```bash
+vercel
+```
 
-The [`pages/store.js`](./pages/store.js) file demonstrates how to fetch a list of products from your site using
-the [Wix Stores API](https://dev.wix.com/docs/sdk/backend-modules/stores). It also demonstrates how to use
-the [Wix eCommerce API](https://dev.wix.com/docs/sdk/backend-modules/ecom/introduction) to manage carts and checkouts.
+Or simply push to your main branch if you've set up automatic deployments.
 
-> **[Wix Stores API](https://dev.wix.com/docs/sdk/backend-modules/stores)**: This API allows you to manage your store
-> inventory, orders, and collections.
-> It provides a comprehensive set of services for customizing store functionality.
->
-> **[Wix eCommerce API](https://dev.wix.com/docs/sdk/backend-modules/ecom/introduction)**: This API provides a
-> comprehensive set of services for customizing eCommerce functionality on your sites.
-> It allows you to manage a site visitor's cart, handle checkout and payment flow, create and manage discount rules,
-> promote items, and manage orders.
+## Project Structure
 
-### Headless Tickets
+- `/src/app` - Next.js 13+ app router pages and API routes
+- `/src/components` - React components
+- `/src/styles` - Global styles and CSS modules
+- `/public` - Static assets
+- `/internal` - Internal utilities and configurations
 
-The [`pages/tickets.js`](./pages/tickets.js) file demonstrates how to use
-the [Wix Events API](https://dev.wix.com/docs/sdk/backend-modules/events/introduction) to fetch a list of events and
-their available tickets from your site.
+## Contributing
 
-> **[Wix Events API](https://dev.wix.com/docs/sdk/backend-modules/events/introduction)**: This API provides
-> functionality for creating, updating, and managing events.
-> It allows you to manage event details like location, scheduling, registration, tickets, RSVPs, online conferencing,
-> messaging customization, and basic registration form customization.
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
