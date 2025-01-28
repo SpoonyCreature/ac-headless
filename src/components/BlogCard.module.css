@@ -1,0 +1,42 @@
+.blogCard {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.blogCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.blogImageContainer {
+    position: relative;
+    width: 100%;
+    height: 200px;
+}
+
+.blogContent {
+    padding: 1.5rem;
+}
+
+.blogTitle {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.blogExcerpt {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.readMore {
+    color: #4285f4;
+    font-size: 0.875rem;
+    font-weight: 500;
+}

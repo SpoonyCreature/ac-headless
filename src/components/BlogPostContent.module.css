@@ -1,0 +1,60 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.main {
+    background: var(--background);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.coverImageContainer {
+    width: 100%;
+    height: 400px;
+    position: relative;
+}
+
+.header {
+    padding: 2rem;
+}
+
+.title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.metadata {
+    display: flex;
+    gap: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.content {
+    padding: 0 2rem 2rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.richContent {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .coverImageContainer {
+        height: 300px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+}

@@ -4,7 +4,6 @@ import Image from 'next/image';
 const PLACEHOLDER_IMAGE = '/placeholder-image.jpg';
 
 function getImageUrlForMedia(media, width, height) {
-    console.log('Processing media:', media);
 
     if (!media) {
         console.log('No media provided, using placeholder');

@@ -1,35 +1,25 @@
-'use client';
-
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { logout } from '@/src/app/actions';
-import { useRouter } from 'next/navigation';
+import { getServerWixClient } from "../lib/wixClient";
+import { members } from "@wix/members";
+import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
-export default function Header() {
-    const [member, setMember] = useState(null);
-    const router = useRouter();
+async function logout() {
+    "use server";
+    cookies().delete("wixSession");
+    revalidatePath("/");
+}
 
-    useEffect(() => {
-        async function fetchMember() {
-            try {
-                const response = await fetch('/api/auth/me');
-                if (response.ok) {
-                    const data = await response.json();
-                    setMember(data.member);
-                }
-            } catch (error) {
-                console.error('Error fetching member:', error);
-            }
-        }
-        fetchMember();
-    }, []);
+export async function Header() {
+    const wixClient = getServerWixClient();
+    let member = null;
 
-    const handleLogout = async (event) => {
-        event.preventDefault();
-        await logout();
-        setMember(null);
-        router.refresh();
-    };
+    if (wixClient.auth.loggedIn()) {
+        const response = await wixClient.members.getCurrentMember({
+            fieldsets: [members.Set.FULL]
+        });
+        member = response.member;
+    }
 
     return (
         <header className="header" style={{
@@ -94,7 +84,7 @@ export default function Header() {
                         <span style={{ color: 'var(--text-primary)' }}>
                             {member.profile?.nickname || member.profile?.slug || "Member"}
                         </span>
-                        <form onSubmit={handleLogout}>
+                        <form action={logout}>
                             <button
                                 type="submit"
                                 style={{
