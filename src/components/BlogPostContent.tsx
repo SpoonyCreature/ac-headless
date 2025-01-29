@@ -2,8 +2,9 @@
 
 import { WixMediaImage } from './WixMediaImage';
 import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { RichTextSkeleton, CommentsSkeleton } from './Skeletons';
+import { WIX_SESSION_COOKIE_NAME } from '../constants/constants';
 
 const RichContentViewer = dynamic(
     () => import('./RichContentViewer').catch(err => {
@@ -79,6 +80,23 @@ const Sidebar = () => (
 );
 
 export function BlogPostContent({ blog }: { blog: BlogPost }) {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await fetch('/api/auth/me');
+                const data = await response.json();
+                setIsAuthenticated(!!data.user);
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                setIsAuthenticated(false);
+            }
+        };
+
+        checkAuth();
+    }, []);
+
     return (
         <div className="min-h-screen pb-32">
             {/* Hero Section */}
@@ -126,9 +144,9 @@ export function BlogPostContent({ blog }: { blog: BlogPost }) {
                         <div className="border-t border-gray-100 pt-16">
                             <Suspense fallback={<CommentsSkeleton />}>
                                 <Comments
-                                    contextId={blog.slug || ''}
+                                    contextId={blog._id}
                                     resourceId={blog._id}
-                                    isAuthenticated={true}
+                                    isAuthenticated={isAuthenticated}
                                 />
                             </Suspense>
                         </div>
