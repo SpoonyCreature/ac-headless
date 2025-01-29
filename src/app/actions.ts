@@ -1,10 +1,19 @@
 'use server';
 
-import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
-import { WIX_SESSION_COOKIE_NAME } from "@/src/constants/constants";
+import { redirect } from 'next/navigation';
+import { getServerWixClient } from './serverWixClient';
+
+export async function login() {
+    const wixClient = getServerWixClient();
+    const { url } = await wixClient.auth.generateOAuthURL('/', {
+        provider: 'google',
+        mode: 'signUp'
+    });
+    redirect(url);
+}
 
 export async function logout() {
-    cookies().delete(WIX_SESSION_COOKIE_NAME);
-    revalidatePath("/");
+    const wixClient = getServerWixClient();
+    await wixClient.auth.logout();
+    redirect('/');
 } 

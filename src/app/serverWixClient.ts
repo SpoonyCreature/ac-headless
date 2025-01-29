@@ -3,11 +3,11 @@ import { cookies } from "next/headers";
 import { WIX_SESSION_COOKIE_NAME } from "./../constants/constants";
 import { members } from "@wix/members";
 import { items } from "@wix/data";
+import { comments } from "@wix/comments";
 
 export function getServerWixClient() {
     const wixSessionCookie = cookies().get(WIX_SESSION_COOKIE_NAME);
     let visitorCookie;
-    console.log("WIX SESSION COOKIE", wixSessionCookie);
 
     if (!wixSessionCookie) {
         visitorCookie = cookies().get("session");
@@ -25,6 +25,7 @@ export function getServerWixClient() {
         modules: {
             members,
             items,
+            comments,
         },
     });
 }

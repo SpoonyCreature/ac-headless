@@ -4,7 +4,6 @@ import Image from 'next/image';
 const PLACEHOLDER_IMAGE = '/placeholder-image.jpg';
 
 function getImageUrlForMedia(media, width, height) {
-
     if (!media) {
         console.log('No media provided, using placeholder');
         return PLACEHOLDER_IMAGE;
@@ -12,7 +11,10 @@ function getImageUrlForMedia(media, width, height) {
 
     if (typeof media === 'string') {
         if (media.startsWith('wix:image')) {
-            const wixUrl = wixMedia.getScaledToFillImageUrl(media, width, height, {});
+            const wixUrl = wixMedia.getScaledToFillImageUrl(media, width, height, {
+                quality: 90,
+                progressive: true
+            });
             console.log('Generated Wix URL:', wixUrl);
             return wixUrl;
         }
@@ -40,30 +42,31 @@ export function WixMediaImage({
     width = 640,
     alt = 'no info available for image',
     className = '',
-    sizes = '10vw',
+    sizes = '100vw',
     objectFit,
     disableZoom = false,
 }) {
     console.log('WixMediaImage props:', { media, height, width, alt, objectFit });
 
-    const imageUrl = getImageUrlForMedia(media, width, height);
+    const imageUrl = getImageUrlForMedia(media, width * 2, height * 2); // Request 2x size for retina displays
     console.log('Final image URL:', imageUrl);
 
-    const styleProps = objectFit
-        ? { style: { objectFit }, fill: true, sizes }
-        : { width, height };
-
     return (
-        <div className="flex items-center justify-center h-full">
-            <div className="overflow-hidden relative group w-full h-full">
-                <Image
-                    {...styleProps}
-                    src={imageUrl}
-                    alt={alt}
-                    className={`object-cover w-full ${!disableZoom ? 'group-hover:scale-110' : ''
-                        } transition duration-300 ease-in-out ${className}`}
-                />
-            </div>
+        <div className="relative w-full h-full">
+            <Image
+                src={imageUrl}
+                alt={alt}
+                width={width}
+                height={height}
+                className={`${className} ${!disableZoom ? 'group-hover:scale-110' : ''} transition duration-300 ease-in-out`}
+                sizes={sizes}
+                quality={90}
+                style={{
+                    objectFit: objectFit || 'cover',
+                    width: '100%',
+                    height: '100%'
+                }}
+            />
         </div>
     );
 } 

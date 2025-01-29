@@ -3,9 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { WIX_SESSION_COOKIE_NAME } from "@/src/constants/constants";
 
 export async function middleware(request: NextRequest) {
-    console.log("Middleware running on path:", request.nextUrl.pathname);
-    console.log("All cookies:", request.cookies.getAll());
-    console.log("WixSession cookie:", request.cookies.get(WIX_SESSION_COOKIE_NAME));
 
     if (
         !request.cookies.get(WIX_SESSION_COOKIE_NAME) ||

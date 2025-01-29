@@ -1,22 +1,22 @@
-import { getServerWixClient } from "@/src/app/serverWixClient";
-import { members } from "@wix/members";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { getServerWixClient } from '@/src/app/serverWixClient';
+import { members } from '@wix/members';
 
 export async function GET() {
     try {
         const wixClient = getServerWixClient();
 
         if (!wixClient.auth.loggedIn()) {
-            return NextResponse.json({ member: null });
+            return NextResponse.json({ user: null });
         }
 
-        const response = await wixClient.members.getCurrentMember({
+        const { member } = await wixClient.members.getCurrentMember({
             fieldsets: [members.Set.FULL]
         });
 
-        return NextResponse.json({ member: response.member });
+        return NextResponse.json({ user: member });
     } catch (error) {
-        console.error('Error fetching member:', error);
-        return NextResponse.json({ error: 'Failed to fetch member' }, { status: 500 });
+        console.error('Error checking auth status:', error);
+        return NextResponse.json({ user: null });
     }
 } 

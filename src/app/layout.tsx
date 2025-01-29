@@ -1,9 +1,14 @@
 import '../styles/globals.css';
 import { Header } from '@/src/components/Header';
+import { Inter } from 'next/font/google';
+import type { Metadata } from 'next';
+import { Footer } from '../components/Footer';
 
-export const metadata = {
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
     title: 'Apologetics Central',
-    description: 'Your source for apologetics content',
+    description: 'Equipping Christians with Reformed Presuppositional Apologetics',
 };
 
 export default function RootLayout({
@@ -12,10 +17,11 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en">
-            <body>
+        <html lang="en" suppressHydrationWarning>
+            <body className={`min-h-screen bg-background font-sans antialiased ${inter.className}`}>
                 <Header />
                 {children}
+                <Footer />
             </body>
         </html>
     );

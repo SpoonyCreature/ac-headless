@@ -18,27 +18,27 @@ export function BlogCard({ blog }: { blog: BlogPost }) {
 
     return (
         <Link href={href}>
-            <article className="group cursor-pointer overflow-hidden rounded-2xl border border-border bg-card transition-all hover:shadow-lg hover:-translate-y-1">
+            <article className="group cursor-pointer overflow-hidden rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm transition-all hover:shadow-xl hover:-translate-y-1">
                 <div className="aspect-[16/9] overflow-hidden">
                     <WixMediaImage
                         media={blog.coverImage}
-                        width={800}
-                        height={450}
+                        width={1200}
+                        height={675}
                         alt={blog.title || 'Blog post image'}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         objectFit="cover"
                     />
                 </div>
-                <div className="p-6">
-                    <h3 className="mb-3 text-xl font-semibold tracking-tight">
+                <div className="p-8">
+                    <h3 className="mb-4 text-2xl font-serif font-bold tracking-tight group-hover:text-primary transition-colors">
                         {blog.title}
                     </h3>
-                    <p className="mb-4 text-sm text-muted-foreground line-clamp-2">
-                        {blog.excerpt || blog.content?.substring(0, 120)}
+                    <p className="mb-6 text-base text-muted-foreground line-clamp-3 font-serif leading-relaxed">
+                        {blog.excerpt || blog.content?.substring(0, 160)}
                     </p>
-                    <div className="flex items-center text-sm font-medium">
+                    <div className="flex items-center text-base font-medium text-primary">
                         Read article
-                        <ArrowUpRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                        <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </div>
                 </div>
             </article>
