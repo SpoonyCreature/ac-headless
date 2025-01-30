@@ -10071,6 +10071,7 @@ __metadata:
     autoprefixer: 10.4.14
     class-variance-authority: ^0.7.1
     clsx: ^2.1.1
+    encoding: ^0.1.13
     eslint: 8.39.0
     eslint-config-next: ^13.4.9
     googleapis: ^144.0.0

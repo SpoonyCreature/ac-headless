@@ -15,6 +15,7 @@ const nextConfig = {
         appDir: true,
         serverActions: true,
     },
+    transpilePackages: ['@wix/comments', '@wix/comments_categories'],
     distDir: '.next',
     // Set the source directory to src
     dir: 'src',
