@@ -3,7 +3,11 @@ console.log('next.config.js is being loaded');
 const nextConfig = {
     reactStrictMode: false,
     images: {
-        domains: ['static.wixstatic.com', 'i.ytimg.com'],
+        domains: [
+            'static.wixstatic.com',
+            'i.ytimg.com',
+            'lh3.googleusercontent.com',
+        ],
     },
     webpack: (config) => {
         config.resolve.alias = {
