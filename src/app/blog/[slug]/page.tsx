@@ -50,7 +50,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
             <div className="container mx-auto px-4 py-16">
                 <div className="max-w-xl mx-auto text-center">
                     <h1 className="text-2xl font-bold mb-4">Blog Post Not Found</h1>
-                    <p className="mb-8">Sorry, we couldn't find the blog post you're looking for.</p>
+                    <p className="mb-8">Sorry, we couldn&apos;t find the blog post you&apos;re looking for.</p>
                     <Link href="/blog" className="text-blue-600 hover:underline">
                         Return to Blog
                     </Link>

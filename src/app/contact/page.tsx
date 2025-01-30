@@ -32,7 +32,7 @@ export default function ContactPage() {
                     <div className="text-center mb-16">
                         <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6">Get in Touch</h1>
                         <p className="text-lg text-muted-foreground font-serif leading-relaxed">
-                            Have questions about Reformed Presuppositional Apologetics? We're here to help and engage in meaningful dialogue.
+                            Have questions about Reformed Presuppositional Apologetics? We&apos;re here to help and engage in meaningful dialogue.
                         </p>
                     </div>
 
@@ -42,7 +42,7 @@ export default function ContactPage() {
                             <Mail className="w-8 h-8 text-primary mb-4" />
                             <h2 className="font-serif text-xl font-bold mb-2">Email Us</h2>
                             <p className="text-muted-foreground mb-4">
-                                Send us an email directly and we'll get back to you as soon as possible.
+                                Send us an email directly and we&apos;ll get back to you as soon as possible.
                             </p>
                             <a href="mailto:contact@apologeticscentral.com" className="text-primary hover:text-primary/80 transition-colors">
                                 contact@apologeticscentral.com
@@ -52,7 +52,7 @@ export default function ContactPage() {
                             <MessageSquare className="w-8 h-8 text-primary mb-4" />
                             <h2 className="font-serif text-xl font-bold mb-2">Send a Message</h2>
                             <p className="text-muted-foreground">
-                                Use the contact form below to send us a message. We'll respond promptly to your inquiry.
+                                Use the contact form below to send us a message. We&apos;ll respond promptly to your inquiry.
                             </p>
                         </div>
                     </div>

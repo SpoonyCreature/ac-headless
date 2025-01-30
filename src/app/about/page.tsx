@@ -46,7 +46,7 @@ export default function AboutPage() {
                         <div className="space-y-12">
                             <div className="space-y-6 text-lg leading-relaxed">
                                 <p className="text-muted-foreground">
-                                    At Apologetics Central, we take a look at questions frequently asked regarding our faith in Jesus Christ and attempt to formulate decent and thorough Biblical answers that are easy to read and understandable. Christians don't have to back away when talking about their faith.
+                                    At Apologetics Central, we take a look at questions frequently asked regarding our faith in Jesus Christ and attempt to formulate decent and thorough Biblical answers that are easy to read and understandable. Christians don&apos;t have to back away when talking about their faith.
                                 </p>
                             </div>
 
@@ -81,7 +81,7 @@ export default function AboutPage() {
                     <div className="max-w-3xl mx-auto text-center">
                         <h2 className="font-serif text-3xl font-bold mb-4 tracking-tight">Get in Touch</h2>
                         <p className="text-xl text-muted-foreground mb-8 font-serif leading-relaxed max-w-2xl mx-auto">
-                            Have questions or want to learn more? We'd love to hear from you.
+                            Have questions or want to learn more? We&apos;d love to hear from you.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link
@@ -103,4 +103,4 @@ export default function AboutPage() {
             </section>
         </main>
     );
-} 
+}

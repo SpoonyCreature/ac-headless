@@ -44,7 +44,7 @@ export default function PrivacyPage() {
                             <div className="space-y-4">
                                 <h3 className="font-serif text-2xl font-semibold tracking-tight">Log Data</h3>
                                 <p className="text-lg text-muted-foreground leading-relaxed">
-                                    We want to inform you that whenever you visit our Service, we collect information that your browser sends to us which is called Log Data. This Log Data may include information such as your computer's Internet Protocol ("IP") address, browser version, pages of our Service that you visit, the time and date of your visit, the time spent on those pages, and other statistics.
+                                    We want to inform you that whenever you visit our Service, we collect information that your browser sends to us which is called Log Data. This Log Data may include information such as your computer&apos;s Internet Protocol (&quot;IP&quot;) address, browser version, pages of our Service that you visit, the time and date of your visit, the time spent on those pages, and other statistics.
                                 </p>
                             </div>
 
@@ -52,10 +52,10 @@ export default function PrivacyPage() {
                                 <h3 className="font-serif text-2xl font-semibold tracking-tight">Cookies</h3>
                                 <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
                                     <p>
-                                        Cookies are files with a small amount of data that is commonly used as an anonymous unique identifier. These are sent to your browser from the website that you visit and are stored on your computer's hard drive.
+                                        Cookies are files with a small amount of data that is commonly used as an anonymous unique identifier. These are sent to your browser from the website that you visit and are stored on your computer&apos;s hard drive.
                                     </p>
                                     <p>
-                                        Our website uses these "cookies" to collect information and to improve our Service. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your computer. If you choose to refuse our cookies, you may not be able to use some portions of our Service.
+                                        Our website uses these &quot;cookies&quot; to collect information and to improve our Service. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your computer. If you choose to refuse our cookies, you may not be able to use some portions of our Service.
                                     </p>
                                 </div>
                             </div>
@@ -97,4 +97,4 @@ export default function PrivacyPage() {
             </div>
         </main>
     );
-} 
+}
