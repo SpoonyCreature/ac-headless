@@ -2,6 +2,7 @@ import { getServerWixClient } from "./serverWixClient";
 import { SearchBox } from '../components/SearchBox';
 import { BlogPosts } from '../components/BlogPosts';
 import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import Image from 'next/image';
 
 interface BlogPost {
     _id: string;
@@ -33,7 +34,7 @@ export default async function Home() {
                             <h1 className="font-serif text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight mb-6 leading-[1.1]">
                                 Every fact bears{' '}
                                 <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                                    God's stamp
+                                    God&apos;s stamp
                                 </span>
                             </h1>
                             <p className="text-xl text-muted-foreground mb-8 font-serif leading-relaxed max-w-xl">
@@ -51,10 +52,12 @@ export default async function Home() {
                         </div>
                         <div className="relative aspect-[4/3] lg:aspect-auto">
                             <div className="absolute inset-0 rounded-2xl overflow-hidden">
-                                <img
-                                    src="/hero-image.jpg"
+                                <Image
+                                    src="/header-image.jpeg"
                                     alt="Reformed Apologetics"
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    className="object-cover"
+                                    priority
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-background/50 to-transparent" />
                             </div>

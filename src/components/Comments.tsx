@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { LoginButton } from './LoginButton';
 import { Reply, MessageSquare } from 'lucide-react';
 
@@ -208,32 +208,28 @@ export function Comments({ contextId, resourceId, isAuthenticated }: CommentsPro
     const [isLoading, setIsLoading] = useState(true);
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
-    useEffect(() => {
-        fetchComments();
-    }, [contextId, resourceId]);
-
-    const fetchComments = async () => {
+    const fetchComments = useCallback(async () => {
         try {
             setIsLoading(true);
             const response = await fetch(`/api/comments?contextId=${contextId}&resourceId=${resourceId}`);
             const data: CommentsResponse = await response.json();
             console.log("COMMENTS DATA", data);
-
-            // Set top-level comments
-            setComments(data.comments || []);
-
-            // Transform commentReplies into a more usable format
-            const repliesMap: Record<string, Comment[]> = {};
-            Object.entries(data.commentReplies || {}).forEach(([parentId, response]) => {
-                repliesMap[parentId] = response.replies || [];
+            setComments(data.comments);
+            const replies: Record<string, Comment[]> = {};
+            Object.entries(data.commentReplies).forEach(([parentId, replyData]) => {
+                replies[parentId] = replyData.replies;
             });
-            setCommentReplies(repliesMap);
+            setCommentReplies(replies);
         } catch (error) {
             console.error('Error fetching comments:', error);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [contextId, resourceId]);
+
+    useEffect(() => {
+        fetchComments();
+    }, [fetchComments]);
 
     const handleSubmitComment = async (e: React.FormEvent) => {
         e.preventDefault();

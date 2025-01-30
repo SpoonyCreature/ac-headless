@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { Suspense } from 'react';
 import { GoogleLoginButton } from "./GoogleLoginButton";
+import Image from 'next/image';
 
 async function logout() {
     "use server";
@@ -35,10 +36,12 @@ export async function Header() {
                         {member ? (
                             <div className="flex items-center gap-3 px-3 py-2 rounded-full bg-muted/50 border border-border">
                                 {member.profile?.photo?.url ? (
-                                    <img
+                                    <Image
                                         src={member.profile.photo.url}
                                         alt="Profile"
-                                        className="w-8 h-8 rounded-full object-cover ring-2 ring-background"
+                                        width={32}
+                                        height={32}
+                                        className="rounded-full object-cover ring-2 ring-background"
                                     />
                                 ) : (
                                     <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold">
