@@ -10,21 +10,35 @@ import Image from 'next/image';
 const RichContentViewer = dynamic(
     () => import('./RichContentViewer').catch(err => {
         console.error('Error loading RichContentViewer:', err);
-        return () => <div>Error loading content viewer</div>;
+        const FallbackComponent = () => <div>Error loading content viewer</div>;
+        FallbackComponent.displayName = 'RichContentViewerFallback';
+        return FallbackComponent;
     }),
     {
         ssr: false,
-        loading: () => <RichTextSkeleton />
+        loading: () => {
+            const LoadingComponent = () => <RichTextSkeleton />;
+            LoadingComponent.displayName = 'RichContentViewerLoading';
+            return <LoadingComponent />;
+        }
     }
 );
+
+RichContentViewer.displayName = 'RichContentViewer';
 
 const Comments = dynamic(
     () => import('./Comments').then(mod => mod.Comments),
     {
         ssr: false,
-        loading: () => <CommentsSkeleton />
+        loading: () => {
+            const LoadingComponent = () => <CommentsSkeleton />;
+            LoadingComponent.displayName = 'CommentsLoading';
+            return <LoadingComponent />;
+        }
     }
 );
+
+Comments.displayName = 'DynamicComments';
 
 interface BlogPost {
     _id: string;
@@ -195,10 +209,12 @@ export function BlogPostContent({ blog }: { blog: BlogPost }) {
                                     {blog.author && (
                                         <div className="flex items-center gap-4">
                                             {blog.author.image && (
-                                                <img
+                                                <Image
                                                     src={blog.author.image}
                                                     alt={blog.author.name}
-                                                    className="w-12 h-12 rounded-full object-cover border border-gray-200/50 shadow-sm"
+                                                    width={48}
+                                                    height={48}
+                                                    className="rounded-full object-cover border border-gray-200/50 shadow-sm"
                                                 />
                                             )}
                                             <div>

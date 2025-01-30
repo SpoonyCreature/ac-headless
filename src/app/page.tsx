@@ -86,7 +86,7 @@ export default async function Home() {
                         {blogs.length === 0 ? (
                             <div className="text-center py-8 bg-muted/50 rounded-lg">
                                 <p className="text-base font-medium mb-1">No resources found</p>
-                                <p className="text-sm text-muted-foreground">Please ensure you have created a "Blog/Posts" collection with content.</p>
+                                <p className="text-sm text-muted-foreground">Please ensure you have created a &quot;Blog/Posts&quot; collection with content.</p>
                             </div>
                         ) : (
                             <BlogPosts initialPosts={blogs} />
