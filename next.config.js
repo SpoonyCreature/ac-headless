@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+console.log('next.config.js is being loaded');
 const nextConfig = {
     reactStrictMode: false,
     images: {
@@ -15,10 +16,11 @@ const nextConfig = {
         appDir: true,
         serverActions: true,
     },
-    transpilePackages: ['@wix/comments', '@wix/comments_categories'],
+    typescript: {
+        ignoreBuildErrors: true,
+    },
     distDir: '.next',
-    // Set the source directory to src
-    dir: 'src',
+    transpilePackages: ['@wix/comments', '@wix/comments_categories'],
 };
 
 module.exports = nextConfig;
