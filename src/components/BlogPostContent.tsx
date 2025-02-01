@@ -52,9 +52,14 @@ interface BlogPost {
     };
     slug?: string;
     author?: {
-        name: string;
-        image?: string;
-        bio?: string;
+        _id: string;
+        profilePhoto?: string;
+        title?: string;
+        nickname: string;
+        aboutPlain?: string | null;
+        aboutRich?: any;
+        slug?: string;
+        coverPhoto?: string | null;
     };
     publishedAt?: string;
     readingTime?: string;
@@ -73,19 +78,22 @@ const AuthorCard = ({ author }: { author: BlogPost['author'] }) => {
 
     return (
         <div className="flex items-start gap-6 p-6 rounded-xl bg-white/50">
-            {author.image && (
+            {author.profilePhoto && (
                 <Image
-                    src={author.image}
-                    alt={author.name}
+                    src={author.profilePhoto}
+                    alt={author.nickname}
                     width={56}
                     height={56}
                     className="rounded-full object-cover border border-gray-100 shadow-sm"
                 />
             )}
             <div>
-                <h3 className="font-serif text-lg text-gray-900 mb-1">{author.name}</h3>
-                {author.bio && (
-                    <p className="text-gray-600 text-base leading-relaxed">{author.bio}</p>
+                <h3 className="font-serif text-lg text-gray-900 mb-1">{author.nickname}</h3>
+                {author.title && (
+                    <div className="text-gray-600 text-sm mb-2">{author.title}</div>
+                )}
+                {author.aboutPlain && (
+                    <p className="text-gray-600 text-base leading-relaxed">{author.aboutPlain}</p>
                 )}
             </div>
         </div>
@@ -186,10 +194,10 @@ export function BlogPostContent({ blog }: { blog: BlogPost }) {
                     {/* Author Section */}
                     {blog.author && (
                         <div className="flex items-center gap-4">
-                            {blog.author.image && (
+                            {blog.author.profilePhoto && (
                                 <Image
-                                    src={blog.author.image}
-                                    alt={blog.author.name}
+                                    src={blog.author.profilePhoto}
+                                    alt={blog.author.nickname}
                                     width={48}
                                     height={48}
                                     className="rounded-full object-cover border border-gray-200/50 shadow-sm"
@@ -197,11 +205,16 @@ export function BlogPostContent({ blog }: { blog: BlogPost }) {
                             )}
                             <div>
                                 <div className="font-medium text-gray-900">
-                                    {blog.author.name}
+                                    {blog.author.nickname}
                                 </div>
-                                {blog.author.bio && (
+                                {blog.author.title && (
+                                    <div className="text-sm text-gray-600 mb-2">
+                                        {blog.author.title}
+                                    </div>
+                                )}
+                                {blog.author.aboutPlain && (
                                     <p className="text-sm text-gray-600 line-clamp-1">
-                                        {blog.author.bio}
+                                        {blog.author.aboutPlain}
                                     </p>
                                 )}
                             </div>

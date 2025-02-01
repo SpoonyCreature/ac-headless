@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { WixMediaImage } from './WixMediaImage';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, User } from 'lucide-react';
 
 interface BlogPost {
     _id: string;
@@ -11,6 +11,11 @@ interface BlogPost {
     excerpt?: string;
     content?: string;
     slug?: string;
+    author?: {
+        _id: string;
+        name: string;
+        image?: string;
+    };
 }
 
 export function BlogCard({ blog }: { blog: BlogPost }) {
@@ -36,9 +41,28 @@ export function BlogCard({ blog }: { blog: BlogPost }) {
                     <p className="mb-6 text-base text-muted-foreground line-clamp-3 font-serif leading-relaxed">
                         {blog.excerpt || blog.content?.substring(0, 160)}
                     </p>
-                    <div className="flex items-center text-base font-medium text-primary">
-                        Read article
-                        <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center text-base font-medium text-primary">
+                            Read article
+                            <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                        </div>
+                        {blog.author && (
+                            <div className="flex items-center text-sm text-muted-foreground">
+                                {blog.author.image ? (
+                                    <WixMediaImage
+                                        media={blog.author.image}
+                                        width={24}
+                                        height={24}
+                                        alt={blog.author.name}
+                                        className="h-6 w-6 rounded-full mr-2"
+                                        objectFit="cover"
+                                    />
+                                ) : (
+                                    <User className="h-4 w-4 mr-2" />
+                                )}
+                                <span>{blog.author.name}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </article>

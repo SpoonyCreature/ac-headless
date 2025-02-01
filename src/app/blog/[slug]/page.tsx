@@ -7,7 +7,7 @@ interface BlogPost {
     _id: string;
     title: string;
     coverImage?: string;
-    author?: string;
+    author?: any;
     _createdDate: string;
     richContent?: {
         nodes: any[];
@@ -17,24 +17,6 @@ interface BlogPost {
     slug?: string;
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-    const response = await getServerWixClient().items
-        .query('Blog/Posts')
-        .eq("slug", params.slug)
-        .or(
-            getServerWixClient().items
-                .query('Blog')
-                .eq("_id", params.slug)
-        )
-        .find();
-
-    const blog = response.items[0];
-
-    return {
-        title: blog?.title ? `${blog.title} - Apologetics Central` : 'Blog Post - Apologetics Central',
-        description: blog?.excerpt || blog?.content?.substring(0, 150),
-    };
-}
 
 export default async function BlogPost({ params }: { params: { slug: string } }) {
     const wixClient = getServerWixClient();
@@ -44,6 +26,13 @@ export default async function BlogPost({ params }: { params: { slug: string } })
         .find();
 
     const post = response.items[0] as BlogPost;
+
+
+    const authorResponse = await getServerWixClient().items.query('Members/PublicData').eq('_id', post.author).find();
+    const author = authorResponse.items[0];
+    console.log("AUTHPR", author);
+
+    post.author = author;
 
     if (!post) {
         return (
