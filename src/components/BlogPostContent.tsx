@@ -159,75 +159,73 @@ export function BlogPostContent({ blog }: { blog: BlogPost }) {
 
     return (
         <div className="min-h-screen pb-24">
-            {/* Title Section */}
-            <header className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-                <div className="max-w-4xl py-12">
-                    {/* Meta Information */}
-                    <div className="flex items-center gap-6 text-gray-600 text-sm tracking-wide mb-6">
-                        {blog.publishedAt && (
-                            <time className="flex items-center gap-2 font-medium">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                {new Date(blog.publishedAt).toLocaleDateString('en-US', {
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                })}
-                            </time>
-                        )}
-                        {blog.readingTime && (
-                            <span className="flex items-center gap-2 font-medium">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                {blog.readingTime} min read
-                            </span>
-                        )}
-                    </div>
-
-                    {/* Title */}
-                    <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-gray-900 mb-8 leading-[1.1] tracking-tight">
-                        {blog.title}
-                    </h1>
-
-                    {/* Author Section */}
-                    {blog.author && (
-                        <div className="flex items-center gap-4">
-                            {blog.author.profilePhoto && (
-                                <Image
-                                    src={blog.author.profilePhoto}
-                                    alt={blog.author.nickname}
-                                    width={48}
-                                    height={48}
-                                    className="rounded-full object-cover border border-gray-200/50 shadow-sm"
-                                />
-                            )}
-                            <div>
-                                <div className="font-medium text-gray-900">
-                                    {blog.author.nickname}
-                                </div>
-                                {blog.author.title && (
-                                    <div className="text-sm text-gray-600 mb-2">
-                                        {blog.author.title}
-                                    </div>
-                                )}
-                                {blog.author.aboutPlain && (
-                                    <p className="text-sm text-gray-600 line-clamp-1">
-                                        {blog.author.aboutPlain}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </header>
-
             {/* Content and Sidebar */}
             <div className="container mx-auto px-4">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Main content */}
                     <article className="flex-grow">
+                        {/* Title Section */}
+                        <header className="mb-12">
+                            {/* Meta Information */}
+                            <div className="flex items-center gap-6 text-gray-600 text-sm tracking-wide mb-6">
+                                {blog.publishedAt && (
+                                    <time className="flex items-center gap-2 font-medium">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        {new Date(blog.publishedAt).toLocaleDateString('en-US', {
+                                            month: 'long',
+                                            day: 'numeric',
+                                            year: 'numeric'
+                                        })}
+                                    </time>
+                                )}
+                                {blog.readingTime && (
+                                    <span className="flex items-center gap-2 font-medium">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {blog.readingTime} min read
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Title */}
+                            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 leading-[1.1] tracking-tight">
+                                {blog.title}
+                            </h1>
+
+                            {/* Author Section */}
+                            {blog.author && (
+                                <div className="flex items-center gap-4">
+                                    {blog.author.profilePhoto && (
+                                        <Image
+                                            src={blog.author.profilePhoto}
+                                            alt={blog.author.nickname}
+                                            width={48}
+                                            height={48}
+                                            className="rounded-full object-cover border border-gray-200/50 shadow-sm"
+                                        />
+                                    )}
+                                    <div>
+                                        <div className="font-medium text-gray-900">
+                                            {blog.author.nickname}
+                                        </div>
+                                        {blog.author.title && (
+                                            <div className="text-sm text-gray-600 mb-2">
+                                                {blog.author.title}
+                                            </div>
+                                        )}
+                                        {blog.author.aboutPlain && (
+                                            <p className="text-sm text-gray-600 line-clamp-1">
+                                                {blog.author.aboutPlain}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </header>
+
                         <div className="prose max-w-none">
                             {blog.richContent ? (
                                 <Suspense fallback={<RichTextSkeleton />}>
@@ -244,7 +242,7 @@ export function BlogPostContent({ blog }: { blog: BlogPost }) {
                     </article>
 
                     {/* Sidebar */}
-                    <aside className="w-full lg:w-80 shrink-0">
+                    <aside className="w-full lg:w-80 shrink-0 lg:pt-[13.5rem]">
                         <Sidebar />
                     </aside>
                 </div>
