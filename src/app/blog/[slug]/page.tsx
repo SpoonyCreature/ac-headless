@@ -5,6 +5,7 @@ import { items } from "@wix/data";
 
 interface BlogPost {
     _id: string;
+    uuid: string;
     title: string;
     coverImage?: string;
     author?: any;
@@ -15,6 +16,13 @@ interface BlogPost {
     };
     content?: string;
     slug?: string;
+}
+
+interface Book {
+    title: string;
+    image: string;
+    link: string;
+    displayPrice?: string;
 }
 
 export default async function BlogPost({ params }: { params: { slug: string } }) {
@@ -31,6 +39,17 @@ export default async function BlogPost({ params }: { params: { slug: string } })
 
         const post = response.items[0] as unknown as BlogPost;
 
+        // Fetch associated books
+        const booksData = await wixClient.items
+            .query("PostData")
+            .eq("postId", post.uuid)
+            .find();
+
+        let books: Book[] = [];
+        if (booksData.items.length > 0) {
+            books = booksData.items[0].books || [];
+        }
+
         let author;
         try {
             const authorResponse = await wixClient.items.query('Members/PublicData').eq('_id', post.author).find();
@@ -42,7 +61,10 @@ export default async function BlogPost({ params }: { params: { slug: string } })
 
         post.author = author;
 
-        return <BlogPostContent blog={post} />;
+        console.log(books);
+        console.log(post);
+
+        return <BlogPostContent blog={post} books={books} />;
     } catch (error) {
         console.error('Error loading blog post:', error);
         return (

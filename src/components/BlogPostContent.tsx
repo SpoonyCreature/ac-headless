@@ -2,7 +2,7 @@
 
 import { WixMediaImage } from './WixMediaImage';
 import dynamic from 'next/dynamic';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { RichTextSkeleton, CommentsSkeleton } from './Skeletons';
 import { WIX_SESSION_COOKIE_NAME } from '../constants/constants';
 import Image from 'next/image';
@@ -65,6 +65,13 @@ interface BlogPost {
     readingTime?: string;
 }
 
+interface Book {
+    title: string;
+    image: string;
+    link: string;
+    displayPrice?: string;
+}
+
 const ShareButton = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
     <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
         {icon}
@@ -101,8 +108,98 @@ const AuthorCard = ({ author }: { author: BlogPost['author'] }) => {
 };
 AuthorCard.displayName = 'AuthorCard';
 
-const Sidebar = () => (
+const BookRecommendations = ({ books }: { books: Book[] }) => {
+    const handleBookClick = useCallback((title: string) => {
+        // You might want to add analytics here
+        console.log('Book clicked:', title);
+    }, []);
+
+    if (!books || books.length === 0) return null;
+
+    return (
+        <div className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-100 p-6 rounded-xl mb-6 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+                <h3 className="font-serif text-xl text-gray-900">Deepen Your Knowledge</h3>
+                <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full">Recommended</span>
+            </div>
+            <p className="text-gray-600 text-sm mb-4">
+                Hand-picked resources to master this topic
+            </p>
+            <div className="space-y-5">
+                {books.map((book, index) => (
+                    <div
+                        key={index}
+                        className="group relative bg-white p-4 rounded-lg border border-gray-100 transition-all duration-300 hover:shadow-md hover:border-blue-100"
+                    >
+                        <a
+                            href={book.link}
+                            onClick={() => handleBookClick(book.title)}
+                            className="block"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <div className="flex flex-col">
+                                {/* Book Cover */}
+                                <div className="mx-auto w-32 h-44 relative mb-4 overflow-hidden rounded-lg shadow-sm transition-transform group-hover:scale-105 bg-gradient-to-b from-gray-50 to-white">
+                                    <WixMediaImage
+                                        media={book.image}
+                                        width={128}
+                                        height={176}
+                                        className="object-cover"
+                                        objectFit="cover"
+                                    />
+                                </div>
+
+                                {/* Book Details */}
+                                <div className="text-center">
+                                    {index === 0 && (
+                                        <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">
+                                            Most Popular
+                                        </span>
+                                    )}
+                                    <h4 className="text-gray-900 font-medium group-hover:text-gray-700 transition-colors mb-2">
+                                        {book.title}
+                                    </h4>
+                                    <div className="flex items-center justify-center gap-2 mb-3">
+                                        {book.displayPrice && (
+                                            <span className="text-sm font-semibold text-gray-900">
+                                                {book.displayPrice}
+                                            </span>
+                                        )}
+                                        <span className="flex items-center text-xs text-amber-600 font-medium">
+                                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zm0 16a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                                            </svg>
+                                            Limited Time Offer
+                                        </span>
+                                    </div>
+                                    <button className="w-full bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center group-hover:bg-gray-800">
+                                        Get This Book
+                                        <svg className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                ))}
+            </div>
+            <div className="mt-4 pt-3 border-t border-gray-100">
+                <p className="text-xs text-gray-500 flex items-center">
+                    <svg className="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Curated to complement this article
+                </p>
+            </div>
+        </div>
+    );
+};
+
+const Sidebar = ({ books }: { books: Book[] }) => (
     <aside className="space-y-6 sticky top-8">
+        <BookRecommendations books={books} />
         {/* Newsletter Subscription */}
         <div className="bg-white/50 border border-gray-100 p-6 rounded-xl">
             <h3 className="font-serif text-xl mb-3 text-gray-900">Subscribe to My Newsletter</h3>
@@ -145,7 +242,7 @@ const Sidebar = () => (
 );
 Sidebar.displayName = 'Sidebar';
 
-export function BlogPostContent({ blog }: { blog: BlogPost }) {
+export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: Book[] }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
@@ -243,7 +340,7 @@ export function BlogPostContent({ blog }: { blog: BlogPost }) {
 
                     {/* Sidebar */}
                     <aside className="w-full lg:w-80 shrink-0 lg:pt-[13.5rem]">
-                        <Sidebar />
+                        <Sidebar books={books} />
                     </aside>
                 </div>
             </div>
