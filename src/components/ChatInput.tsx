@@ -1,5 +1,5 @@
-import { Send } from 'lucide-react';
-import { FormEvent, useRef, useState } from 'react';
+import { Send, Loader2, Sparkles } from 'lucide-react';
+import { FormEvent, useRef, useState, useEffect } from 'react';
 import { LoginButton } from './LoginButton';
 
 interface ChatInputProps {
@@ -11,6 +11,23 @@ interface ChatInputProps {
 export function ChatInput({ onSend, disabled, isAuthenticated }: ChatInputProps) {
     const [message, setMessage] = useState('');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Update textarea height whenever content changes
+    useEffect(() => {
+        adjustTextareaHeight();
+    }, [message]);
+
+    const adjustTextareaHeight = () => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            // Reset height to min to get accurate scrollHeight
+            textarea.style.height = 'auto';
+            // Set new height based on content (min 48px, max 200px)
+            const newHeight = Math.max(48, Math.min(textarea.scrollHeight, 200));
+            textarea.style.height = `${newHeight}px`;
+        }
+    };
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -20,8 +37,9 @@ export function ChatInput({ onSend, disabled, isAuthenticated }: ChatInputProps)
             try {
                 onSend(trimmedMessage);
                 setMessage('');
+                // Reset height after sending
                 if (textareaRef.current) {
-                    textareaRef.current.style.height = 'auto';
+                    textareaRef.current.style.height = '48px';
                 }
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -36,51 +54,64 @@ export function ChatInput({ onSend, disabled, isAuthenticated }: ChatInputProps)
         }
     };
 
-    const handleInput = () => {
-        const textarea = textareaRef.current;
-        if (textarea) {
-            textarea.style.height = 'auto';
-            const newHeight = Math.min(textarea.scrollHeight, 200);
-            textarea.style.height = `${newHeight}px`;
-        }
-    };
-
     if (!isAuthenticated) {
         return (
-            <div className="rounded-lg bg-muted/30 border border-border/50 text-center p-4">
-                <p className="text-sm text-muted-foreground mb-4">
-                    Sign in to start a conversation
-                </p>
+            <div className="rounded-2xl bg-muted/50 border border-border/50 text-center p-6">
+                <div className="flex items-center justify-center mb-4">
+                    <Sparkles className="w-5 h-5 mr-2 text-primary" />
+                    <p className="text-sm font-medium">
+                        Sign in to start chatting
+                    </p>
+                </div>
                 <LoginButton />
             </div>
         );
     }
 
     return (
-        <form onSubmit={handleSubmit} className="relative">
-            <div className="relative">
-                <textarea
-                    ref={textareaRef}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onInput={handleInput}
-                    placeholder="Type a message..."
-                    className="w-full min-h-[56px] max-h-[200px] p-4 pr-12 rounded-lg bg-background border border-border/50 resize-none focus:outline-none focus:border-border focus:ring-2 focus:ring-primary/10 placeholder:text-muted-foreground/60"
-                    disabled={disabled}
-                    rows={1}
-                />
-                <button
-                    type="submit"
-                    disabled={!message.trim() || disabled}
-                    className="absolute right-2 bottom-[10px] p-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                    <Send className="w-5 h-5" />
-                </button>
+        <div className="relative" ref={containerRef}>
+            <form onSubmit={handleSubmit}>
+                <div className="relative">
+                    <textarea
+                        ref={textareaRef}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Type a message..."
+                        className="w-full min-h-[48px] max-h-[200px] px-4 py-[14px] pr-12
+                            resize-none overflow-y-auto
+                            bg-background rounded-[24px]
+                            border border-border/50 
+                            placeholder:text-muted-foreground/50
+                            focus:outline-none focus:border-border
+                            disabled:opacity-50 disabled:cursor-not-allowed
+                            scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
+                        disabled={disabled}
+                        rows={1}
+                        style={{
+                            lineHeight: '20px',
+                        }}
+                    />
+                    <button
+                        type="submit"
+                        disabled={!message.trim() || disabled}
+                        className="absolute right-3 top-1/2 -translate-y-1/2
+                            p-1.5 rounded-full
+                            text-muted-foreground/50 hover:text-muted-foreground
+                            disabled:opacity-50 disabled:cursor-not-allowed 
+                            transition-colors"
+                    >
+                        {disabled ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                            <Send className="w-5 h-5" />
+                        )}
+                    </button>
+                </div>
+            </form>
+            <div className="mt-2 text-xs text-center text-muted-foreground/50">
+                Press Enter to send • Shift + Enter for new line
             </div>
-            <div className="mt-2 text-xs text-center text-muted-foreground">
-                Press Enter to send, Shift + Enter for new line
-            </div>
-        </form>
+        </div>
     );
 } 

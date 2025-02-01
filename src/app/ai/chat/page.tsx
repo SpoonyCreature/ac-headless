@@ -6,6 +6,8 @@ import { ChatMessage } from '@/src/components/ChatMessage';
 import { ChatInput } from '@/src/components/ChatInput';
 import { Chat as ChatType } from '@/src/types/chat';
 import { useRouter } from 'next/navigation';
+import { LoadingMessage } from '@/src/components/LoadingMessage';
+import { Menu, X } from 'lucide-react';
 
 interface Message {
     _id: string;
@@ -25,9 +27,16 @@ export default function ChatPage() {
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        fetchCurrentUser();
+        const init = async () => {
+            await fetchCurrentUser();
+            setIsInitialLoad(false);
+        };
+        init();
     }, []);
 
     useEffect(() => {
@@ -58,8 +67,17 @@ export default function ChatPage() {
     }, [isAuthenticated]);
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+            if (window.innerWidth < 768) {
+                setIsSidebarOpen(false);
+            }
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const fetchCurrentUser = async () => {
         try {
@@ -99,10 +117,6 @@ export default function ChatPage() {
         } catch (error) {
             console.error('Error fetching private chats:', error);
         }
-    };
-
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleSend = async (message: string) => {
@@ -182,30 +196,78 @@ export default function ChatPage() {
 
     return (
         <div className="flex h-screen bg-background">
-            <ChatSidebar
-                privateChats={privateChats}
-                publicChats={publicChats}
-                currentChatId={undefined}
-                currentUserId={currentUserId}
-            />
-            <div className="flex-1 flex flex-col min-h-0">
-                <div className="flex-1 overflow-y-auto pb-[140px]">
-                    <div className="max-w-3xl mx-auto px-4">
-                        {messages.map((message) => (
-                            <ChatMessage
-                                key={message._id}
-                                message={message}
+            {/* Mobile Menu Button */}
+            <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="md:hidden fixed top-20 left-4 z-30 p-2 bg-background/80 backdrop-blur-sm border border-border/50 rounded-lg hover:bg-muted/50 transition-colors"
+            >
+                {isSidebarOpen ? (
+                    <X className="w-5 h-5" />
+                ) : (
+                    <Menu className="w-5 h-5" />
+                )}
+            </button>
+
+            {/* Sidebar with overlay for mobile */}
+            <div className={`
+                fixed inset-y-16 bg-background/80 backdrop-blur-sm z-20
+                transition-opacity duration-200
+                md:hidden
+                ${isSidebarOpen ? 'opacity-100 inset-x-0' : 'opacity-0 pointer-events-none'}
+            `} onClick={() => setIsSidebarOpen(false)} />
+
+            {/* Sidebar */}
+            <aside className={`
+                fixed md:sticky top-16 md:top-0 left-0 z-30
+                h-[calc(100vh-4rem)] md:h-screen
+                w-80 shrink-0
+                bg-background border-r border-border/50
+                transition-transform duration-200
+                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                md:translate-x-0
+            `}>
+                <ChatSidebar
+                    privateChats={privateChats}
+                    publicChats={publicChats}
+                    currentChatId={undefined}
+                    currentUserId={currentUserId}
+                />
+            </aside>
+
+            {/* Main Content */}
+            <main className="flex-1 relative w-full min-w-0">
+                <div className="absolute inset-0 flex flex-col pt-16 md:pt-0">
+                    <div className="flex-1 overflow-y-auto">
+                        <div className="max-w-3xl mx-auto px-4 py-6 md:py-8">
+                            {isInitialLoad ? (
+                                <div className="space-y-4">
+                                    <LoadingMessage />
+                                </div>
+                            ) : (
+                                <>
+                                    {messages.map((message) => (
+                                        <ChatMessage
+                                            key={message._id}
+                                            message={message}
+                                        />
+                                    ))}
+                                    {isLoading && <LoadingMessage />}
+                                </>
+                            )}
+                            <div ref={messagesEndRef} className="h-4" />
+                        </div>
+                    </div>
+                    <div className="flex-shrink-0 bg-gradient-to-t from-background via-background to-background/0 pt-6 pb-8">
+                        <div className="max-w-3xl mx-auto px-4">
+                            <ChatInput
+                                onSend={handleSend}
+                                disabled={isLoading || isInitialLoad}
+                                isAuthenticated={isAuthenticated}
                             />
-                        ))}
-                        <div ref={messagesEndRef} />
+                        </div>
                     </div>
                 </div>
-                <div className="fixed bottom-0 left-80 right-0 bg-gradient-to-t from-background via-background to-background/0 pt-6 pb-8">
-                    <div className="max-w-3xl mx-auto px-4">
-                        <ChatInput onSend={handleSend} disabled={isLoading} isAuthenticated={isAuthenticated} />
-                    </div>
-                </div>
-            </div>
+            </main>
         </div>
     );
 } 
