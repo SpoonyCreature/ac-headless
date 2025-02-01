@@ -152,12 +152,10 @@ export async function POST(request: NextRequest) {
 
                     if (items.length > 0) {
                         const existingThread = items[0];
-                        console.log('Found existing thread:', {
-                            id: existingThread._id,
-                            messageCount: existingThread.thread?.length
-                        });
                         await wixClient.items.update('gptthread', {
-                            _id: threadId,
+                            _id: existingThread._id,
+                            question: existingThread.question,
+                            personality: existingThread.personality,
                             thread: [...(existingThread.thread || []), userMessage, assistantMessage]
                         });
                         console.log('Thread updated successfully');
