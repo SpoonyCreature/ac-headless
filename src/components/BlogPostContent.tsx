@@ -142,169 +142,98 @@ export function BlogPostContent({ blog }: { blog: BlogPost }) {
 
     useEffect(() => {
         const checkAuth = async () => {
-            try {
-                const response = await fetch('/api/auth/me');
-                const data = await response.json();
-                setIsAuthenticated(!!data.user);
-            } catch (error) {
-                console.error('Error checking auth status:', error);
-                setIsAuthenticated(false);
-            }
+            const cookies = document.cookie.split(';');
+            const hasWixSession = cookies.some(cookie => cookie.trim().startsWith(WIX_SESSION_COOKIE_NAME + '='));
+            setIsAuthenticated(hasWixSession);
         };
-
         checkAuth();
     }, []);
 
     return (
-        <div className="min-h-screen pb-24 overflow-x-hidden">
-            {/* Hero Section */}
-            <div className="relative h-[85vh] min-h-[600px] w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] -mt-[calc(var(--navbar-height,0px))]">
-                {blog.coverImage && (
-                    <>
-                        <div className="absolute inset-0">
-                            <WixMediaImage
-                                media={blog.coverImage}
-                                width={2000}
-                                height={1000}
-                                alt={blog.title}
-                                className="w-full h-full object-cover"
-                                objectFit="cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-white"></div>
-                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/80 to-white"></div>
-                        </div>
-                        <div className="absolute inset-0 flex items-end">
-                            <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-                                <div className="max-w-4xl">
-                                    {/* Meta Information */}
-                                    <div className="flex items-center gap-6 text-gray-600 text-sm tracking-wide mb-6">
-                                        {blog.publishedAt && (
-                                            <time className="flex items-center gap-2 font-medium">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                                {new Date(blog.publishedAt).toLocaleDateString('en-US', {
-                                                    month: 'long',
-                                                    day: 'numeric',
-                                                    year: 'numeric'
-                                                })}
-                                            </time>
-                                        )}
-                                        {blog.readingTime && (
-                                            <span className="flex items-center gap-2 font-medium">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                {blog.readingTime} min read
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* Title */}
-                                    <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-gray-900 mb-8 leading-[1.1] tracking-tight">
-                                        {blog.title}
-                                    </h1>
-
-                                    {/* Author Section */}
-                                    {blog.author && (
-                                        <div className="flex items-center gap-4">
-                                            {blog.author.image && (
-                                                <Image
-                                                    src={blog.author.image}
-                                                    alt={blog.author.name}
-                                                    width={48}
-                                                    height={48}
-                                                    className="rounded-full object-cover border border-gray-200/50 shadow-sm"
-                                                />
-                                            )}
-                                            <div>
-                                                <div className="font-medium text-gray-900">
-                                                    {blog.author.name}
-                                                </div>
-                                                {blog.author.bio && (
-                                                    <p className="text-sm text-gray-600 line-clamp-1">
-                                                        {blog.author.bio}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
-
-            {/* Content Section with paper-like background */}
-            <div className="relative -mt-16 bg-white pb-16 pt-16">
-                <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                        <div className="lg:col-span-2">
-                            {/* Social Share Buttons */}
-                            <div className="flex items-center gap-4 mb-12 pb-8 border-b border-gray-200/80">
-                                <ShareButton
-                                    icon={
-                                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                                        </svg>
-                                    }
-                                    label="Share on X"
-                                />
-                                <ShareButton
-                                    icon={
-                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                                        </svg>
-                                    }
-                                    label="Share on Facebook"
-                                />
-                                <ShareButton
-                                    icon={
-                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                                        </svg>
-                                    }
-                                    label="Share on LinkedIn"
-                                />
-                            </div>
-
-                            {/* Article Content */}
-                            <article className="prose prose-xl max-w-none">
-                                <Suspense fallback={<RichTextSkeleton />}>
-                                    {blog.richContent ? (
-                                        <RichContentViewer content={blog.richContent} />
-                                    ) : blog.content ? (
-                                        <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-                                    ) : (
-                                        <p>No content available</p>
-                                    )}
-                                </Suspense>
-                            </article>
-
-                            {/* Author Card - Bottom */}
-                            {blog.author && (
-                                <div className="mb-16">
-                                    <AuthorCard author={blog.author} />
-                                </div>
-                            )}
-
-                            {/* Comments Section */}
-                            <div className="border-t border-gray-100 pt-12">
-                                <Suspense fallback={<CommentsSkeleton />}>
-                                    <Comments
-                                        contextId={blog._id}
-                                        resourceId={blog._id}
-                                        isAuthenticated={isAuthenticated}
-                                    />
-                                </Suspense>
-                            </div>
-                        </div>
-
-                        <div className="lg:col-span-1">
-                            <Sidebar />
-                        </div>
+        <div className="min-h-screen pb-24">
+            {/* Title Section */}
+            <header className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+                <div className="max-w-4xl py-12">
+                    {/* Meta Information */}
+                    <div className="flex items-center gap-6 text-gray-600 text-sm tracking-wide mb-6">
+                        {blog.publishedAt && (
+                            <time className="flex items-center gap-2 font-medium">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                {new Date(blog.publishedAt).toLocaleDateString('en-US', {
+                                    month: 'long',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                })}
+                            </time>
+                        )}
+                        {blog.readingTime && (
+                            <span className="flex items-center gap-2 font-medium">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {blog.readingTime} min read
+                            </span>
+                        )}
                     </div>
+
+                    {/* Title */}
+                    <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-gray-900 mb-8 leading-[1.1] tracking-tight">
+                        {blog.title}
+                    </h1>
+
+                    {/* Author Section */}
+                    {blog.author && (
+                        <div className="flex items-center gap-4">
+                            {blog.author.image && (
+                                <Image
+                                    src={blog.author.image}
+                                    alt={blog.author.name}
+                                    width={48}
+                                    height={48}
+                                    className="rounded-full object-cover border border-gray-200/50 shadow-sm"
+                                />
+                            )}
+                            <div>
+                                <div className="font-medium text-gray-900">
+                                    {blog.author.name}
+                                </div>
+                                {blog.author.bio && (
+                                    <p className="text-sm text-gray-600 line-clamp-1">
+                                        {blog.author.bio}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </header>
+
+            {/* Content and Sidebar */}
+            <div className="container mx-auto px-4">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Main content */}
+                    <article className="flex-grow">
+                        <div className="prose max-w-none">
+                            {blog.richContent ? (
+                                <Suspense fallback={<RichTextSkeleton />}>
+                                    <RichContentViewer content={blog.richContent} />
+                                </Suspense>
+                            ) : (
+                                <div dangerouslySetInnerHTML={{ __html: blog.content || '' }} />
+                            )}
+                        </div>
+
+                        <Suspense fallback={<CommentsSkeleton />}>
+                            <Comments contextId={blog._id} resourceId={blog._id} isAuthenticated={isAuthenticated} />
+                        </Suspense>
+                    </article>
+
+                    {/* Sidebar */}
+                    <aside className="w-full lg:w-80 shrink-0">
+                        <Sidebar />
+                    </aside>
                 </div>
             </div>
         </div>
