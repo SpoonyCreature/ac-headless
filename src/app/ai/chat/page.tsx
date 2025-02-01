@@ -256,14 +256,15 @@ export default function ChatPage() {
                             )}
                             <div ref={messagesEndRef} className="h-4" />
                         </div>
-                    </div>
-                    <div className="flex-shrink-0 bg-gradient-to-t from-background via-background to-background/0 pt-6 pb-8">
-                        <div className="max-w-3xl mx-auto px-4">
-                            <ChatInput
-                                onSend={handleSend}
-                                disabled={isLoading || isInitialLoad}
-                                isAuthenticated={isAuthenticated}
-                            />
+                        {/* Input container that becomes relative at the bottom */}
+                        <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/95 to-transparent pt-6 pb-6">
+                            <div className="max-w-3xl mx-auto px-4">
+                                <ChatInput
+                                    onSend={handleSend}
+                                    disabled={isLoading || isInitialLoad}
+                                    isAuthenticated={isAuthenticated}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -8,19 +8,27 @@ import { comments } from "@wix/comments";
 export function getServerWixClient() {
     const wixSessionCookie = cookies().get(WIX_SESSION_COOKIE_NAME);
     let visitorCookie;
+    let tokens;
 
     if (!wixSessionCookie) {
         visitorCookie = cookies().get("session");
     }
 
+    try {
+        if (wixSessionCookie && wixSessionCookie.value) {
+            tokens = JSON.parse(wixSessionCookie.value);
+        } else if (visitorCookie && visitorCookie.value) {
+            tokens = JSON.parse(visitorCookie.value);
+        }
+    } catch (error) {
+        console.error('Error parsing session cookie:', error);
+        tokens = undefined;
+    }
+
     return createClient({
         auth: OAuthStrategy({
             clientId: process.env.NEXT_PUBLIC_WIX_CLIENT_ID!,
-            tokens: wixSessionCookie && wixSessionCookie.value
-                ? JSON.parse(wixSessionCookie.value)
-                : (visitorCookie && visitorCookie.value
-                    ? JSON.parse(visitorCookie.value)
-                    : undefined),
+            tokens,
         }),
         modules: {
             members,

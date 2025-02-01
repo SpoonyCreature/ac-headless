@@ -17,8 +17,9 @@ const nextConfig = {
         return config;
     },
     experimental: {
-        appDir: true,
-        serverActions: true,
+        serverActions: {
+            bodySizeLimit: '2mb'
+        }
     },
     typescript: {
         ignoreBuildErrors: true,

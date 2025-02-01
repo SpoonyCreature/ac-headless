@@ -1,5 +1,6 @@
 import { ChatMessage as ChatMessageType } from '@/src/types/chat';
 import { User, Bot } from 'lucide-react';
+import { cn } from '@/src/lib/utils';
 
 interface ChatMessageProps {
     message: ChatMessageType;
@@ -9,33 +10,55 @@ export function ChatMessage({ message }: ChatMessageProps) {
     const isUser = message.role === 'user';
 
     return (
-        <div className={`group relative flex gap-4 p-6 transition-colors ${isUser ? 'bg-muted/30' : 'bg-background hover:bg-muted/10'}`}>
-            <div className="flex-shrink-0">
+        <div className={cn(
+            "group relative flex gap-3 px-4 py-3",
+            isUser ? "flex-row-reverse" : "flex-row"
+        )}>
+            {/* Avatar */}
+            <div className="flex-shrink-0 mt-1">
                 {isUser ? (
-                    <div className="w-9 h-9 rounded-full bg-primary/10 ring-1 ring-primary/25 flex items-center justify-center text-primary shadow-sm">
-                        <User className="w-5 h-5" />
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/80 ring-4 ring-primary/10 flex items-center justify-center text-primary-foreground shadow-lg">
+                        <User className="w-4 h-4" />
                     </div>
                 ) : (
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 ring-1 ring-primary/25 flex items-center justify-center shadow-sm">
-                        <Bot className="w-5 h-5 text-primary" />
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 ring-4 ring-background flex items-center justify-center shadow-lg">
+                        <Bot className="w-4 h-4 text-primary" />
                     </div>
                 )}
             </div>
-            <div className="flex-1 space-y-2.5 min-w-0">
-                <div className="flex justify-between items-center">
-                    <div className="font-medium text-sm text-foreground/90">
+
+            {/* Message Content */}
+            <div className={cn(
+                "flex flex-col gap-1 max-w-[85%] md:max-w-[75%]",
+                isUser ? "items-end" : "items-start"
+            )}>
+                {/* Name and Time */}
+                <div className={cn(
+                    "flex gap-2 items-center text-xs",
+                    isUser ? "flex-row-reverse" : "flex-row"
+                )}>
+                    <span className="font-medium text-foreground/80">
                         {isUser ? 'You' : 'Assistant'}
-                    </div>
-                    <div className="text-[11px] font-medium text-muted-foreground/60">
+                    </span>
+                    <span className="text-muted-foreground/50">
                         {message.time}
+                    </span>
+                </div>
+
+                {/* Message Bubble */}
+                <div className={cn(
+                    "rounded-2xl px-4 py-2 shadow-sm",
+                    isUser ?
+                        "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground" :
+                        "bg-gradient-to-br from-muted/80 to-muted border border-border/50 text-foreground"
+                )}>
+                    <div className={cn(
+                        "prose prose-sm max-w-none",
+                        isUser ? "prose-invert" : ""
+                    )}>
+                        {message.text}
                     </div>
                 </div>
-                <div className={`prose prose-sm max-w-none ${isUser ? 'text-foreground/90' : 'text-foreground'}`}>
-                    {message.text}
-                </div>
-            </div>
-            <div className="absolute left-0 w-1 top-0 bottom-0 transition-opacity opacity-0 group-hover:opacity-100">
-                <div className={`w-full h-full ${isUser ? 'bg-primary/20' : 'bg-primary/30'}`} />
             </div>
         </div>
     );

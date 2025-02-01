@@ -56,7 +56,7 @@ export function ChatInput({ onSend, disabled, isAuthenticated }: ChatInputProps)
 
     if (!isAuthenticated) {
         return (
-            <div className="rounded-2xl bg-muted/50 border border-border/50 text-center p-6">
+            <div className="rounded-2xl bg-muted/50 border border-border/50 text-center p-6 backdrop-blur-sm">
                 <div className="flex items-center justify-center mb-4">
                     <Sparkles className="w-5 h-5 mr-2 text-primary" />
                     <p className="text-sm font-medium">
@@ -69,7 +69,7 @@ export function ChatInput({ onSend, disabled, isAuthenticated }: ChatInputProps)
     }
 
     return (
-        <div className="relative" ref={containerRef}>
+        <div className="relative backdrop-blur-sm" ref={containerRef}>
             <form onSubmit={handleSubmit}>
                 <div className="relative">
                     <textarea
@@ -80,10 +80,10 @@ export function ChatInput({ onSend, disabled, isAuthenticated }: ChatInputProps)
                         placeholder="Type a message..."
                         className="w-full min-h-[48px] max-h-[200px] px-4 py-[14px] pr-12
                             resize-none overflow-y-auto
-                            bg-background rounded-[24px]
-                            border border-border/50 
+                            bg-background/95 rounded-[24px]
+                            border border-border/50 shadow-lg
                             placeholder:text-muted-foreground/50
-                            focus:outline-none focus:border-border
+                            focus:outline-none focus:border-border focus:ring-2 focus:ring-primary/10
                             disabled:opacity-50 disabled:cursor-not-allowed
                             scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
                         disabled={disabled}
@@ -97,7 +97,7 @@ export function ChatInput({ onSend, disabled, isAuthenticated }: ChatInputProps)
                         disabled={!message.trim() || disabled}
                         className="absolute right-3 top-1/2 -translate-y-1/2
                             p-1.5 rounded-full
-                            text-muted-foreground/50 hover:text-muted-foreground
+                            text-muted-foreground hover:text-primary
                             disabled:opacity-50 disabled:cursor-not-allowed 
                             transition-colors"
                     >
@@ -109,7 +109,7 @@ export function ChatInput({ onSend, disabled, isAuthenticated }: ChatInputProps)
                     </button>
                 </div>
             </form>
-            <div className="mt-2 text-xs text-center text-muted-foreground/50">
+            <div className="mt-2 text-xs text-center text-muted-foreground/70">
                 Press Enter to send • Shift + Enter for new line
             </div>
         </div>
