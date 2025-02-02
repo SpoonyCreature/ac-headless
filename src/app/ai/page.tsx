@@ -6,7 +6,7 @@ export default function AIPage() {
             <div className="container mx-auto px-4">
                 <div className="max-w-3xl mx-auto text-center">
                     <Bot className="w-16 h-16 text-primary mx-auto mb-8" />
-                    <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6">Christian AI Q&A</h1>
+                    <h1 className="font-serif text-4xl md:text-5xl mb-6">Christian AI Q&A</h1>
                     <p className="text-xl text-muted-foreground mb-8 font-serif leading-relaxed">
                         Coming soon: An AI-powered assistant trained in Reformed Presuppositional Apologetics to help answer your questions about the Christian faith.
                     </p>

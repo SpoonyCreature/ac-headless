@@ -5,7 +5,7 @@ export default function NotFound() {
         <div className="min-h-screen bg-[url('/paper-texture.png')] bg-repeat py-16 md:py-24">
             <div className="container mx-auto px-4">
                 <div className="max-w-xl mx-auto text-center">
-                    <h1 className="font-serif text-4xl font-bold mb-6">Article Not Found</h1>
+                    <h1 className="font-serif text-4xl mb-6">Article Not Found</h1>
                     <p className="text-lg text-muted-foreground mb-8 font-serif leading-relaxed">
                         The article you&apos;re looking for doesn&apos;t exist or has been removed.
                     </p>

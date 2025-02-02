@@ -79,7 +79,7 @@ export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
         <div className="space-y-16">
             {/* Regular Posts Section */}
             <div>
-                <h2 className="font-serif text-3xl font-bold mb-8">Articles</h2>
+                <h2 className="font-serif text-3xl  mb-8">Articles</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
                     {regularPosts.map((post) => (
                         <BlogCard key={post._id} blog={post} />
@@ -102,7 +102,7 @@ export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
 
             {/* Nuggets Section */}
             <div>
-                <h2 className="font-serif text-3xl font-bold mb-8">Nuggets</h2>
+                <h2 className="font-serif text-3xl  mb-8">Nuggets</h2>
                 <div className="grid grid-cols-1 gap-4 mb-8">
                     {nuggets.map((nugget) => (
                         <NuggetCard key={nugget._id} blog={nugget} />

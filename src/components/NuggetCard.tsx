@@ -31,7 +31,7 @@ export function NuggetCard({ blog }: { blog: BlogPost }) {
                         />
                     </div>
                     <div className="flex-1">
-                        <h3 className="mb-2 text-lg font-serif font-bold tracking-tight group-hover:text-primary transition-colors">
+                        <h3 className="mb-2 text-lg font-serif  tracking-tight group-hover:text-primary transition-colors">
                             {blog.title}
                         </h3>
                         <p className="mb-4 text-sm text-muted-foreground line-clamp-2 font-serif leading-relaxed">

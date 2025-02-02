@@ -8,7 +8,7 @@ export default function AboutPage() {
             <section className="py-16 md:py-24">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto">
-                        <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6 tracking-tight">About Apologetics Central</h1>
+                        <h1 className="font-serif text-4xl md:text-5xl mb-6 tracking-tight">About Apologetics Central</h1>
                         <p className="text-xl md:text-2xl text-muted-foreground font-serif leading-relaxed">
                             Founded in April 2014 in Pretoria, South Africa, we equip Christians with the tools necessary to defend their faith in Jesus when confronted with difficult questions.
                         </p>
@@ -20,7 +20,7 @@ export default function AboutPage() {
             <section className="py-16 bg-muted/20">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="font-serif text-3xl font-bold mb-6 tracking-tight">What We Believe</h2>
+                        <h2 className="font-serif text-3xl mb-6 tracking-tight">What We Believe</h2>
                         <div className="space-y-6 text-lg leading-relaxed">
                             <p className="text-muted-foreground">
                                 Officially, Apologetics Central holds the same confessions as the GKSA (Reformed Churches in South Africa). This includes the three forms of unity:
@@ -42,7 +42,7 @@ export default function AboutPage() {
             <section className="py-16">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto">
-                        <h2 className="font-serif text-3xl font-bold mb-6 tracking-tight">You Have Questions. The Bible Has Answers.</h2>
+                        <h2 className="font-serif text-3xl mb-6 tracking-tight">You Have Questions. The Bible Has Answers.</h2>
                         <div className="space-y-12">
                             <div className="space-y-6 text-lg leading-relaxed">
                                 <p className="text-muted-foreground">
@@ -79,7 +79,7 @@ export default function AboutPage() {
             <section className="py-16 bg-muted/20">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center">
-                        <h2 className="font-serif text-3xl font-bold mb-4 tracking-tight">Get in Touch</h2>
+                        <h2 className="font-serif text-3xl mb-4 tracking-tight">Get in Touch</h2>
                         <p className="text-xl text-muted-foreground mb-8 font-serif leading-relaxed max-w-2xl mx-auto">
                             Have questions or want to learn more? We&apos;d love to hear from you.
                         </p>

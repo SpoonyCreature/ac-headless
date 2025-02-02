@@ -3,7 +3,7 @@ export default function PrivacyPage() {
         <main className="min-h-screen bg-[url('/paper-texture.png')] bg-repeat py-16 md:py-24">
             <div className="container mx-auto px-4">
                 <div className="max-w-3xl mx-auto">
-                    <h1 className="font-serif text-4xl md:text-5xl font-bold mb-8 tracking-tight">Privacy Policy & Terms</h1>
+                    <h1 className="font-serif text-4xl md:text-5xl  mb-8 tracking-tight">Privacy Policy & Terms</h1>
                     <div className="space-y-12">
                         <div>
                             <p className="text-xl text-muted-foreground leading-relaxed">
@@ -13,7 +13,7 @@ export default function PrivacyPage() {
 
                         <div className="space-y-8">
                             <div className="space-y-6">
-                                <h2 className="font-serif text-3xl font-bold tracking-tight">Privacy Policy</h2>
+                                <h2 className="font-serif text-3xl  tracking-tight">Privacy Policy</h2>
                                 <p className="text-lg text-muted-foreground leading-relaxed">
                                     If you choose to use our Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that we collect is used for providing and improving the Service. We will not use or share your information with anyone except as described in this Privacy Policy.
                                 </p>
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
 
                         <div className="space-y-8">
                             <div className="space-y-6">
-                                <h2 className="font-serif text-3xl font-bold tracking-tight">Terms of Service</h2>
+                                <h2 className="font-serif text-3xl  tracking-tight">Terms of Service</h2>
                             </div>
 
                             <div className="space-y-4">

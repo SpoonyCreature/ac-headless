@@ -35,7 +35,7 @@ export function BlogCard({ blog }: { blog: BlogPost }) {
                     />
                 </div>
                 <div className="p-8">
-                    <h3 className="mb-4 text-2xl font-serif font-bold tracking-tight group-hover:text-primary transition-colors">
+                    <h3 className="mb-4 text-2xl font-serif  tracking-tight group-hover:text-primary transition-colors">
                         {blog.title}
                     </h3>
                     <p className="mb-6 text-base text-muted-foreground line-clamp-3 font-serif leading-relaxed">

@@ -26,7 +26,7 @@ export default async function BlogPage() {
             <div className="container mx-auto px-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="max-w-2xl">
-                        <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6">Articles & Insights</h1>
+                        <h1 className="font-serif text-4xl md:text-5xl mb-6">Articles & Insights</h1>
                         <p className="text-lg text-muted-foreground mb-12 font-serif leading-relaxed">
                             Explore our collection of articles on Reformed Presuppositional Apologetics, biblical wisdom, and Christian thought.
                         </p>

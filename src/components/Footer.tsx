@@ -33,7 +33,7 @@ export function Footer() {
                 <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
                     {/* About Section */}
                     <div className="flex flex-col space-y-4">
-                        <h3 className="font-serif text-lg font-bold">Apologetics Central</h3>
+                        <h3 className="font-serif text-lg ">Apologetics Central</h3>
                         <p className="text-sm text-muted-foreground leading-relaxed">
                             Dedicated to equipping Christians with Reformed Presuppositional Apologetics through scholarly resources and biblical wisdom.
                         </p>
@@ -70,7 +70,7 @@ export function Footer() {
 
                     {/* Quick Links */}
                     <nav className="flex flex-col space-y-4" aria-label="Footer navigation">
-                        <h3 className="font-serif text-lg font-bold">Quick Links</h3>
+                        <h3 className="font-serif text-lg ">Quick Links</h3>
                         <ul className="space-y-3">
                             <li>
                                 <Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 group">
@@ -101,7 +101,7 @@ export function Footer() {
 
                     {/* Resources */}
                     <nav className="flex flex-col space-y-4" aria-label="Resources navigation">
-                        <h3 className="font-serif text-lg font-bold">Resources</h3>
+                        <h3 className="font-serif text-lg ">Resources</h3>
                         <ul className="space-y-3">
                             <li>
                                 <a
@@ -126,7 +126,7 @@ export function Footer() {
 
                     {/* Newsletter */}
                     <div className="flex flex-col space-y-4">
-                        <h3 className="font-serif text-lg font-bold">Stay Updated</h3>
+                        <h3 className="font-serif text-lg ">Stay Updated</h3>
                         <p className="text-sm text-muted-foreground">
                             Subscribe to our newsletter for the latest articles and resources.
                         </p>

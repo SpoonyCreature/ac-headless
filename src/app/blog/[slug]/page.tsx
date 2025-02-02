@@ -70,7 +70,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
         return (
             <div className="container mx-auto px-4 py-16">
                 <div className="max-w-xl mx-auto text-center">
-                    <h1 className="text-2xl font-bold mb-4">Error Loading Blog Post</h1>
+                    <h1 className="text-2xl  mb-4">Error Loading Blog Post</h1>
                     <p className="mb-8">Sorry, we encountered an error while loading this blog post.</p>
                     <Link href="/blog" className="text-blue-600 hover:underline">
                         Return to Blog

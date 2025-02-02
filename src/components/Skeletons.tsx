@@ -37,7 +37,7 @@ export function BlogListSkeleton() {
         <div className="space-y-16">
             {/* Regular Posts */}
             <div>
-                <h2 className="font-serif text-3xl font-bold mb-8">Articles</h2>
+                <h2 className="font-serif text-3xl  mb-8">Articles</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
                     {[...Array(6)].map((_, i) => (
                         <CardSkeleton key={i} />
@@ -47,7 +47,7 @@ export function BlogListSkeleton() {
 
             {/* Nuggets */}
             <div>
-                <h2 className="font-serif text-3xl font-bold mb-8">Nuggets</h2>
+                <h2 className="font-serif text-3xl  mb-8">Nuggets</h2>
                 <div className="grid grid-cols-1 gap-4 mb-8">
                     {[...Array(3)].map((_, i) => (
                         <CompactCardSkeleton key={i} />
