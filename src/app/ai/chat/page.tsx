@@ -81,15 +81,17 @@ export default function ChatPage() {
                 credentials: 'same-origin',
                 // Add headers to prevent caching
                 headers: {
-                    'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache'
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
                 }
             });
 
             console.log('Debug - Response received:', {
                 status: response.status,
                 ok: response.ok,
-                statusText: response.statusText
+                statusText: response.statusText,
+                headers: Object.fromEntries(response.headers.entries())
             });
 
             const data = await response.json();
