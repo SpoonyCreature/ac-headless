@@ -66,9 +66,28 @@ export default function ChatPage() {
     }, [isAuthenticated]);
 
     const fetchCurrentUser = async () => {
+        console.log('Debug - Starting fetchCurrentUser');
         try {
-            const response = await fetch('/api/auth/me');
+            console.log('Debug - Making request to /api/auth/me');
+            const response = await fetch('/api/auth/me', {
+                // Add cache: 'no-store' to prevent caching
+                cache: 'no-store',
+                // Add credentials to ensure cookies are sent
+                credentials: 'same-origin'
+            });
+
+            console.log('Debug - Response received:', {
+                status: response.status,
+                ok: response.ok,
+                statusText: response.statusText
+            });
+
             const data = await response.json();
+            console.log('Debug - Response data:', {
+                hasUser: !!data.user,
+                userId: data.user?._id
+            });
+
             if (data.user) {
                 setCurrentUserId(data.user._id);
                 setIsAuthenticated(true);
@@ -76,7 +95,11 @@ export default function ChatPage() {
                 setIsAuthenticated(false);
             }
         } catch (error) {
-            console.error('Error fetching current user:', error);
+            console.error('Error fetching current user:', {
+                error: error instanceof Error ? error.message : 'Unknown error',
+                type: error instanceof Error ? error.constructor.name : typeof error,
+                stack: error instanceof Error ? error.stack : undefined
+            });
             setIsAuthenticated(false);
         }
     };
