@@ -24,14 +24,14 @@ export default function MobileMenu() {
 
             {/* Mobile Menu Overlay */}
             <div
-                className={`fixed inset-0 bg-background/50 backdrop-blur-sm md:hidden transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                className={`fixed inset-0 bg-black/80 md:hidden transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                     }`}
                 onClick={toggleMenu}
             />
 
             {/* Mobile Menu Panel */}
             <div
-                className={`fixed inset-y-0 right-0 w-64 bg-background/95 backdrop-blur-lg transform transition-transform duration-300 ease-in-out md:hidden shadow-lg border-l border-border ${isOpen ? 'translate-x-0' : 'translate-x-full'
+                className={`fixed inset-y-0 right-0 w-64 bg-background shadow-lg border-l border-border transform transition-transform duration-300 ease-in-out md:hidden z-[100] ${isOpen ? 'translate-x-0' : 'translate-x-full'
                     }`}
             >
                 <div className="p-6">

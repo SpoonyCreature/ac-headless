@@ -28,8 +28,7 @@ export default function ChatPage() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const [isInitialLoad, setIsInitialLoad] = useState(true);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isMobile, setIsMobile] = useState(false);
+    const [showSidebar, setShowSidebar] = useState(false);
 
     useEffect(() => {
         const init = async () => {
@@ -65,19 +64,6 @@ export default function ChatPage() {
             fetchPrivateChats();
         }
     }, [isAuthenticated]);
-
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-            if (window.innerWidth < 768) {
-                setIsSidebarOpen(false);
-            }
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
 
     const fetchCurrentUser = async () => {
         try {
@@ -195,36 +181,20 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="flex h-screen bg-background">
-            {/* Mobile Menu Button */}
+        <div className="flex min-h-screen bg-background">
+            {/* Mobile Sidebar Toggle */}
             <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="md:hidden fixed top-20 left-4 z-30 p-2 bg-background/80 backdrop-blur-sm border border-border/50 rounded-lg hover:bg-muted/50 transition-colors"
+                onClick={() => setShowSidebar(!showSidebar)}
+                className="lg:hidden fixed left-4 bottom-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
             >
-                {isSidebarOpen ? (
-                    <X className="w-5 h-5" />
-                ) : (
-                    <Menu className="w-5 h-5" />
-                )}
+                <Menu className="w-6 h-6" />
             </button>
 
-            {/* Sidebar with overlay for mobile */}
-            <div className={`
-                fixed inset-y-16 bg-background/80 backdrop-blur-sm z-20
-                transition-opacity duration-200
-                md:hidden
-                ${isSidebarOpen ? 'opacity-100 inset-x-0' : 'opacity-0 pointer-events-none'}
-            `} onClick={() => setIsSidebarOpen(false)} />
-
             {/* Sidebar */}
-            <aside className={`
-                fixed md:sticky top-16 md:top-0 left-0 z-30
-                h-[calc(100vh-4rem)] md:h-screen
-                w-80 shrink-0
-                bg-background border-r border-border/50
-                transition-transform duration-200
-                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                md:translate-x-0
+            <div className={`
+                fixed inset-y-0 left-0 z-50 transform lg:relative lg:translate-x-0 transition-transform duration-200 ease-in-out
+                bg-background border-r border-border w-80
+                ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <ChatSidebar
                     privateChats={privateChats}
@@ -232,11 +202,19 @@ export default function ChatPage() {
                     currentChatId={undefined}
                     currentUserId={currentUserId}
                 />
-            </aside>
+            </div>
+
+            {/* Overlay for mobile */}
+            {showSidebar && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                    onClick={() => setShowSidebar(false)}
+                />
+            )}
 
             {/* Main Content */}
             <main className="flex-1 relative w-full min-w-0">
-                <div className="absolute inset-0 flex flex-col pt-16 md:pt-0">
+                <div className="absolute inset-0 flex flex-col">
                     <div className="flex-1 overflow-y-auto">
                         <div className="max-w-3xl mx-auto px-4 py-6 md:py-8">
                             {isInitialLoad ? (
@@ -256,15 +234,15 @@ export default function ChatPage() {
                             )}
                             <div ref={messagesEndRef} className="h-4" />
                         </div>
-                        {/* Input container that becomes relative at the bottom */}
-                        <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/95 to-transparent pt-6 pb-6">
-                            <div className="max-w-3xl mx-auto px-4">
-                                <ChatInput
-                                    onSend={handleSend}
-                                    disabled={isLoading || isInitialLoad}
-                                    isAuthenticated={isAuthenticated}
-                                />
-                            </div>
+                    </div>
+                    {/* Input container */}
+                    <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/95 to-transparent pt-6 pb-6">
+                        <div className="max-w-3xl mx-auto px-4">
+                            <ChatInput
+                                onSend={handleSend}
+                                disabled={isLoading || isInitialLoad}
+                                isAuthenticated={isAuthenticated}
+                            />
                         </div>
                     </div>
                 </div>

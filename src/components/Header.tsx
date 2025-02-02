@@ -28,7 +28,7 @@ export async function Header() {
     }
 
     return (
-        <header className="sticky top-0 z-50 backdrop-blur-sm bg-background/80 border-b border-border">
+        <header className="sticky top-0 z-50 bg-background border-b border-border">
             <div className="container mx-auto px-4 py-3">
                 <nav className="flex items-center justify-between">
                     {/* Logo */}
@@ -77,8 +77,8 @@ export async function Header() {
                             ) : (
                                 <GoogleLoginButton
                                     variant="default"
-                                    size="md"
-                                    className="hidden sm:flex"
+                                    size="sm"
+                                    className="flex"
                                 />
                             )}
                         </Suspense>

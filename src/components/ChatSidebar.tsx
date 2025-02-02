@@ -21,17 +21,8 @@ export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId
 
     return (
         <div className="w-80 border-r border-border bg-muted/10 flex flex-col h-full">
-            <div className="p-4 flex-shrink-0">
-                <Link
-                    href="/ai/chat"
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
-                    <Plus className="w-4 h-4" />
-                    <span className="text-sm font-medium">New Chat</span>
-                </Link>
-            </div>
 
-            <div className="flex-1 overflow-y-auto px-4 space-y-6">
+            <div className="p-4 flex-1 overflow-y-auto px-4 space-y-6">
                 {privateChats.length > 0 && (
                     <div>
                         <h3 className="text-sm font-medium text-muted-foreground mb-2 px-3">Your Chats</h3>
