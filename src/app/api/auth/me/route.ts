@@ -16,7 +16,8 @@ export async function GET() {
 
         console.log('Debug - Cookie check:', {
             exists: !!wixSessionCookie,
-            name: wixSessionCookie?.name
+            name: wixSessionCookie?.name,
+            value: wixSessionCookie?.value ? '[REDACTED]' : undefined
         });
 
         if (!wixSessionCookie?.value) {
@@ -28,9 +29,12 @@ export async function GET() {
         let tokens;
         try {
             tokens = JSON.parse(wixSessionCookie.value);
+            const now = Date.now() / 1000; // Convert to seconds
             console.log('Debug - Parsed tokens:', {
                 hasAccessToken: !!tokens?.accessToken?.value,
                 accessTokenExpiry: tokens?.accessToken?.expiresAt,
+                currentTime: now,
+                isAccessTokenValid: tokens?.accessToken?.expiresAt > now,
                 hasRefreshToken: !!tokens?.refreshToken?.value,
             });
         } catch (parseError) {
@@ -53,18 +57,26 @@ export async function GET() {
 
         // Get member info
         console.log('Debug - Getting member info');
-        const { member } = await wixClient.members.getCurrentMember({
-            fieldsets: [members.Set.FULL]
-        });
+        try {
+            const { member } = await wixClient.members.getCurrentMember({
+                fieldsets: [members.Set.FULL]
+            });
 
-        console.log('Debug - Got member:', {
-            memberId: member?._id,
-            hasProfile: !!member?.profile,
-            status: member?.status,
-            privacyStatus: member?.privacyStatus
-        });
+            console.log('Debug - Got member:', {
+                memberId: member?._id,
+                hasProfile: !!member?.profile,
+                status: member?.status,
+                privacyStatus: member?.privacyStatus
+            });
 
-        return NextResponse.json({ user: member });
+            return NextResponse.json({ user: member });
+        } catch (memberError) {
+            console.error('Debug - Error getting member:', {
+                error: memberError instanceof Error ? memberError.message : 'Unknown error',
+                stack: memberError instanceof Error ? memberError.stack : undefined
+            });
+            return NextResponse.json({ user: null });
+        }
     } catch (error) {
         console.error('Debug - Error in /api/auth/me:', {
             error: error instanceof Error ? error.message : 'Unknown error',

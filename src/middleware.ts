@@ -9,17 +9,6 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // Log auth-related requests
-    if (request.nextUrl.pathname.startsWith('/api/auth')) {
-        console.log('Debug - Middleware: Auth request detected:', {
-            path: request.nextUrl.pathname,
-            method: request.method,
-            hasWixSession: request.cookies.has('wixSession'),
-            cookieValue: request.cookies.get('wixSession')?.value ? '[REDACTED]' : undefined,
-            headers: Object.fromEntries(request.headers.entries())
-        });
-    }
-
 
     // Check for existing session
     const wixSessionCookie = request.cookies.get(WIX_SESSION_COOKIE_NAME);
@@ -65,7 +54,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        // Match all paths except static assets and api routes
+        // Match all paths except static assets
         '/((?!_next/static|_next/image|favicon.ico).*)'
     ]
 }; 
