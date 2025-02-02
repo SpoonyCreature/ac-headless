@@ -9,7 +9,8 @@ export async function middleware(request: NextRequest) {
             path: request.nextUrl.pathname,
             method: request.method,
             hasWixSession: request.cookies.has('wixSession'),
-            cookieValue: request.cookies.get('wixSession')?.value ? '[REDACTED]' : undefined
+            cookieValue: request.cookies.get('wixSession')?.value ? '[REDACTED]' : undefined,
+            headers: Object.fromEntries(request.headers.entries())
         });
     }
 
@@ -17,14 +18,14 @@ export async function middleware(request: NextRequest) {
         !request.cookies.get(WIX_SESSION_COOKIE_NAME) ||
         request.cookies.get(WIX_SESSION_COOKIE_NAME)?.value === ""
     ) {
-        console.log("No session found, generating visitor tokens");
+        console.log("Debug - Middleware: No session found, generating visitor tokens");
         const myWixClient = createClient({
             auth: OAuthStrategy({ clientId: process.env.NEXT_PUBLIC_WIX_CLIENT_ID! }),
         });
 
         try {
             const visitorTokens = await myWixClient.auth.generateVisitorTokens();
-            console.log("Generated visitor tokens");
+            console.log("Debug - Middleware: Generated visitor tokens");
 
             const response = NextResponse.next();
             response.cookies.set(
@@ -39,7 +40,7 @@ export async function middleware(request: NextRequest) {
 
             return response;
         } catch (error) {
-            console.error('Error generating visitor tokens:', error);
+            console.error('Debug - Middleware: Error generating visitor tokens:', error);
             return NextResponse.redirect(new URL('/?error=failed_to_generate_tokens', request.url));
         }
     }
