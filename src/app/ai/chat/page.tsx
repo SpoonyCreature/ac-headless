@@ -18,6 +18,8 @@ interface Message {
 }
 
 export default function ChatPage() {
+    console.log('Debug - ChatPage component rendering');
+
     const [privateChats, setPrivateChats] = useState<ChatType[]>([]);
     const [publicChats, setPublicChats] = useState<ChatType[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string>();
@@ -31,8 +33,11 @@ export default function ChatPage() {
     const [showSidebar, setShowSidebar] = useState(false);
 
     useEffect(() => {
+        console.log('Debug - ChatPage init effect running');
         const init = async () => {
+            console.log('Debug - ChatPage init async function starting');
             await fetchCurrentUser();
+            console.log('Debug - ChatPage fetchCurrentUser completed');
             setIsInitialLoad(false);
         };
         init();
@@ -73,7 +78,12 @@ export default function ChatPage() {
                 // Add cache: 'no-store' to prevent caching
                 cache: 'no-store',
                 // Add credentials to ensure cookies are sent
-                credentials: 'same-origin'
+                credentials: 'same-origin',
+                // Add headers to prevent caching
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
             });
 
             console.log('Debug - Response received:', {

@@ -3,6 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { WIX_SESSION_COOKIE_NAME } from "@/src/constants/constants";
 
 export async function middleware(request: NextRequest) {
+    // Log auth-related requests
+    if (request.nextUrl.pathname.startsWith('/api/auth')) {
+        console.log('Debug - Middleware: Auth request detected:', {
+            path: request.nextUrl.pathname,
+            method: request.method,
+            hasWixSession: request.cookies.has('wixSession'),
+            cookieValue: request.cookies.get('wixSession')?.value ? '[REDACTED]' : undefined
+        });
+    }
 
     if (
         !request.cookies.get(WIX_SESSION_COOKIE_NAME) ||
@@ -39,5 +48,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+    matcher: [
+        // Match all paths except static assets
+        '/((?!_next/static|_next/image|favicon.ico).*)'
+    ]
 }; 
