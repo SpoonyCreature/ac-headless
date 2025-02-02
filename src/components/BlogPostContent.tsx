@@ -262,9 +262,9 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                     {/* Main content */}
                     <article className="flex-grow">
                         {/* Title Section */}
-                        <header className="mb-12">
+                        <header className="mb-16 mt-12">
                             {/* Meta Information */}
-                            <div className="flex items-center gap-6 text-gray-600 text-sm tracking-wide mb-6">
+                            <div className="flex items-center gap-6 text-gray-600 text-sm tracking-wide mb-8">
                                 {blog.publishedAt && (
                                     <time className="flex items-center gap-2 font-medium">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,37 +288,26 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                             </div>
 
                             {/* Title */}
-                            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-8 leading-[1.1] tracking-tight">
+                            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-10 leading-[1.1] tracking-tight">
                                 {blog.title}
                             </h1>
 
                             {/* Author Section */}
                             {blog.author && (
-                                <div className="flex items-center gap-4">
+                                <div className="inline-flex items-center gap-3.5 px-5 py-2.5 rounded-full bg-white shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-gray-100" role="contentinfo" aria-label="Article author">
+                                    <span className="text-[14px] font-medium text-gray-500">By</span>
                                     {blog.author.profilePhoto && (
                                         <Image
                                             src={blog.author.profilePhoto}
                                             alt={blog.author.nickname}
-                                            width={48}
-                                            height={48}
-                                            className="rounded-full object-cover border border-gray-200/50 shadow-sm"
+                                            width={26}
+                                            height={26}
+                                            className="rounded-full object-cover"
                                         />
                                     )}
-                                    <div>
-                                        <div className="font-medium text-gray-900">
-                                            {blog.author.nickname}
-                                        </div>
-                                        {blog.author.title && (
-                                            <div className="text-sm text-gray-600 mb-2">
-                                                {blog.author.title}
-                                            </div>
-                                        )}
-                                        {blog.author.aboutPlain && (
-                                            <p className="text-sm text-gray-600 line-clamp-1">
-                                                {blog.author.aboutPlain}
-                                            </p>
-                                        )}
-                                    </div>
+                                    <span className="text-[14px] font-medium text-gray-700">
+                                        {blog.author.nickname}
+                                    </span>
                                 </div>
                             )}
                         </header>
