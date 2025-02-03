@@ -32,7 +32,7 @@ export async function Header() {
             <div className="container mx-auto px-4 py-3">
                 <nav className="flex items-center justify-between">
                     {/* Logo */}
-                    <Link href="/" className="relative z-10 text-xl sm:text-2xl font-bold tracking-tighter hover:text-primary transition-all duration-200 ease-in-out">
+                    <Link href="/" className="relative z-10 text-lg xs:text-xl sm:text-2xl font-bold tracking-tighter hover:text-primary transition-all duration-200 ease-in-out max-w-[140px] xs:max-w-none">
                         Apologetics Central
                     </Link>
 
@@ -45,10 +45,10 @@ export async function Header() {
                     </div>
 
                     {/* Auth Section */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4">
                         <Suspense fallback={<div className="h-10 w-32 animate-pulse bg-muted rounded-md" />}>
                             {member ? (
-                                <div className="flex items-center gap-3 px-3 py-2 rounded-full bg-muted/50 border border-border hover:bg-muted/70 transition-colors duration-200">
+                                <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-full bg-muted/50 border border-border hover:bg-muted/70 transition-colors duration-200">
                                     {member.profile?.photo?.url ? (
                                         <Image
                                             src={member.profile.photo.url}
@@ -78,7 +78,7 @@ export async function Header() {
                                 <GoogleLoginButton
                                     variant="default"
                                     size="sm"
-                                    className="flex"
+                                    className="flex text-sm sm:text-base"
                                 />
                             )}
                         </Suspense>
