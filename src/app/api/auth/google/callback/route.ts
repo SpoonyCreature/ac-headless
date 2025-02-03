@@ -91,11 +91,11 @@ export async function GET(request: NextRequest) {
         // Create response with redirect
         const response = NextResponse.redirect(new URL('/', request.url));
 
-        // Set the cookie with updated settings
+        // Set the cookie with updated settings - session only, no maxAge
         response.cookies.set("wixSession", JSON.stringify(memberTokens), {
             path: '/',
-            secure: true,
-            sameSite: 'none',
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
             httpOnly: true
         });
 
