@@ -15,20 +15,16 @@ function getImageUrlForMedia(media, width, height) {
                 quality: 90,
                 progressive: true
             });
-            console.log('Generated Wix URL:', wixUrl);
             return wixUrl;
         }
-        console.log('Using direct URL:', media);
         return media;
     }
 
     if (media.url) {
-        console.log('Using media.url:', media.url);
         return media.url;
     }
 
     if (media.src) {
-        console.log('Using media.src:', media.src);
         return media.src;
     }
 
@@ -46,10 +42,8 @@ export function WixMediaImage({
     objectFit,
     disableZoom = false,
 }) {
-    console.log('WixMediaImage props:', { media, height, width, alt, objectFit });
 
     const imageUrl = getImageUrlForMedia(media, width * 2, height * 2); // Request 2x size for retina displays
-    console.log('Final image URL:', imageUrl);
 
     return (
         <div className="relative w-full h-full">

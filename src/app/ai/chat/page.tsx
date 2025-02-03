@@ -216,72 +216,47 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="flex min-h-screen bg-background">
-            {/* Mobile Sidebar Toggle */}
+        <div className="flex h-[calc(100vh-4rem)] relative">
+            {/* Sidebar toggle for mobile */}
             <button
+                className="md:hidden fixed top-20 left-4 z-50 p-2 bg-white rounded-full shadow-lg"
                 onClick={() => setShowSidebar(!showSidebar)}
-                className="lg:hidden fixed left-4 bottom-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
             >
-                <Menu className="w-6 h-6" />
+                {showSidebar ? <X /> : <Menu />}
             </button>
 
             {/* Sidebar */}
-            <div className={`
-                fixed inset-y-0 left-0 z-50 transform lg:relative lg:translate-x-0 transition-transform duration-200 ease-in-out
-                bg-background border-r border-border w-80
-                ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
-            `}>
+            <div className={`fixed md:static w-80 h-full transition-transform duration-300 ease-in-out ${showSidebar ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 z-40`}>
                 <ChatSidebar
                     privateChats={privateChats}
                     publicChats={publicChats}
-                    currentChatId={undefined}
                     currentUserId={currentUserId}
                 />
             </div>
 
-            {/* Overlay for mobile */}
-            {showSidebar && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-                    onClick={() => setShowSidebar(false)}
-                />
-            )}
-
-            {/* Main Content */}
-            <main className="flex-1 relative w-full min-w-0">
-                <div className="absolute inset-0 flex flex-col">
-                    <div className="flex-1 overflow-y-auto">
-                        <div className="max-w-3xl mx-auto px-4 py-6 md:py-8">
-                            {isInitialLoad ? (
-                                <div className="space-y-4">
-                                    <LoadingMessage />
-                                </div>
-                            ) : (
-                                <>
-                                    {messages.map((message) => (
-                                        <ChatMessage
-                                            key={message._id}
-                                            message={message}
-                                        />
-                                    ))}
-                                    {isLoading && <LoadingMessage />}
-                                </>
-                            )}
-                            <div ref={messagesEndRef} className="h-4" />
-                        </div>
-                    </div>
-                    {/* Input container */}
-                    <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/95 to-transparent pt-6 pb-6">
-                        <div className="max-w-3xl mx-auto px-4">
-                            <ChatInput
-                                onSend={handleSend}
-                                disabled={isLoading || isInitialLoad}
-                                isAuthenticated={isAuthenticated}
-                            />
-                        </div>
-                    </div>
+            {/* Main chat area */}
+            <div className="flex-1 md:ml-0 flex flex-col h-full relative">
+                {/* Messages container with padding bottom for input */}
+                <div className="flex-1 overflow-y-auto pb-32">
+                    {messages.map((message) => (
+                        <ChatMessage
+                            key={message._id}
+                            message={message}
+                        />
+                    ))}
+                    {isLoading && <LoadingMessage />}
+                    <div ref={messagesEndRef} />
                 </div>
-            </main>
+
+                {/* Sticky chat input container */}
+                <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+                    <ChatInput
+                        onSend={handleSend}
+                        disabled={isLoading}
+                        isAuthenticated={isAuthenticated}
+                    />
+                </div>
+            </div>
         </div>
     );
 } 
