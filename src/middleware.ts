@@ -40,8 +40,9 @@ export async function middleware(request: NextRequest) {
             JSON.stringify(visitorTokens),
             {
                 path: '/',
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax'
+                secure: true,
+                sameSite: 'none',
+                httpOnly: true
             }
         );
 

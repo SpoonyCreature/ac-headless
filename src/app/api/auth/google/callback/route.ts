@@ -91,9 +91,13 @@ export async function GET(request: NextRequest) {
         // Create response with redirect
         const response = NextResponse.redirect(new URL('/', request.url));
 
-        // Set the cookie
-        response.cookies.set("wixSession", JSON.stringify(memberTokens));
-
+        // Set the cookie with updated settings
+        response.cookies.set("wixSession", JSON.stringify(memberTokens), {
+            path: '/',
+            secure: true,
+            sameSite: 'none',
+            httpOnly: true
+        });
 
         return response;
     } catch (error) {
