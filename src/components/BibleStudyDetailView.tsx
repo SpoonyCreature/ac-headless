@@ -14,6 +14,7 @@ export function BibleStudyDetailView({ study, onGenerateCommentary, onGenerateCr
     const [activeTab, setActiveTab] = useState<'verse' | 'commentary' | 'cross-references'>('verse');
     const [showCrossReferences, setShowCrossReferences] = useState(true);
     const [showOriginalText, setShowOriginalText] = useState<Record<number, boolean>>({});
+    const [generatingCrossRefs, setGeneratingCrossRefs] = useState<string | null>(null);
 
     const { verses = [], crossReferences, explanation } = study;
 
@@ -21,6 +22,16 @@ export function BibleStudyDetailView({ study, onGenerateCommentary, onGenerateCr
         const text = `${verse.bookName} ${verse.chapter}:${verse.verse} - ${verse.text}`;
         navigator.clipboard.writeText(text);
         // TODO: Add toast notification
+    };
+
+    const handleGenerateCrossRefs = async (verse: BibleVerse) => {
+        const verseRef = `${verse.bookName} ${verse.chapter}:${verse.verse}`;
+        setGeneratingCrossRefs(verseRef);
+        try {
+            await onGenerateCrossReferenceMap?.(verse);
+        } finally {
+            setGeneratingCrossRefs(null);
+        }
     };
 
     return (
@@ -216,10 +227,18 @@ export function BibleStudyDetailView({ study, onGenerateCommentary, onGenerateCr
                                                                 <p className="text-muted-foreground">No cross references available yet</p>
                                                                 {onGenerateCrossReferenceMap && (
                                                                     <button
-                                                                        onClick={() => onGenerateCrossReferenceMap(currentVerse)}
-                                                                        className="mt-4 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm"
+                                                                        onClick={() => handleGenerateCrossRefs(currentVerse)}
+                                                                        disabled={generatingCrossRefs === currentVerseRef}
+                                                                        className="mt-4 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                                                     >
-                                                                        Generate Cross References
+                                                                        {generatingCrossRefs === currentVerseRef ? (
+                                                                            <>
+                                                                                <Network className="w-4 h-4 animate-spin inline mr-2" />
+                                                                                Generating Cross References...
+                                                                            </>
+                                                                        ) : (
+                                                                            'Generate Cross References'
+                                                                        )}
                                                                     </button>
                                                                 )}
                                                             </div>
@@ -227,31 +246,17 @@ export function BibleStudyDetailView({ study, onGenerateCommentary, onGenerateCr
                                                     }
 
                                                     return (
-                                                        <div>
-                                                            <h3 className="text-lg font-medium mb-4">Cross References</h3>
-                                                            <div className="space-y-4">
-                                                                {relevantCrossRefs?.map((ref: CrossReference, i: number) => (
-                                                                    <div key={i} className="p-4 bg-muted/30 rounded-lg space-y-2">
-                                                                        <div className="flex items-center justify-between">
-                                                                            <span className="font-medium">{ref.reference}</span>
-                                                                            <span className="text-xs text-muted-foreground">{ref.period}</span>
-                                                                        </div>
-                                                                        <div className="space-y-2">
-                                                                            <p className="text-sm text-muted-foreground italic">{ref.connection}</p>
-                                                                            <p className="text-sm">{ref.text}</p>
-                                                                            <a
-                                                                                href={`https://biblehub.com/${ref.reference.toLowerCase().replace(/\s+/g, '/').replace(':', '/')}`}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="text-xs text-primary hover:underline inline-flex items-center gap-1"
-                                                                            >
-                                                                                <ExternalLink className="w-3 h-3" />
-                                                                                View on BibleHub
-                                                                            </a>
-                                                                        </div>
+                                                        <div className="space-y-6">
+                                                            {relevantCrossRefs.map((ref: CrossReference, index: number) => (
+                                                                <div key={index} className="p-4 bg-muted/30 rounded-lg space-y-3">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <h4 className="font-medium text-primary">{ref.reference}</h4>
+                                                                        <span className="text-xs text-muted-foreground">{ref.period}</span>
                                                                     </div>
-                                                                ))}
-                                                            </div>
+                                                                    <p className="text-sm italic border-l-2 border-primary/20 pl-3">{ref.text}</p>
+                                                                    <p className="text-sm text-muted-foreground">{ref.connection}</p>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     );
                                                 })()}
@@ -278,43 +283,6 @@ export function BibleStudyDetailView({ study, onGenerateCommentary, onGenerateCr
                     ))}
                 </div>
             </div>
-
-            {/* Cross References Section */}
-            {Array.isArray(study.crossReferences) && study.crossReferences.length > 0 && (
-                <div className="space-y-4 pt-4 border-t border-border">
-                    <button
-                        onClick={() => setShowCrossReferences(!showCrossReferences)}
-                        className="flex items-center justify-between w-full text-left"
-                    >
-                        <h2 className="text-xl font-medium flex items-center gap-2">
-                            <Network className="w-5 h-5 text-primary" />
-                            Cross References
-                        </h2>
-                        <ChevronDown className={cn(
-                            "w-5 h-5 text-muted-foreground transition-transform",
-                            showCrossReferences && "rotate-180"
-                        )} />
-                    </button>
-
-                    {showCrossReferences && (
-                        <div className="grid gap-3 pl-4 border-l-2 border-primary/20">
-                            {Array.isArray(study.crossReferences) ? (
-                                study.crossReferences.map((ref: CrossReference, index: number) => (
-                                    <div key={index} className="space-y-1">
-                                        <p className="font-medium text-primary">
-                                            {ref.reference}
-                                        </p>
-                                        <p className="text-muted-foreground">{ref.text}</p>
-                                        <p className="text-sm text-muted-foreground italic">{ref.connection}</p>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-muted-foreground">No cross-references available.</p>
-                            )}
-                        </div>
-                    )}
-                </div>
-            )}
         </div>
     );
 } 

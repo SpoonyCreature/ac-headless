@@ -16,9 +16,10 @@ interface BibleStudySidebarProps {
     studies: BibleStudy[];
     currentStudyId?: string;
     currentUserId?: string;
+    isLoading?: boolean;
 }
 
-export function BibleStudySidebar({ studies = [], currentStudyId, currentUserId }: BibleStudySidebarProps) {
+export function BibleStudySidebar({ studies = [], currentStudyId, currentUserId, isLoading = false }: BibleStudySidebarProps) {
     const [showMore, setShowMore] = useState(false);
 
     // Filter studies to show only user's studies
@@ -26,6 +27,31 @@ export function BibleStudySidebar({ studies = [], currentStudyId, currentUserId 
 
     const initialStudies = userStudies.slice(0, 5);
     const remainingStudies = userStudies.slice(5);
+
+    if (isLoading) {
+        return (
+            <div className="w-80 border-r border-border bg-muted/10 flex flex-col h-full">
+                <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+                    <div>
+                        <h3 className="text-sm font-medium text-muted-foreground mb-2 px-3">Your Studies</h3>
+                        <div className="space-y-2">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="px-3 py-2 rounded-lg">
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-4 h-4 bg-muted-foreground/20 rounded animate-pulse" />
+                                        <div className="flex-1 space-y-2">
+                                            <div className="h-4 bg-muted-foreground/20 rounded w-3/4 animate-pulse" />
+                                            <div className="h-3 bg-muted-foreground/20 rounded w-1/4 animate-pulse" />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-80 border-r border-border bg-muted/10 flex flex-col h-full">

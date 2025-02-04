@@ -36,6 +36,7 @@ export default function BibleStudyPage() {
     const [query, setQuery] = useState('');
     const [translation, setTranslation] = useState<Translation>('web');
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingStudies, setIsLoadingStudies] = useState(true);
     const [results, setResults] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -61,6 +62,7 @@ export default function BibleStudyPage() {
     // Check authentication status and fetch studies on mount
     useEffect(() => {
         const init = async () => {
+            setIsLoadingStudies(true);
             try {
                 const response = await fetch('/api/auth/me');
                 const data = await response.json();
@@ -75,6 +77,8 @@ export default function BibleStudyPage() {
             } catch (error) {
                 console.error('Error during initialization:', error);
                 setIsAuthenticated(false);
+            } finally {
+                setIsLoadingStudies(false);
             }
         };
         init();
@@ -170,6 +174,7 @@ export default function BibleStudyPage() {
                 <BibleStudySidebar
                     studies={studies}
                     currentUserId={currentUserId || undefined}
+                    isLoading={isLoadingStudies}
                 />
             </div>
 

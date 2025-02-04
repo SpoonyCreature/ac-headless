@@ -112,13 +112,21 @@ export async function POST(request: NextRequest) {
         }
 
         // Create the cross references array
-        const crossReferences: CrossReference[] = crossRefResponse.cross_references.map((ref) => ({
-            reference: ref.reference,
-            connection: ref.connection,
-            period: ref.period,
-            text: '', // The text will be displayed when needed
-            sourceReference
-        }));
+        const crossReferences: CrossReference[] = await Promise.all(
+            crossRefResponse.cross_references.map(async (ref) => {
+                // Fetch the verse text for this reference
+                const verses = await getSpecificVerses(ref.reference, translation);
+                const verseText = verses.map(v => v.text).join(' ');
+
+                return {
+                    reference: ref.reference,
+                    connection: ref.connection,
+                    period: ref.period,
+                    text: verseText,
+                    sourceReference
+                };
+            })
+        );
 
         return NextResponse.json({
             crossReferences,

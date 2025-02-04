@@ -112,16 +112,7 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
                         originalText: originalVerse
                     };
                 }),
-                crossReferences: data.study.crossReferences == null ? data.study.crossReferences.map((v: any) => {
-                    const [bookChapter, verse] = v.reference.split(':');
-                    const lastSpaceIndex = bookChapter.lastIndexOf(' ');
-                    return {
-                        ...v,
-                        bookName: bookChapter.slice(0, lastSpaceIndex),
-                        chapter: bookChapter.slice(lastSpaceIndex + 1),
-                        verse: verse
-                    };
-                }) : []
+                crossReferences: Array.isArray(data.study.crossReferences) ? data.study.crossReferences : []
             };
 
             setStudy(processedStudy);
