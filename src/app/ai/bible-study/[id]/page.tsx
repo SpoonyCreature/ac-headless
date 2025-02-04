@@ -5,39 +5,7 @@ import { Bot, Book, Save, Globe, Lock, Edit2, Check, X, ChevronLeft } from 'luci
 import Link from 'next/link';
 import { BibleStudyDetailView } from '@/src/components/BibleStudyDetailView';
 import { useRouter } from 'next/navigation';
-
-interface BibleVerse {
-    bookName: string;  // Required
-    chapter: string;   // Required
-    verse: string;     // Required
-    text: string;
-    reference: string;
-    originalText?: {
-        reference: string;
-        text: string;
-        language: 'hebrew' | 'greek';
-    };
-    commentary?: string[];
-    aiInsights?: string[];
-    crossReferenceMap?: {
-        reference: string;
-        connection: string;
-    }[];
-}
-
-interface BibleStudy {
-    _id: string;
-    query: string;
-    translation: string;
-    verses: Array<BibleVerse>;  // Using the BibleVerse interface
-    crossReferences: Array<BibleVerse>;  // Using the same interface for consistency
-    explanation: string;
-    public: boolean;
-    notes: string[];
-    comments: string[];
-    _owner: string;
-    _createdDate: string;
-}
+import { BibleVerse, BibleStudy } from '@/src/types/bible';
 
 export default function BibleStudyViewPage({ params }: { params: { id: string } }) {
     const [study, setStudy] = useState<BibleStudy | null>(null);
@@ -144,7 +112,7 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
                         originalText: originalVerse
                     };
                 }),
-                crossReferences: data.study.crossReferences?.map((v: any) => {
+                crossReferences: data.study.crossReferences == null ? data.study.crossReferences.map((v: any) => {
                     const [bookChapter, verse] = v.reference.split(':');
                     const lastSpaceIndex = bookChapter.lastIndexOf(' ');
                     return {
@@ -153,7 +121,7 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
                         chapter: bookChapter.slice(lastSpaceIndex + 1),
                         verse: verse
                     };
-                }) || []
+                }) : []
             };
 
             setStudy(processedStudy);
@@ -173,84 +141,63 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
         }
     };
 
-    const handleGenerateCommentary = async (verse: any) => {
+    const handleGenerateCrossReferenceMap = async (verse: BibleVerse) => {
         if (!study) return;
 
         try {
-            const response = await fetch(`/api/bible-study/${study._id}/commentary`, {
+            if (!Array.isArray(study.crossReferences)) {
+                study.crossReferences = [];
+            }
+            const response = await fetch('/api/bible-study/cross-references', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    reference: `${verse.bookName} ${verse.chapter}:${verse.verse}`,
-                    text: verse.text
+                    bookName: verse.bookName,
+                    chapter: verse.chapter,
+                    verse: verse.verse,
+                    text: verse.text,
+                    translation: study.translation
                 }),
             });
 
             if (!response.ok) {
-                throw new Error('Failed to generate commentary');
+                throw new Error('Failed to generate cross references');
             }
 
             const data = await response.json();
-            // Refresh the study to get the new commentary
-            await fetchStudy();
-        } catch (error) {
-            console.error('Error generating commentary:', error);
-        }
-    };
 
-    const handleGenerateInsights = async (verse: any) => {
-        if (!study) return;
+            // Create new cross references with source verse reference
+            const newCrossReferences = data.crossReferences;
 
-        try {
-            const response = await fetch(`/api/bible-study/${study._id}/insights`, {
-                method: 'POST',
+            // Combine with existing cross references, removing any previous ones for this verse
+            const sourceReference = `${verse.bookName} ${verse.chapter}:${verse.verse}`;
+            const existingCrossRefs = study.crossReferences?.filter(ref => ref.sourceReference !== sourceReference) || [];
+            const updatedCrossReferences = [...existingCrossRefs, ...newCrossReferences];
+
+            // Update the study in the database
+            const updateResponse = await fetch(`/api/bible-study/${study._id}`, {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    reference: `${verse.bookName} ${verse.chapter}:${verse.verse}`,
-                    text: verse.text
+                    crossReferences: updatedCrossReferences
                 }),
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to generate insights');
+            if (!updateResponse.ok) {
+                throw new Error('Failed to update study with cross references');
             }
 
-            const data = await response.json();
-            // Refresh the study to get the new insights
-            await fetchStudy();
-        } catch (error) {
-            console.error('Error generating insights:', error);
-        }
-    };
-
-    const handleGenerateCrossReferenceMap = async (verse: any) => {
-        if (!study) return;
-
-        try {
-            const response = await fetch(`/api/bible-study/${study._id}/cross-reference-map`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    reference: `${verse.bookName} ${verse.chapter}:${verse.verse}`,
-                    text: verse.text
-                }),
+            // Update the local state
+            setStudy({
+                ...study,
+                crossReferences: updatedCrossReferences
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to generate cross reference map');
-            }
-
-            const data = await response.json();
-            // Refresh the study to get the new cross reference map
-            await fetchStudy();
         } catch (error) {
-            console.error('Error generating cross reference map:', error);
+            console.error('Error generating cross references:', error);
         }
     };
 
@@ -346,8 +293,6 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
                     {/* Bible Study Detail View */}
                     <BibleStudyDetailView
                         study={study}
-                        onGenerateCommentary={handleGenerateCommentary}
-                        onGenerateInsights={handleGenerateInsights}
                         onGenerateCrossReferenceMap={handleGenerateCrossReferenceMap}
                     />
                 </div>

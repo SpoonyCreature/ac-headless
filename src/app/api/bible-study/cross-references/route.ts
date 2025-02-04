@@ -1,131 +1,133 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { completion } from '@/src/lib/openai';
+import { completion, JsonSchemaFormat } from '@/src/lib/openai';
 import { getSpecificVerses } from '@/src/lib/bible';
+import { CrossReference } from '@/src/types/bible';
 
-interface CrossReference {
-    reference: string;
-    connection: string;
-    theme: string;
-    testament: string;
-    period: string;
-    narrative_order: number;
+interface CrossReferenceRequest {
+    bookName: string;
+    chapter: string;
+    verse: string;
+    text: string;
+    translation?: string;
 }
 
-// Helper to parse verse references from GPT response
-function parseVerseReferences(response: string): string[] {
-    // Split the response into lines and filter out empty lines
-    const lines = response.split('\n').filter(line => line.trim());
-
-    // Extract verse references (ignoring section headers that start with ##)
-    const references = lines
-        .filter(line => !line.startsWith('##'))
-        .join(' ')
-        .split(';')
-        .map(ref => ref.trim())
-        .filter(ref => ref);
-
-    return references;
-}
+// Define the JSON schema for cross references
+const crossReferencesSchema: JsonSchemaFormat = {
+    type: "json_schema",
+    json_schema: {
+        name: "cross_references",
+        schema: {
+            type: "object",
+            properties: {
+                cross_references: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            reference: {
+                                type: "string",
+                                description: "The Bible verse reference. Can include verse ranges. Format: {{book name in english}} {{chapter}}:{{verse}}-{{verse}} or {{book name in english}} {{chapter}}:{verse},{verse}, e.g. 'Colossians 1:16-19' or multiple verses 'Genesis 1:1,3'"
+                            },
+                            connection: {
+                                type: "string",
+                                description: "How this verse connects to the original verse in words"
+                            },
+                            period: {
+                                type: "string",
+                                enum: [
+                                    "Creation",
+                                    "Patriarchal",
+                                    "Egyptian Bondage",
+                                    "Exodus and Wilderness",
+                                    "Conquest of Canaan",
+                                    "Judges",
+                                    "United Kingdom",
+                                    "Divided Kingdom",
+                                    "Exile",
+                                    "Post-Exilic",
+                                    "Inter-Testamental",
+                                    "Life of Christ",
+                                    "Early Church",
+                                    "Apostolic"
+                                ],
+                                description: "The historical period of the verse"
+                            },
+                        },
+                        required: ["reference", "connection", "period"],
+                        additionalProperties: false
+                    },
+                }
+            },
+            required: ["cross_references"],
+            additionalProperties: false
+        },
+        strict: true
+    }
+};
 
 export async function POST(request: NextRequest) {
     try {
-        const { reference, text, translation = 'web' } = await request.json();
+        const { bookName, chapter, verse, text, translation = 'web' }: CrossReferenceRequest = await request.json();
 
-        if (!reference || !text) {
+        if (!bookName || !chapter || !verse || !text) {
             return NextResponse.json(
-                { error: 'Reference and text are required' },
+                { error: 'Book name, chapter, verse, and text are required' },
                 { status: 400 }
             );
         }
 
-        // Step 1: Get cross references using GPT
+        const sourceReference = `${bookName} ${chapter}:${verse}`;
+
+        // Step 1: Get cross references using GPT with JSON schema
         const crossRefPrompt = `
-            <instructions>
-                You will be provided with a Bible verse
-                You have to provide a cross references for the provided Bible verse
-                You may only provide a maximum of 8 cross reference verses - so ensure they are relevant to the verse and high impact.
-            </instructions>
-            <output-format>
-            {{book name in english}} {{chapter}}:{verse},{verse};  // for specific verses in a chapter
-                OR
-                {{book name in english}} {{chapter}}:{{verse}}-{{verse}}; // for a range of verses in a chapter
-                OR
-                {{book name in english}} {{chapter}}:{verse},{verse}; {{book name in english}} {{chapter}}:{{verse}}-{{verse}} ... // for a combination of verses from many locations
-            </output-format>
-            <output-example>
-            ## Example 1
-                John 3:16,17; 1 John 3:16-19,22
-                
-                ## Example 2
-                Genesis 1:1-3; Leviticus 6:1,5,7; Exodus 15:18,21-22
-            </output-example>
+            Analyze the provided Bible verse and generate up to 8 relevant cross references.
+            For each cross reference, provide:
+            1. The exact verse reference (can include verse ranges, e.g. "Colossians 1:16-19" or "Genesis 1:1,3")
+            2. How it connects to the original verse
+            3. The historical period it belongs to
+            
+            Ensure the references are highly relevant and impactful.
+            
+            Original verse: ${sourceReference}
+            Text: ${text}
         `;
 
         const crossRefResponse = await completion([
             { role: 'system', content: crossRefPrompt },
-            {
-                role: 'user', content: `<verse-reference>${reference}</verse-reference>
-            <verse-text>${text}</verse-text>`
-            }
+            { role: 'user', content: 'Please provide the cross references in the specified format.' }
         ], {
-            temperature: 0.7
+            temperature: 0.7,
+            response_format: crossReferencesSchema
         });
 
-        if (!crossRefResponse) {
-            throw new Error('No response from GPT for cross references');
+        // Add detailed logging
+        console.log('Cross References API Response:', {
+            input: { bookName, chapter, verse, text },
+            gptResponse: crossRefResponse,
+            timestamp: new Date().toISOString()
+        });
+
+        if (!crossRefResponse?.cross_references || !Array.isArray(crossRefResponse.cross_references)) {
+            throw new Error('Invalid response format from GPT');
         }
 
-        // Parse the response into structured data
-        const lines = crossRefResponse.split('\n').filter(line => line.trim());
-        const crossReferences: CrossReference[] = [];
-        let currentRef: Partial<CrossReference> = {};
-
-        for (const line of lines) {
-            if (line.startsWith('## Cross Reference')) {
-                if (Object.keys(currentRef).length > 0 && currentRef.reference) {
-                    crossReferences.push(currentRef as CrossReference);
-                }
-                currentRef = {};
-            } else if (line.includes(':')) {
-                const [key, value] = line.split(':').map(s => s.trim());
-                if (key === 'Reference') {
-                    currentRef.reference = value;
-                } else if (key === 'Connection') {
-                    currentRef.connection = value;
-                } else if (key === 'Theme') {
-                    currentRef.theme = value;
-                } else if (key === 'Testament') {
-                    currentRef.testament = value;
-                } else if (key === 'Period') {
-                    currentRef.period = value;
-                } else if (key === 'Order') {
-                    currentRef.narrative_order = parseInt(value);
-                }
-            }
-        }
-        if (Object.keys(currentRef).length > 0 && currentRef.reference) {
-            crossReferences.push(currentRef as CrossReference);
-        }
-
-        // Step 2: Fetch the actual verse texts
-        const verseRefs = crossReferences.map(ref => ref.reference);
-        const verses = await getSpecificVerses(verseRefs.join('; '), translation);
-
-        // Step 3: Combine the verse texts with the metadata
-        const enrichedCrossReferences = verses.map((verse, index) => ({
-            ...verse,
-            ...crossReferences[index],
-            year: Math.floor(crossReferences[index].narrative_order * 40) - 2000 // Rough conversion to biblical years
+        // Create the cross references array
+        const crossReferences: CrossReference[] = crossRefResponse.cross_references.map((ref) => ({
+            reference: ref.reference,
+            connection: ref.connection,
+            period: ref.period,
+            text: '', // The text will be displayed when needed
+            sourceReference
         }));
 
         return NextResponse.json({
-            crossReferences: enrichedCrossReferences,
+            crossReferences,
             translation
         });
     } catch (error) {
         console.error('Error generating cross references:', error);
         return NextResponse.json(
-            { error: 'Failed to generate cross references' },
+            { error: error instanceof Error ? error.message : 'Failed to generate cross references' },
             { status: 500 }
         );
     }
