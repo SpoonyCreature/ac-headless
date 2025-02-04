@@ -9,9 +9,10 @@ interface ChatSidebarProps {
     publicChats: Chat[];
     currentChatId?: string;
     currentUserId?: string;
+    isLoading?: boolean;
 }
 
-export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId, currentUserId }: ChatSidebarProps) {
+export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId, currentUserId, isLoading = false }: ChatSidebarProps) {
     const [showMorePrivate, setShowMorePrivate] = useState(false);
     const [showMorePublic, setShowMorePublic] = useState(false);
 
@@ -19,6 +20,47 @@ export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId
     const remainingPrivateChats = privateChats.slice(5);
     const initialPublicChats = publicChats.slice(0, 5);
     const remainingPublicChats = publicChats.slice(5);
+
+    if (isLoading) {
+        return (
+            <div className="w-80 border-r border-border bg-background flex flex-col h-full">
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    <div>
+                        <h3 className="text-sm font-medium text-muted-foreground mb-2 px-3">Your Chats</h3>
+                        <div className="space-y-2">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="px-3 py-2 rounded-lg">
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-4 h-4 bg-muted-foreground/20 rounded animate-pulse" />
+                                        <div className="flex-1 space-y-2">
+                                            <div className="h-4 bg-muted-foreground/20 rounded w-3/4 animate-pulse" />
+                                            <div className="h-3 bg-muted-foreground/20 rounded w-1/4 animate-pulse" />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-medium text-muted-foreground mb-2 px-3">Public Chats</h3>
+                        <div className="space-y-2">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="px-3 py-2 rounded-lg">
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-4 h-4 bg-muted-foreground/20 rounded animate-pulse" />
+                                        <div className="flex-1 space-y-2">
+                                            <div className="h-4 bg-muted-foreground/20 rounded w-3/4 animate-pulse" />
+                                            <div className="h-3 bg-muted-foreground/20 rounded w-1/4 animate-pulse" />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-80 border-r border-border bg-background flex flex-col h-full">
@@ -133,7 +175,7 @@ export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId
                     </div>
                 )}
 
-                {privateChats.length === 0 && publicChats.length === 0 && (
+                {!isLoading && privateChats.length === 0 && publicChats.length === 0 && (
                     <div className="px-3 py-8 text-center text-muted-foreground">
                         <p>No chats yet</p>
                         <p className="text-sm mt-1">Start a new chat to see it here</p>

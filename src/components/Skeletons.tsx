@@ -107,3 +107,34 @@ export const CommentsSkeleton = () => (
         </div>
     </div>
 );
+
+export function ChatSkeleton() {
+    return (
+        <div className="flex h-screen bg-background">
+            <div className="flex-1 flex flex-col">
+                <div className="p-4">
+                    <div className="max-w-4xl mx-auto flex items-center justify-center gap-4">
+                        <div className="h-4 bg-muted rounded animate-pulse w-48" />
+                        <div className="h-10 bg-muted rounded animate-pulse w-32" />
+                    </div>
+                </div>
+                <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                    {[...Array(5)].map((_, i) => (
+                        <div key={i} className="flex items-start gap-6 max-w-4xl mx-auto">
+                            <div className="h-10 w-10 rounded-full bg-muted animate-pulse flex-shrink-0" />
+                            <div className="flex-1 space-y-3">
+                                <div className="h-5 bg-muted rounded animate-pulse w-32" />
+                                <div className="space-y-2">
+                                    <div className="h-4 bg-muted rounded animate-pulse w-full" />
+                                    <div className="h-4 bg-muted rounded animate-pulse w-[95%]" />
+                                    <div className="h-4 bg-muted rounded animate-pulse w-[85%]" />
+                                    <div className="h-4 bg-muted rounded animate-pulse w-[70%]" />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}

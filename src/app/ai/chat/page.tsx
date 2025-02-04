@@ -38,10 +38,25 @@ export default function ChatPage() {
             console.log('Debug - ChatPage init async function starting');
             await fetchCurrentUser();
             console.log('Debug - ChatPage fetchCurrentUser completed');
-            setIsInitialLoad(false);
         };
         init();
     }, []);
+
+    useEffect(() => {
+        // Fetch public chats for everyone
+        const initChats = async () => {
+            try {
+                await Promise.all([
+                    fetchPublicChats(),
+                    isAuthenticated ? fetchPrivateChats() : Promise.resolve()
+                ]);
+            } finally {
+                setIsInitialLoad(false);
+            }
+        };
+
+        initChats();
+    }, [isAuthenticated]);
 
     useEffect(() => {
         // Add welcome message when component mounts (now always on reload)
@@ -60,15 +75,6 @@ export default function ChatPage() {
             })
         }]);
     }, []);
-
-    useEffect(() => {
-        // Fetch public chats for everyone
-        fetchPublicChats();
-        // Fetch private chats only if authenticated
-        if (isAuthenticated) {
-            fetchPrivateChats();
-        }
-    }, [isAuthenticated]);
 
     const fetchCurrentUser = async () => {
         console.log('Debug - Starting fetchCurrentUser');
@@ -234,6 +240,7 @@ export default function ChatPage() {
                     privateChats={privateChats}
                     publicChats={publicChats}
                     currentUserId={currentUserId}
+                    isLoading={isInitialLoad}
                 />
             </div>
 
@@ -259,13 +266,18 @@ export default function ChatPage() {
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* Sticky chat input container */}
-                <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-                    <ChatInput
-                        onSend={handleSend}
-                        disabled={isLoading}
-                        isAuthenticated={isAuthenticated}
-                    />
+                {/* Fixed chat input container */}
+                <div className="fixed bottom-0 left-0 right-0 lg:left-80 z-20">
+                    <div className="bg-gradient-to-t from-background via-background to-transparent h-32 w-full absolute bottom-full pointer-events-none" />
+                    <div className="bg-background/80 backdrop-blur-lg border-t border-border/50 p-4 shadow-lg">
+                        <div className="max-w-5xl mx-auto">
+                            <ChatInput
+                                onSend={handleSend}
+                                disabled={isLoading}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

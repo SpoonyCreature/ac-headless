@@ -53,8 +53,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
                         "bg-gradient-to-br from-muted/80 to-muted border border-border/50 text-foreground"
                 )}>
                     <div className={cn(
-                        "prose prose-sm max-w-none",
-                        isUser ? "prose-invert" : ""
+                        isUser ?
+                            "prose prose-sm max-w-none prose-invert" :
+                            "prose prose-base max-w-none leading-relaxed",
+
                     )}>
                         {message.text}
                     </div>
