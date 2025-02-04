@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, BookOpen, Languages, Copy, Info, ExternalLink, MessageSquare, Network, Lightbulb, History } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { BibleVerse, BibleStudy, CrossReference } from '@/src/types/bible';
+import { VerseTimeline } from './VerseTimeline';
 
 interface BibleStudyDetailProps {
     study: BibleStudy;
@@ -213,6 +214,7 @@ export function BibleStudyDetailView({ study, onGenerateCommentary, onGenerateCr
 
                                         {activeTab === 'cross-references' && (
                                             <div className="space-y-6">
+                                                {/* Cross References Content */}
                                                 {(() => {
                                                     const currentVerse = verses[activeVerse];
                                                     const currentVerseRef = `${currentVerse.bookName} ${currentVerse.chapter}:${currentVerse.verse}`;
@@ -246,23 +248,40 @@ export function BibleStudyDetailView({ study, onGenerateCommentary, onGenerateCr
                                                     }
 
                                                     return (
-                                                        <div className="space-y-6">
-                                                            {relevantCrossRefs.map((ref: CrossReference, index: number) => (
-                                                                <div key={index} className="p-4 bg-muted/30 rounded-lg space-y-3">
-                                                                    <div className="flex items-center justify-between">
-                                                                        <h4 className="font-medium text-primary">{ref.reference}</h4>
-                                                                        <span className="text-xs text-muted-foreground">{ref.period}</span>
-                                                                    </div>
-                                                                    <p className="text-sm italic border-l-2 border-primary/20 pl-3">{ref.text}</p>
-                                                                    <p className="text-sm text-muted-foreground">{ref.connection}</p>
+                                                        <div className="space-y-8">
+                                                            {/* Timeline Section */}
+                                                            <div className="space-y-5 -mx-4 px-4 py-6 bg-gradient-to-b from-muted/50 to-transparent">
+                                                                <div className="max-w-3xl mx-auto">
+                                                                    <VerseTimeline
+                                                                        sourceReference={currentVerseRef}
+                                                                        crossReferences={relevantCrossRefs}
+                                                                    />
                                                                 </div>
-                                                            ))}
+                                                            </div>
+
+                                                            {/* Cross References List */}
+
+                                                            <div className="space-y-4 mx-auto">
+                                                                <div className="flex items-center gap-2 text-primary">
+                                                                    <Network className="w-4 h-4" />
+                                                                    <h2 className="text-lg font-medium">All Cross References</h2>
+                                                                </div>
+                                                                {relevantCrossRefs.map((ref: CrossReference, index: number) => (
+                                                                    <div key={index} className="p-4 bg-muted/30 rounded-lg space-y-3 hover:bg-muted/50 transition-colors">
+                                                                        <div className="flex items-center justify-between">
+                                                                            <h4 className="font-medium text-primary">{ref.reference}</h4>
+                                                                            <span className="text-xs text-muted-foreground">{ref.period}</span>
+                                                                        </div>
+                                                                        <p className="text-sm italic border-l-2 border-primary/20 pl-3">{ref.text}</p>
+                                                                        <p className="text-sm text-muted-foreground">{ref.connection}</p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
                                                         </div>
                                                     );
                                                 })()}
                                             </div>
                                         )}
-
 
                                         {/* Study Tools */}
                                         <div className="flex items-center gap-2 pt-4 mt-4 border-t border-border">
