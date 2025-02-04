@@ -64,6 +64,66 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
 
             const data = await response.json();
 
+            // Check if we need to fetch original verses
+            if (!data.study.originalVerses || data.study.originalVerses.length === 0) {
+                // List of NT books including numbered books
+                const ntBooks = [
+                    'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans',
+                    '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians',
+                    'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians',
+                    '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews',
+                    'James', '1 Peter', '2 Peter', '1 John', '2 John', '3 John',
+                    'Jude', 'Revelation'
+                ];
+
+                // Separate OT and NT verses
+                const otVerses = data.study.verses
+                    .filter((v: any) => {
+                        const ref = v.reference;
+                        return !ntBooks.some(book => ref.startsWith(book));
+                    })
+                    .map((v: any) => v.reference)
+                    .join(';');
+
+                const ntVerses = data.study.verses
+                    .filter((v: any) => {
+                        const ref = v.reference;
+                        return ntBooks.some(book => ref.startsWith(book));
+                    })
+                    .map((v: any) => v.reference)
+                    .join(';');
+
+                // Fetch original verses if we have any
+                if (otVerses || ntVerses) {
+                    const originalResponse = await fetch('/api/bible-study/original-text', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            otVerses,
+                            ntVerses
+                        }),
+                    });
+
+                    if (originalResponse.ok) {
+                        const originalData = await originalResponse.json();
+                        data.study.originalVerses = originalData.verses;
+
+                        // Update the study in the database with the original verses
+                        await fetch(`/api/bible-study/${params.id}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                originalVerses: originalData.verses
+                            }),
+                        });
+                    }
+                }
+            }
+
             // Process verses to add parsed reference parts and match original verses
             const processedStudy: BibleStudy = {
                 ...data.study,

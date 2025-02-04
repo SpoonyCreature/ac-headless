@@ -21,6 +21,34 @@ export interface HydratedPrompt {
     userPrompt: string;
 }
 
+// Types for JSON schema response format
+export interface JsonSchemaFormat {
+    type: "json_schema";
+    json_schema: {
+        name?: string;
+        schema: {
+            type: "object";
+            properties: Record<string, any>;
+            required?: string[];
+            additionalProperties?: boolean;
+        };
+        strict?: boolean;
+    };
+}
+
+// Types for completion options
+export interface CompletionOptions {
+    temperature?: number;
+    model?: string;
+    max_tokens?: number;
+    top_p?: number;
+    frequency_penalty?: number;
+    presence_penalty?: number;
+    response_format?: 'text' | JsonSchemaFormat;
+    store?: boolean;
+    stop?: string[];
+}
+
 // Prompt management
 const prompts: Record<string, PromptTemplate> = {
     DEFAULT: {
@@ -60,14 +88,49 @@ export function hydratePrompt(template: PromptTemplate, variables: Record<string
 
 export async function completion(
     messages: { role: 'system' | 'user' | 'assistant'; content: string }[],
-    options: { temperature?: number; model?: string } = {}
+    options: CompletionOptions = {}
 ) {
-    const response = await openai.chat.completions.create({
-        model: options.model || 'gpt-4o-mini',
-        temperature: options.temperature || 0.7,
-        messages: messages,
+    const {
+        temperature = 0.7,
+        model = 'gpt-4o-mini',
+        max_tokens,
+        top_p,
+        frequency_penalty,
+        presence_penalty,
+        response_format = 'text',
+        store = false,
+        stop,
+    } = options;
+
+    const completionRequest: any = {
+        model,
+        temperature,
+        messages,
         stream: false,
-    });
+        store,
+    };
+
+    // Add optional parameters if they are provided
+    if (max_tokens) completionRequest.max_tokens = max_tokens;
+    if (top_p) completionRequest.top_p = top_p;
+    if (frequency_penalty) completionRequest.frequency_penalty = frequency_penalty;
+    if (presence_penalty) completionRequest.presence_penalty = presence_penalty;
+    if (stop) completionRequest.stop = stop;
+
+    // Handle JSON schema response format
+    if (response_format !== 'text') {
+        completionRequest.response_format = response_format;
+    }
+
+    const response = await openai.chat.completions.create(completionRequest);
+
+    if (response_format !== 'text') {
+        try {
+            return JSON.parse(response.choices[0].message.content || '{}');
+        } catch (error) {
+            throw new Error('Failed to parse JSON response from OpenAI');
+        }
+    }
 
     return response.choices[0].message.content;
 } 
