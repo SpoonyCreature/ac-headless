@@ -32,7 +32,7 @@ export async function Header() {
             <div className="container mx-auto px-4 py-3">
                 <nav className="flex items-center justify-between">
                     {/* Logo */}
-                    <Link href="/" className="relative z-10 text-lg xs:text-xl sm:text-2xl font-bold tracking-tighter hover:text-primary transition-all duration-200 ease-in-out max-w-[140px] xs:max-w-none">
+                    <Link href="/" className="relative z-10 text-lg xs:text-xl sm:text-2xl font-bold tracking-tighter hover:text-primary transition-all duration-200 ease-in-out whitespace-nowrap">
                         Apologetics Central
                     </Link>
 

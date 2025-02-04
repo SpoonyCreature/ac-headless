@@ -27,7 +27,7 @@ export function Footer() {
     };
 
     return (
-        <footer className="border-t border-border/40 bg-gradient-to-b from-white to-slate-100 dark:from-slate-950 dark:to-slate-900" aria-labelledby="footer-heading">
+        <footer className="border-t border-border/40 bg-gradient-to-b from-white to-slate-100" aria-labelledby="footer-heading">
             <h2 id="footer-heading" className="sr-only">Footer</h2>
             <div className="container mx-auto px-4 py-12 lg:py-16">
                 <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -157,10 +157,10 @@ export function Footer() {
                                 </button>
                             </div>
                             {subscribeStatus === 'success' && (
-                                <p className="text-xs text-green-600 dark:text-green-400">Thanks for subscribing!</p>
+                                <p className="text-xs text-green-600">Thanks for subscribing!</p>
                             )}
                             {subscribeStatus === 'error' && (
-                                <p className="text-xs text-red-600 dark:text-red-400">Something went wrong. Please try again.</p>
+                                <p className="text-xs text-red-600">Something went wrong. Please try again.</p>
                             )}
                         </form>
                     </div>

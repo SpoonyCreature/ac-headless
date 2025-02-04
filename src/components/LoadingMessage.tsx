@@ -6,7 +6,7 @@ export function LoadingMessage() {
         <div className="group relative flex gap-3 px-4 py-3">
             {/* Avatar */}
             <div className="flex-shrink-0 mt-1">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 ring-4 ring-background flex items-center justify-center shadow-lg">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 ring-4 ring-background flex items-center justify-center shadow-lg">
                     <Bot className="w-4 h-4 text-primary" />
                 </div>
             </div>

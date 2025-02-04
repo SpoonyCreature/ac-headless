@@ -21,7 +21,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
                         <User className="w-4 h-4" />
                     </div>
                 ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 ring-4 ring-background flex items-center justify-center shadow-lg">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 ring-4 ring-background flex items-center justify-center shadow-lg">
                         <Bot className="w-4 h-4 text-primary" />
                     </div>
                 )}
