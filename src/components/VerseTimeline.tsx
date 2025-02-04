@@ -106,9 +106,9 @@ export function VerseTimeline({ sourceReference, crossReferences }: VerseTimelin
         <div className="w-full space-y-4">
             <div className="space-y-6">
                 {/* Timeline Track */}
-                <div className="relative h-32">
+                <div className="relative p-4">
                     {/* Main Timeline Area */}
-                    <div className="relative h-12">
+                    <div className="relative">
                         {/* Background Track */}
                         <div className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-muted">
                             {/* Testament Divider */}
@@ -165,31 +165,10 @@ export function VerseTimeline({ sourceReference, crossReferences }: VerseTimelin
                             </div>
                         ))}
                     </div>
-
-                    {/* Book Labels */}
-                    <div className="absolute inset-x-0 bottom-0 h-16">
-                        {TIMELINE_MARKERS.map(({ book, position }) => (
-                            <div
-                                key={book}
-                                className={`absolute transform -translate-x-1/2 text-xs text-muted-foreground
-                                    ${position === 0 ? 'translate-x-0' :
-                                        position === 1 ? '-translate-x-full' : ''}`}
-                                style={{
-                                    left: `${position * 100}%`,
-                                    top: '0.5rem'
-                                }}
-                            >
-                                <div className="h-2 w-px bg-muted-foreground/30 mx-auto mb-1" />
-                                <div className="rotate-45 origin-left translate-x-3">
-                                    {book}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
                 </div>
 
                 {/* Details Section */}
-                <div className="h-[180px] overflow-y-auto rounded-lg border border-border bg-card/50">
+                <div className="overflow-y-auto rounded-lg border border-border bg-card/50">
                     {expandedCluster !== null ? (
                         <div className="p-4 space-y-3">
                             {timelineData.clusters[expandedCluster].references.map((ref, i) => (

@@ -267,13 +267,14 @@ export function BibleStudyDetailView({ study, onGenerateCommentary, onGenerateCr
                                                                     <h2 className="text-lg font-medium">All Cross References</h2>
                                                                 </div>
                                                                 {relevantCrossRefs.map((ref: CrossReference, index: number) => (
-                                                                    <div key={index} className="p-4 bg-muted/30 rounded-lg space-y-3 hover:bg-muted/50 transition-colors">
+                                                                    <div key={index} className="bg-muted/30 rounded-lg space-y-3 hover:bg-muted/50 transition-colors">
                                                                         <div className="flex items-center justify-between">
                                                                             <h4 className="font-medium text-primary">{ref.reference}</h4>
                                                                             <span className="text-xs text-muted-foreground">{ref.period}</span>
                                                                         </div>
                                                                         <p className="text-sm italic border-l-2 border-primary/20 pl-3">{ref.text}</p>
                                                                         <p className="text-sm text-muted-foreground">{ref.connection}</p>
+                                                                        <hr className="my-2 pt-4 border-border" />
                                                                     </div>
                                                                 ))}
                                                             </div>
