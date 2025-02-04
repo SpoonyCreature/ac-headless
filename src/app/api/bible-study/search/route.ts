@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
             If the user seems to have put in a direct verse, then you can skip that verse in the output
             Try and provide a fairly comprehensive list of verses that are relevant to the search query, which can be used to faciliate a Bible study as well (approx. 10-30 verses)
             If the user asks for specific verses, chapter, honor that directly.
+            Always retrun verses in the requested format ONLY, even if the user asks for something non-sensical - make it work / fit
             </instructions>
             <output-format>
             {{book name in english}} {{chapter}}:{verse},{verse};  // for specific verses in a chapter

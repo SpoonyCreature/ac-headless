@@ -54,7 +54,11 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
             // Check if current user is the owner
             const authResponse = await fetch('/api/auth/me');
             const authData = await authResponse.json();
-            setIsOwner(authData.user?._id === data.study._owner);
+            if (authData.user && authData.user.member) {
+                setIsOwner(authData.user.member._id === data.study._owner);
+            } else {
+                setIsOwner(false);
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {

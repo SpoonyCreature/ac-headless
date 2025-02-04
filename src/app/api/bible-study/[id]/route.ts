@@ -22,12 +22,25 @@ export async function GET(
 
         const study = items[0];
 
+        console.log('study', study);
+
         // Check if user has access
-        if (!study.public && (!wixClient.auth.loggedIn() || study._owner !== wixClient.auth.currentUser?._id)) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
+        if (!study.public) {
+            if (!wixClient.auth.loggedIn()) {
+                return NextResponse.json(
+                    { error: 'Unauthorized' },
+                    { status: 401 }
+                );
+            }
+
+            // Get the current member
+            const { member } = await wixClient.members.getCurrentMember();
+            if (!member || study._owner !== member._id) {
+                return NextResponse.json(
+                    { error: 'Unauthorized' },
+                    { status: 401 }
+                );
+            }
         }
 
         return NextResponse.json({ study });
@@ -71,7 +84,8 @@ export async function PATCH(
         const study = items[0];
 
         // Check if user owns the study
-        if (study._owner !== wixClient.auth.currentUser?._id) {
+        const { member } = await wixClient.members.getCurrentMember();
+        if (!member || study._owner !== member._id) {
             return NextResponse.json(
                 { error: 'Unauthorized' },
                 { status: 401 }

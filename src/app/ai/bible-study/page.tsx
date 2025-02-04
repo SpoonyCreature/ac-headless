@@ -16,6 +16,22 @@ const TRANSLATIONS = [
 
 type Translation = typeof TRANSLATIONS[number]['id'];
 
+// Add example queries to rotate through
+const EXAMPLE_QUERIES = [
+    "What does the Bible say about love?",
+    "John 3",
+    "The book of Genesis",
+    "The story of David",
+    "Wisdom from Proverbs",
+];
+
+// Add categories for better organization
+const FEATURES = [
+    { icon: Search, label: 'Search Topics & Verses' },
+    { icon: Bot, label: 'AI-Powered Analysis' },
+    { icon: Save, label: 'Save & Organize Studies' },
+] as const;
+
 export default function BibleStudyPage() {
     const [query, setQuery] = useState('');
     const [translation, setTranslation] = useState<Translation>('web');
@@ -27,6 +43,7 @@ export default function BibleStudyPage() {
     const [studies, setStudies] = useState<any[]>([]);
     const [showSidebar, setShowSidebar] = useState(false);
     const [activeStep, setActiveStep] = useState(1);
+    const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
     const router = useRouter();
 
     // Refs for each section
@@ -62,6 +79,16 @@ export default function BibleStudyPage() {
         };
         init();
     }, []); // Empty dependency array means this runs once on mount
+
+    // Add example query rotation effect
+    useEffect(() => {
+        if (!query) {
+            const interval = setInterval(() => {
+                setCurrentExampleIndex((prev) => (prev + 1) % EXAMPLE_QUERIES.length);
+            }, 3000);
+            return () => clearInterval(interval);
+        }
+    }, [query]);
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -129,17 +156,17 @@ export default function BibleStudyPage() {
             {/* Mobile Sidebar Toggle */}
             <button
                 onClick={() => setShowSidebar(!showSidebar)}
-                className="lg:hidden fixed left-4 bottom-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+                className="lg:hidden fixed right-4 bottom-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
             >
                 <Menu className="w-6 h-6" />
             </button>
 
             {/* Sidebar */}
-            <div className={`
-                fixed inset-y-0 left-0 z-50 transform lg:relative lg:translate-x-0 transition-transform duration-200 ease-in-out
-                bg-background border-r border-border w-80
-                ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
-            `}>
+            <div className={cn(
+                'fixed inset-y-0 left-0 z-50 transform lg:relative lg:translate-x-0 transition-transform duration-200 ease-in-out',
+                'bg-background border-r border-border w-80',
+                showSidebar ? 'translate-x-0' : '-translate-x-full'
+            )}>
                 <BibleStudySidebar
                     studies={studies}
                     currentUserId={currentUserId || undefined}
@@ -156,74 +183,28 @@ export default function BibleStudyPage() {
 
             {/* Main Content */}
             <main className="flex-1 min-h-screen">
-                {/* Progress Bar - Only show when there's a search */}
-                {(query || results) && (
-                    <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border">
-                        <div className="container mx-auto px-4">
-                            <div className="max-w-4xl mx-auto">
-                                <div className="flex items-center justify-between py-4">
-                                    <div className="flex items-center gap-8">
-                                        <div className="flex items-center gap-3">
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
-                                                !results ? "bg-primary text-primary-foreground" : "bg-primary/20 text-primary"
-                                            )}>1</div>
-                                            <span className={cn(
-                                                "font-medium",
-                                                !results ? "text-foreground" : "text-muted-foreground"
-                                            )}>Search</span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
-                                                results && !isLoading ? "bg-primary text-primary-foreground" : "bg-primary/20 text-primary"
-                                            )}>2</div>
-                                            <span className={cn(
-                                                "font-medium",
-                                                results && !isLoading ? "text-foreground" : "text-muted-foreground"
-                                            )}>Review</span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
-                                                false ? "bg-primary text-primary-foreground" : "bg-primary/20 text-primary"
-                                            )}>3</div>
-                                            <span className={cn(
-                                                "font-medium",
-                                                false ? "text-foreground" : "text-muted-foreground"
-                                            )}>Save</span>
-                                        </div>
-                                    </div>
-                                    {/* Reset button */}
-                                    {results && (
-                                        <button
-                                            onClick={() => {
-                                                setQuery('');
-                                                setResults(null);
-                                                setError(null);
-                                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                                            }}
-                                            className="text-sm text-muted-foreground hover:text-foreground"
-                                        >
-                                            Start New Study
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
                 {/* Hero Section - Only show when there's no search */}
                 {!query && !results && (
-                    <div className="bg-gradient-to-b from-primary/5 to-transparent pt-24 pb-16">
+                    <div className="bg-gradient-to-b from-primary/5 to-transparent pt-8 md:pt-24 pb-8 md:pb-16">
                         <div className="container mx-auto px-4">
                             <div className="max-w-4xl mx-auto text-center">
-                                <Book className="w-16 h-16 text-primary mx-auto mb-8" />
-                                <h1 className="font-serif text-4xl md:text-6xl mb-6">Bible Study Assistant</h1>
-                                <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
-                                    Create insightful Bible studies in minutes with AI-powered analysis and study tools
+                                <div className="relative inline-block mb-6 md:mb-8">
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+                                    <Book className="w-12 h-12 md:w-16 md:h-16 text-primary relative" />
+                                </div>
+                                <h1 className="font-serif text-3xl md:text-6xl mb-4 md:mb-6">AI-Powered Bible Study</h1>
+                                <p className="text-lg md:text-xl text-muted-foreground mb-8 md:mb-12 max-w-2xl mx-auto">
+                                    Experience deeper biblical understanding with AI-guided analysis
                                 </p>
+                                <div className="flex flex-col items-center gap-4 md:gap-6">
+                                    <div className="flex flex-col items-center gap-2 text-sm">
+                                        <span className="text-muted-foreground">Try searching for topics or verses like:</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium text-primary animate-pulse">{EXAMPLE_QUERIES[currentExampleIndex]}</span>
+                                            <span className="text-muted-foreground text-xs">({currentExampleIndex + 1}/{EXAMPLE_QUERIES.length})</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -231,42 +212,54 @@ export default function BibleStudyPage() {
 
                 {/* Search Section */}
                 <div className={cn(
-                    "py-8",
+                    "py-4 md:py-8",
                     query || results ? "border-b border-border" : ""
                 )}>
                     <div className="container mx-auto px-4">
                         <div className="max-w-2xl mx-auto">
                             {/* Search Form */}
                             <div className={cn(
-                                "bg-background rounded-2xl",
-                                !query && !results ? "border border-border shadow-lg p-8" : ""
+                                "bg-background rounded-xl md:rounded-2xl transition-all duration-300",
+                                !query && !results ? "border border-border shadow-lg p-4 md:p-8" : ""
                             )}>
-                                <form onSubmit={handleSearch}>
-                                    <div className="flex gap-4 mb-4">
+                                <form onSubmit={handleSearch} className="space-y-4">
+                                    <div className="flex flex-col md:flex-row gap-3 md:gap-4">
                                         <div className="relative flex-1">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                                                <Search className="w-5 h-5 text-muted-foreground" />
+                                            </div>
                                             <input
                                                 type="text"
                                                 value={query}
                                                 onChange={(e) => setQuery(e.target.value)}
-                                                placeholder="Enter a topic (e.g., 'love') or verse (e.g., 'John 3:16')"
-                                                className="w-full px-4 py-3 rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/50 pl-11"
+                                                placeholder="Enter a topic (e.g., 'faith') or verse (e.g., 'John 3:16')"
+                                                className="w-full h-12 px-4 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 pl-10"
                                             />
-                                            <Search className="w-5 h-5 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2" />
                                         </div>
                                         <button
                                             type="submit"
                                             disabled={isLoading || !query.trim()}
-                                            className="px-6 py-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium whitespace-nowrap"
+                                            className="h-12 px-6 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium whitespace-nowrap"
                                         >
-                                            {isLoading ? 'Searching...' : 'Start Study'}
+                                            {isLoading ? (
+                                                <span className="flex items-center gap-2">
+                                                    <Bot className="w-5 h-5 animate-spin" />
+                                                    Analyzing...
+                                                </span>
+                                            ) : (
+                                                <span className="flex items-center gap-2">
+                                                    <Bot className="w-5 h-5" />
+                                                    Preview Study
+                                                </span>
+                                            )}
                                         </button>
                                     </div>
-                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                         <span>Translation:</span>
                                         <select
                                             value={translation}
                                             onChange={(e) => setTranslation(e.target.value as Translation)}
-                                            className="bg-transparent border-none focus:outline-none focus:ring-0 text-foreground"
+                                            className="bg-transparent focus:outline-none focus:ring-0 text-foreground"
                                         >
                                             {TRANSLATIONS.map((t) => (
                                                 <option key={t.id} value={t.id}>
@@ -275,74 +268,34 @@ export default function BibleStudyPage() {
                                             ))}
                                         </select>
                                     </div>
+                                    <div className="text-xs text-muted-foreground mt-2">
+                                        This will generate a study outline that you can further explore and customize
+                                    </div>
                                 </form>
                             </div>
-
-                            {/* Next Step Hint - Only show when there's a query but no results */}
-                            {query && !results && !isLoading && !error && (
-                                <div className="mt-6 text-center text-muted-foreground">
-                                    <p>Click "Start Study" to begin your Bible study journey</p>
-                                </div>
-                            )}
-
-                            {/* Loading State */}
-                            {isLoading && (
-                                <div className="mt-8 text-center space-y-4">
-                                    <Bot className="w-8 h-8 animate-spin mx-auto text-primary" />
-                                    <div className="space-y-2">
-                                        <p className="font-medium">Creating Your Bible Study</p>
-                                        <p className="text-sm text-muted-foreground">Analyzing verses and generating insights...</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Error State */}
-                            {error && (
-                                <div className="mt-6 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive">
-                                    {error}
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* Features Section - Only show on initial state */}
                 {!query && !results && (
-                    <div className="py-16 bg-background border-y border-border">
+                    <div className="py-8 md:py-16">
                         <div className="container mx-auto px-4">
                             <div className="max-w-5xl mx-auto">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                    <div className="relative">
-                                        <div className="bg-gradient-to-b from-primary/5 to-transparent rounded-2xl p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+                                    {FEATURES.map((feature) => (
+                                        <div key={feature.label} className="bg-gradient-to-b from-primary/5 to-transparent rounded-xl p-6">
                                             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                                                <Bot className="w-6 h-6 text-primary" />
+                                                <feature.icon className="w-6 h-6 text-primary" />
                                             </div>
-                                            <h3 className="font-medium text-lg mb-2">AI-Powered Insights</h3>
-                                            <p className="text-muted-foreground">Get verse-by-verse commentary, cross-references, and theological insights generated by AI.</p>
+                                            <h3 className="font-medium text-lg mb-2">{feature.label}</h3>
+                                            <p className="text-muted-foreground text-sm">
+                                                {feature.label === 'Search Topics & Verses' && 'Search any Bible topic or verse reference for instant insights.'}
+                                                {feature.label === 'AI-Powered Analysis' && 'Get deep analysis and cross-references powered by AI.'}
+                                                {feature.label === 'Save & Organize Studies' && 'Create and organize your personal Bible study library.'}
+                                            </p>
                                         </div>
-                                    </div>
-                                    <div className="relative">
-                                        <div className="bg-gradient-to-b from-primary/5 to-transparent rounded-2xl p-6">
-                                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                                                <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg>
-                                            </div>
-                                            <h3 className="font-medium text-lg mb-2">Personal Workspace</h3>
-                                            <p className="text-muted-foreground">Add your own notes, create custom study guides, and organize your insights.</p>
-                                        </div>
-                                    </div>
-                                    <div className="relative">
-                                        <div className="bg-gradient-to-b from-primary/5 to-transparent rounded-2xl p-6">
-                                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                                                <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </div>
-                                            <h3 className="font-medium text-lg mb-2">Study Journey</h3>
-                                            <p className="text-muted-foreground">Track your progress, set study goals, and maintain consistent study habits.</p>
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -357,11 +310,12 @@ export default function BibleStudyPage() {
                                 {/* Results Header */}
                                 <div className="text-center space-y-4">
                                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                                        <span>Step 2:</span> Review Your Study
+                                        <Bot className="w-4 h-4" />
+                                        <span>Study Preview</span>
                                     </div>
-                                    <h2 className="text-2xl font-medium">Your Bible Study Results</h2>
+                                    <h2 className="text-2xl font-medium">Your Study Overview</h2>
                                     <p className="text-muted-foreground max-w-2xl mx-auto">
-                                        Here's what we found for "{query}". Review the content below and when you're ready, save your study to access all features.
+                                        Here's an overview of your study on "{query}". Save to unlock in-depth features including original language study, commentary insights, personal notes, and more.
                                     </p>
                                 </div>
 
@@ -371,32 +325,42 @@ export default function BibleStudyPage() {
                                 {/* Next Steps */}
                                 <div className="bg-gradient-to-b from-primary/5 to-transparent rounded-2xl p-8 text-center space-y-6">
                                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                                        <span>Step 3:</span> Save Your Study
+                                        <Save className="w-4 h-4" />
+                                        <span>Save & Continue</span>
                                     </div>
                                     {isAuthenticated ? (
                                         <>
-                                            <h3 className="text-xl font-medium">Ready to Enhance Your Study?</h3>
+                                            <h3 className="text-xl font-medium">Ready to Build Your Full Study?</h3>
+                                            <p className="text-muted-foreground max-w-xl mx-auto">
+                                                Create your comprehensive study with original language insights, commentary references, personal notes, and sharing options.
+                                            </p>
                                             <button
                                                 onClick={handleCreateStudy}
-                                                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-medium shadow-lg"
+                                                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-medium shadow-lg group relative overflow-hidden"
                                             >
-                                                <Save className="w-5 h-5" />
-                                                Save Bible Study
+                                                <span className="relative z-10 flex items-center gap-2">
+                                                    <Save className="w-5 h-5" />
+                                                    Build Full Study
+                                                </span>
+                                                <div className="absolute inset-0 bg-gradient-to-r from-primary-foreground/0 via-primary-foreground/5 to-primary-foreground/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                                             </button>
                                         </>
                                     ) : (
                                         <>
-                                            <h3 className="text-xl font-medium">Sign In to Save Your Study</h3>
+                                            <h3 className="text-xl font-medium">Build Your Complete Study</h3>
                                             <p className="text-muted-foreground max-w-xl mx-auto">
-                                                Create an account to save your study, add personal notes, and access all premium features.
+                                                Create a free account to build your comprehensive study with original language analysis, commentary insights, verse highlighting, personal notes, and easy sharing.
                                             </p>
-                                            <a
+                                            <Link
                                                 href="/login"
-                                                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-medium shadow-lg"
+                                                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-medium shadow-lg group relative overflow-hidden"
                                             >
-                                                Get Started
-                                                <ChevronRight className="w-4 h-4" />
-                                            </a>
+                                                <span className="relative z-10 flex items-center gap-2">
+                                                    Get Started
+                                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                                </span>
+                                                <div className="absolute inset-0 bg-gradient-to-r from-primary-foreground/0 via-primary-foreground/5 to-primary-foreground/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                                            </Link>
                                         </>
                                     )}
                                 </div>
