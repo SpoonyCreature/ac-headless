@@ -1,29 +1,36 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Bot, Book, Save, Globe, Lock, Edit2, Check, X, ChevronLeft, Languages } from 'lucide-react';
-import { BibleStudyResults } from '@/src/components/BibleStudyResults';
-import { useRouter } from 'next/navigation';
+import { Bot, Book, Save, Globe, Lock, Edit2, Check, X, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { isOldTestament, isNewTestament } from '@/src/lib/bible';
+import { BibleStudyDetailView } from '@/src/components/BibleStudyDetailView';
+import { useRouter } from 'next/navigation';
+
+interface BibleVerse {
+    bookName: string;  // Required
+    chapter: string;   // Required
+    verse: string;     // Required
+    text: string;
+    reference: string;
+    originalText?: {
+        reference: string;
+        text: string;
+        language: 'hebrew' | 'greek';
+    };
+    commentary?: string[];
+    aiInsights?: string[];
+    crossReferenceMap?: {
+        reference: string;
+        connection: string;
+    }[];
+}
 
 interface BibleStudy {
     _id: string;
     query: string;
     translation: string;
-    verses: Array<{
-        reference: string;
-        text: string;
-    }>;
-    crossReferences: Array<{
-        reference: string;
-        text: string;
-    }>;
-    originalVerses?: Array<{
-        reference: string;
-        text: string;
-        language: 'hebrew' | 'greek';
-    }>;
+    verses: Array<BibleVerse>;  // Using the BibleVerse interface
+    crossReferences: Array<BibleVerse>;  // Using the same interface for consistency
     explanation: string;
     public: boolean;
     notes: string[];
@@ -39,56 +46,11 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
     const [isOwner, setIsOwner] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editedStudy, setEditedStudy] = useState<Partial<BibleStudy>>({});
-    const [showOriginalText, setShowOriginalText] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         fetchStudy();
     }, [params.id]);
-
-    const fetchOriginalVerses = async (verses: Array<{ reference: string }>) => {
-        try {
-            // Separate OT and NT verses
-            const verseRefs = verses.map(v => v.reference);
-            const otVerses = verseRefs.filter(ref => {
-                // Get the book name up to the last space (before chapter number)
-                const lastSpaceIndex = ref.lastIndexOf(' ');
-                const bookName = ref.slice(0, lastSpaceIndex);
-                return isOldTestament(bookName);
-            });
-            const ntVerses = verseRefs.filter(ref => {
-                // Get the book name up to the last space (before chapter number)
-                const lastSpaceIndex = ref.lastIndexOf(' ');
-                const bookName = ref.slice(0, lastSpaceIndex);
-                return isNewTestament(bookName);
-            });
-
-            const otVerseString = otVerses.join(';');
-            const ntVerseString = ntVerses.join(';');
-
-            // Fetch original language verses
-            const response = await fetch('/api/bible-study/original-text', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    otVerses: otVerseString,
-                    ntVerses: ntVerseString,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch original text');
-            }
-
-            const data = await response.json();
-            return data.verses;
-        } catch (error) {
-            console.error('Error fetching original verses:', error);
-            return [];
-        }
-    };
 
     const fetchStudy = async () => {
         try {
@@ -101,29 +63,40 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
             }
 
             const data = await response.json();
-            setStudy(data.study);
 
-            // Check if we need to fetch original verses
-            if (data.study && (!data.study.originalVerses || data.study.originalVerses.length === 0)) {
-                const originalVerses = await fetchOriginalVerses(data.study.verses);
-                if (originalVerses.length > 0) {
-                    // Update the study with original verses
-                    const updateResponse = await fetch(`/api/bible-study/${params.id}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            originalVerses
-                        }),
-                    });
+            // Process verses to add parsed reference parts and match original verses
+            const processedStudy: BibleStudy = {
+                ...data.study,
+                verses: data.study.verses.map((v: any) => {
+                    const [bookChapter, verse] = v.reference.split(':');
+                    const lastSpaceIndex = bookChapter.lastIndexOf(' ');
 
-                    if (updateResponse.ok) {
-                        const updatedData = await updateResponse.json();
-                        setStudy(updatedData.study);
-                    }
-                }
-            }
+                    // Find matching original verse
+                    const originalVerse = data.study.originalVerses?.find(
+                        (ov: any) => ov.reference === v.reference
+                    );
+
+                    return {
+                        ...v,
+                        bookName: bookChapter.slice(0, lastSpaceIndex),
+                        chapter: bookChapter.slice(lastSpaceIndex + 1),
+                        verse: verse,
+                        originalText: originalVerse
+                    };
+                }),
+                crossReferences: data.study.crossReferences?.map((v: any) => {
+                    const [bookChapter, verse] = v.reference.split(':');
+                    const lastSpaceIndex = bookChapter.lastIndexOf(' ');
+                    return {
+                        ...v,
+                        bookName: bookChapter.slice(0, lastSpaceIndex),
+                        chapter: bookChapter.slice(lastSpaceIndex + 1),
+                        verse: verse
+                    };
+                }) || []
+            };
+
+            setStudy(processedStudy);
 
             // Check if current user is the owner
             const authResponse = await fetch('/api/auth/me');
@@ -140,30 +113,84 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
         }
     };
 
-    const handleSave = async () => {
-        if (!study || !editedStudy) return;
+    const handleGenerateCommentary = async (verse: any) => {
+        if (!study) return;
 
-        setIsLoading(true);
         try {
-            const response = await fetch(`/api/bible-study/${params.id}`, {
-                method: 'PATCH',
+            const response = await fetch(`/api/bible-study/${study._id}/commentary`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(editedStudy),
+                body: JSON.stringify({
+                    reference: `${verse.bookName} ${verse.chapter}:${verse.verse}`,
+                    text: verse.text
+                }),
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update Bible study');
+                throw new Error('Failed to generate commentary');
             }
 
             const data = await response.json();
-            setStudy(data.study);
-            setIsEditing(false);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to update Bible study');
-        } finally {
-            setIsLoading(false);
+            // Refresh the study to get the new commentary
+            await fetchStudy();
+        } catch (error) {
+            console.error('Error generating commentary:', error);
+        }
+    };
+
+    const handleGenerateInsights = async (verse: any) => {
+        if (!study) return;
+
+        try {
+            const response = await fetch(`/api/bible-study/${study._id}/insights`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    reference: `${verse.bookName} ${verse.chapter}:${verse.verse}`,
+                    text: verse.text
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to generate insights');
+            }
+
+            const data = await response.json();
+            // Refresh the study to get the new insights
+            await fetchStudy();
+        } catch (error) {
+            console.error('Error generating insights:', error);
+        }
+    };
+
+    const handleGenerateCrossReferenceMap = async (verse: any) => {
+        if (!study) return;
+
+        try {
+            const response = await fetch(`/api/bible-study/${study._id}/cross-reference-map`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    reference: `${verse.bookName} ${verse.chapter}:${verse.verse}`,
+                    text: verse.text
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to generate cross reference map');
+            }
+
+            const data = await response.json();
+            // Refresh the study to get the new cross reference map
+            await fetchStudy();
+        } catch (error) {
+            console.error('Error generating cross reference map:', error);
         }
     };
 
@@ -229,17 +256,10 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
                     </div>
 
                     {/* Controls */}
-                    <div className="mb-8 flex justify-center gap-4">
-                        {isOwner && (
-                            isEditing ? (
+                    {isOwner && (
+                        <div className="mb-8 flex justify-center gap-4">
+                            {isEditing ? (
                                 <>
-                                    <button
-                                        onClick={handleSave}
-                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                                    >
-                                        <Check className="w-4 h-4" />
-                                        Save Changes
-                                    </button>
                                     <button
                                         onClick={() => {
                                             setIsEditing(false);
@@ -259,62 +279,17 @@ export default function BibleStudyViewPage({ params }: { params: { id: string } 
                                     <Edit2 className="w-4 h-4" />
                                     Edit Study
                                 </button>
-                            )
-                        )}
-                        {study.originalVerses && study.originalVerses.length > 0 && (
-                            <button
-                                onClick={() => setShowOriginalText(!showOriginalText)}
-                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${showOriginalText
-                                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                    : 'border-primary text-primary hover:bg-primary/10'
-                                    }`}
-                            >
-                                <Languages className="w-4 h-4" />
-                                {showOriginalText ? 'Hide Original Text' : 'Show Original Text'}
-                            </button>
-                        )}
-                    </div>
+                            )}
+                        </div>
+                    )}
 
-                    {/* Study Content */}
-                    <BibleStudyResults
-                        results={{
-                            verses: study.verses.map(v => {
-                                // Handle numbered books correctly
-                                const [bookChapter, verse] = v.reference.split(':');
-                                const lastSpaceIndex = bookChapter.lastIndexOf(' ');
-                                const book = bookChapter.slice(0, lastSpaceIndex);
-                                const chapter = bookChapter.slice(lastSpaceIndex + 1);
-
-                                return {
-                                    bookName: book,
-                                    chapter,
-                                    verse,
-                                    text: v.text,
-                                    originalText: showOriginalText
-                                        ? study.originalVerses?.find(ov => ov.reference === v.reference)
-                                        : undefined
-                                };
-                            }),
-                            crossReferences: study.crossReferences?.map(v => {
-                                // Handle numbered books correctly
-                                const [bookChapter, verse] = v.reference.split(':');
-                                const lastSpaceIndex = bookChapter.lastIndexOf(' ');
-                                const book = bookChapter.slice(0, lastSpaceIndex);
-                                const chapter = bookChapter.slice(lastSpaceIndex + 1);
-
-                                return {
-                                    bookName: book,
-                                    chapter,
-                                    verse,
-                                    text: v.text
-                                };
-                            }),
-                            explanation: study.explanation
-                        }}
+                    {/* Bible Study Detail View */}
+                    <BibleStudyDetailView
+                        study={study}
+                        onGenerateCommentary={handleGenerateCommentary}
+                        onGenerateInsights={handleGenerateInsights}
+                        onGenerateCrossReferenceMap={handleGenerateCrossReferenceMap}
                     />
-
-                    {/* Notes Section - TODO */}
-                    {/* Comments Section - TODO */}
                 </div>
             </div>
         </main>

@@ -315,7 +315,7 @@ export default function BibleStudyPage() {
                                     </div>
                                     <h2 className="text-2xl font-medium">Your Study Overview</h2>
                                     <p className="text-muted-foreground max-w-2xl mx-auto">
-                                        Here's an overview of your study on "{query}". Save to unlock in-depth features including original language study, commentary insights, personal notes, and more.
+                                        Here&aposl;'s an overview of your study on &quot;"{query}&quot;". Save to unlock in-depth features including original language study, commentary insights, personal notes, and more.
                                     </p>
                                 </div>
 
