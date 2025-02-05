@@ -73,31 +73,33 @@ interface Book {
 }
 
 const ShareButton = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
-    <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
+    <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-full transition-all duration-200">
         {icon}
         <span className="text-sm font-medium">{label}</span>
     </button>
 );
-ShareButton.displayName = 'ShareButton';
 
 const AuthorCard = ({ author }: { author: BlogPost['author'] }) => {
     if (!author) return null;
 
     return (
-        <div className="flex items-start gap-6 p-6 rounded-xl bg-white/50">
+        <div className="flex items-start gap-6 p-8 rounded-2xl bg-gradient-to-br from-white via-white to-gray-50 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
             {author.profilePhoto && (
                 <Image
                     src={author.profilePhoto}
                     alt={author.nickname}
-                    width={56}
-                    height={56}
-                    className="rounded-full object-cover border border-gray-100 shadow-sm"
+                    width={72}
+                    height={72}
+                    className="rounded-2xl object-cover border-2 border-white shadow-md"
                 />
             )}
             <div>
-                <h3 className="font-serif text-lg text-gray-900 mb-1">{author.nickname}</h3>
+                <h3 className="font-serif text-xl text-gray-900 mb-2 font-semibold">{author.nickname}</h3>
                 {author.title && (
-                    <div className="text-gray-600 text-sm mb-2">{author.title}</div>
+                    <div className="text-gray-600 text-sm mb-3 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                        {author.title}
+                    </div>
                 )}
                 {author.aboutPlain && (
                     <p className="text-gray-600 text-base leading-relaxed">{author.aboutPlain}</p>
@@ -106,30 +108,28 @@ const AuthorCard = ({ author }: { author: BlogPost['author'] }) => {
         </div>
     );
 };
-AuthorCard.displayName = 'AuthorCard';
 
 const BookRecommendations = ({ books }: { books: Book[] }) => {
     const handleBookClick = useCallback((title: string) => {
-        // You might want to add analytics here
         console.log('Book clicked:', title);
     }, []);
 
     if (!books || books.length === 0) return null;
 
     return (
-        <div className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-100 p-6 rounded-xl mb-6 shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-                <h3 className="font-serif text-xl text-gray-900">Deepen Your Knowledge</h3>
-                <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full">Recommended</span>
+        <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="font-serif text-xl text-gray-900 font-semibold">Featured Books</h3>
+                <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full">New</span>
             </div>
-            <p className="text-gray-600 text-sm mb-4">
-                Hand-picked resources to master this topic
+            <p className="text-gray-600 text-sm mb-6">
+                Curated resources to expand your knowledge
             </p>
-            <div className="space-y-5">
+            <div className="space-y-6">
                 {books.map((book, index) => (
                     <div
                         key={index}
-                        className="group relative bg-white p-4 rounded-lg border border-gray-100 transition-all duration-300 hover:shadow-md hover:border-blue-100"
+                        className="group relative bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-blue-100"
                     >
                         <a
                             href={book.link}
@@ -138,29 +138,29 @@ const BookRecommendations = ({ books }: { books: Book[] }) => {
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            <div className="flex flex-col">
+                            <div className="flex items-center gap-6">
                                 {/* Book Cover */}
-                                <div className="mx-auto w-32 h-44 relative mb-4 overflow-hidden rounded-lg shadow-sm transition-transform group-hover:scale-105 bg-gradient-to-b from-gray-50 to-white">
+                                <div className="w-24 h-36 relative overflow-hidden rounded-lg shadow-md transition-transform group-hover:scale-105 bg-gradient-to-b from-gray-50 to-white">
                                     <WixMediaImage
                                         media={book.image}
-                                        width={128}
-                                        height={176}
+                                        width={96}
+                                        height={144}
                                         className="object-cover"
                                         objectFit="cover"
                                     />
                                 </div>
 
                                 {/* Book Details */}
-                                <div className="text-center">
+                                <div className="flex-1">
                                     {index === 0 && (
-                                        <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">
-                                            Most Popular
+                                        <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full mb-2">
+                                            Bestseller
                                         </span>
                                     )}
-                                    <h4 className="text-gray-900 font-medium group-hover:text-gray-700 transition-colors mb-2">
+                                    <h4 className="text-gray-900 font-medium text-lg group-hover:text-gray-700 transition-colors mb-2">
                                         {book.title}
                                     </h4>
-                                    <div className="flex items-center justify-center gap-2 mb-3">
+                                    <div className="flex items-center gap-3 mb-4">
                                         {book.displayPrice && (
                                             <span className="text-sm font-semibold text-gray-900">
                                                 {book.displayPrice}
@@ -170,12 +170,12 @@ const BookRecommendations = ({ books }: { books: Book[] }) => {
                                             <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zm0 16a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
                                             </svg>
-                                            Limited Time Offer
+                                            Special Offer
                                         </span>
                                     </div>
-                                    <button className="w-full bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center group-hover:bg-gray-800">
-                                        Get This Book
-                                        <svg className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 group-hover:gap-3">
+                                        View Details
+                                        <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                         </svg>
                                     </button>
@@ -185,199 +185,203 @@ const BookRecommendations = ({ books }: { books: Book[] }) => {
                     </div>
                 ))}
             </div>
-            <div className="mt-4 pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-500 flex items-center">
-                    <svg className="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Curated to complement this article
-                </p>
-            </div>
         </div>
     );
 };
 
 const Sidebar = ({ books }: { books: Book[] }) => (
-    <aside className="space-y-6">
-        <BookRecommendations books={books} />
-        {/* Newsletter Subscription */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-            <div className="p-6">
-                <h3 className="font-serif text-xl mb-3 text-gray-900 font-bold">Subscribe to My Newsletter</h3>
-                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                    Get exclusive insights and updates delivered straight to your inbox.
-                </p>
-                <form className="space-y-3">
-                    <input
-                        type="email"
-                        placeholder="Enter your email"
-                        className="w-full px-4 py-2.5 text-base border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900/30 transition-all bg-gray-50"
-                    />
-                    <button className="w-full bg-gray-900 text-white px-6 py-2.5 rounded-lg text-base font-medium hover:bg-gray-800 transition-all">
-                        Subscribe
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        {/* Latest YouTube Video */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-            <div className="p-6">
-                <h3 className="font-serif text-xl mb-4 text-gray-900 font-bold">Latest Video</h3>
-                <div className="aspect-video bg-gray-50 rounded-lg overflow-hidden mb-3">
-                    <iframe
-                        className="w-full h-full"
-                        src="https://www.youtube.com/embed/latest"
-                        title="Latest YouTube video"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                    ></iframe>
+    <aside className="space-y-8">
+        {/* Recommended Books */}
+        {books.length > 0 && (
+            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                <div className="p-6">
+                    <div className="mb-4">
+                        <h3 className="font-serif text-xl font-bold text-gray-900 mb-2">Recommended Reading</h3>
+                        <p className="text-sm text-gray-600">Support our ministry by exploring these carefully selected books</p>
+                    </div>
+                    <div className="space-y-6">
+                        {books.slice(0, 3).map((book, index) => (
+                            <div key={index} className="group relative bg-gray-50 p-4 rounded-lg">
+                                <div className="flex gap-4">
+                                    <div className="w-20 h-28 relative rounded-lg overflow-hidden shadow-sm flex-shrink-0">
+                                        <WixMediaImage
+                                            media={book.image}
+                                            width={80}
+                                            height={112}
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                            objectFit="cover"
+                                        />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="font-medium text-gray-900 mb-1 truncate">
+                                            {book.title}
+                                        </h4>
+                                        {book.displayPrice && (
+                                            <div className="text-sm text-gray-600 mb-3">
+                                                Support us: {book.displayPrice}
+                                            </div>
+                                        )}
+                                        <a
+                                            href={book.link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center justify-center w-full px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors"
+                                        >
+                                            Purchase & Support
+                                            <svg className="w-4 h-4 ml-2 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="mt-6 pt-6 border-t border-gray-100">
+                        <p className="text-sm text-gray-500 mb-4 text-center">Your purchase helps us create more content and resources</p>
+                    </div>
                 </div>
-                <a href="#" className="text-gray-900 hover:text-gray-600 font-medium inline-flex items-center gap-2 text-sm group">
-                    Watch on YouTube
-                    <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                </a>
             </div>
+        )}
+
+        {/* Newsletter */}
+        <div className="bg-gray-900 rounded-lg p-6 text-white">
+            <h3 className="font-serif text-lg font-semibold mb-3">Stay Updated</h3>
+            <p className="text-gray-300 text-sm mb-4">Get the latest insights delivered to your inbox.</p>
+            <form className="space-y-3">
+                <input
+                    type="email"
+                    placeholder="Your email"
+                    className="w-full px-4 py-2 text-sm bg-white/10 border border-white/20 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    Subscribe
+                </button>
+            </form>
         </div>
     </aside>
 );
-Sidebar.displayName = 'Sidebar';
 
 export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: Book[] }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
         const checkAuth = async () => {
-            const response = await fetch('/api/auth/me');
-            const data = await response.json();
-            setIsAuthenticated(!!data.user);
+            try {
+                const response = await fetch('/api/auth/me');
+                setIsAuthenticated(response.ok);
+            } catch (error) {
+                console.error('Error checking authentication:', error);
+                setIsAuthenticated(false);
+            }
         };
         checkAuth();
     }, []);
 
     return (
-        <div className="min-h-screen pb-24 bg-gray-50">
-            {/* Hero Section with Cover Image */}
-            {blog.coverImage && (
-                <div className="relative bg-gray-900">
-                    <WixMediaImage
-                        media={blog.coverImage}
-                        width={1920}
-                        height={1080}
-                        className="absolute inset-0 w-full h-full object-cover opacity-70"
-                        objectFit="cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/90" />
-                    <div className="relative pt-24 pb-24 px-6 sm:px-8 lg:px-12 xl:px-24 text-white">
-                        <div className="max-w-3xl mx-auto text-center">
-                            <div className="flex flex-wrap justify-center items-center gap-3 mb-6 text-sm text-gray-300">
+        <div className="min-h-screen bg-white">
+            <div className="max-w-6xl mx-auto px-4 py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    {/* Main Content */}
+                    <article className="lg:col-span-8">
+                        {/* Article Header */}
+                        <header className="mb-12">
+                            {blog.coverImage && (
+                                <div className="aspect-[2/1] overflow-hidden rounded-lg mb-8">
+                                    <WixMediaImage
+                                        media={blog.coverImage}
+                                        width={1200}
+                                        height={600}
+                                        className="w-full h-full object-cover"
+                                        objectFit="cover"
+                                    />
+                                </div>
+                            )}
+                            <h1 className="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                                {blog.title}
+                            </h1>
+                            <div className="flex items-center gap-6 text-sm text-gray-500 mb-8">
+                                {blog.author && (
+                                    <div className="flex items-center gap-2">
+                                        {blog.author.profilePhoto && (
+                                            <Image
+                                                src={blog.author.profilePhoto}
+                                                alt={blog.author.nickname}
+                                                width={32}
+                                                height={32}
+                                                className="rounded-full"
+                                            />
+                                        )}
+                                        <span className="text-gray-900 font-medium">{blog.author.nickname}</span>
+                                    </div>
+                                )}
                                 {blog.publishedAt && (
-                                    <time className="flex items-center gap-2 font-medium ">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
+                                    <time>
                                         {new Date(blog.publishedAt).toLocaleDateString('en-US', {
+                                            year: 'numeric',
                                             month: 'long',
-                                            day: 'numeric',
-                                            year: 'numeric'
+                                            day: 'numeric'
                                         })}
                                     </time>
                                 )}
                                 {blog.readingTime && (
-                                    <span className="flex items-center gap-2 font-medium">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 0118 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        {blog.readingTime} min read
-                                    </span>
+                                    <span>{blog.readingTime} read</span>
                                 )}
                             </div>
-                            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                                {blog.title}
-                            </h1>
-                            {blog.author && (
-                                <div className="flex items-center justify-center gap-4 text-gray-300">
-                                    {blog.author.profilePhoto && (
-                                        <div className="shrink-0">
-                                            <Image
-                                                src={blog.author.profilePhoto}
-                                                alt={blog.author.nickname}
-                                                width={48}
-                                                height={48}
-                                                className="rounded-full object-cover ring-2 ring-gray-600"
-                                            />
-                                        </div>
-                                    )}
-                                    <div className="text-left">
-                                        <span className="block text-sm font-medium">By {blog.author.nickname}</span>
-                                        {blog.author.title && (
-                                            <span className="text-sm">{blog.author.title}</span>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+                        </header>
 
-            {/* Content and Sidebar */}
-            <div className="container max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 xl:px-24 mt-12 lg:mt-16">
-                <div className="flex flex-col lg:flex-row items-start gap-12">
-                    {/* Main content */}
-                    <article className="flex-grow">
-                        {/* Blog Content */}
-                        <div className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:tracking-tight prose-headings:font-bold prose-p:text-lg prose-p:leading-relaxed prose-a:text-blue-500 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md">
-                            {blog.richContent ? (
-                                <Suspense fallback={<RichTextSkeleton />}>
+                        {/* Article Content */}
+                        <div className="prose prose-lg max-w-none 
+                            prose-headings:font-serif prose-headings:font-bold
+                            prose-p:text-gray-600 prose-p:leading-relaxed
+                            prose-a:text-blue-600 prose-a:no-underline hover:prose-a:text-blue-700
+                            prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-gray-50
+                            prose-blockquote:py-2 prose-blockquote:px-4
+                            prose-code:text-blue-600 prose-code:bg-gray-50
+                            prose-pre:bg-gray-900 prose-pre:text-gray-100
+                            prose-img:rounded-lg">
+                            <Suspense fallback={<RichTextSkeleton />}>
+                                {blog.richContent ? (
                                     <RichContentViewer content={blog.richContent} />
-                                </Suspense>
-                            ) : (
-                                <div dangerouslySetInnerHTML={{ __html: blog.content || '' }} />
-                            )}
+                                ) : (
+                                    blog.content && <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+                                )}
+                            </Suspense>
                         </div>
 
                         {/* Author Bio */}
-                        {blog.author && blog.author.aboutPlain && (
-                            <div className="mt-16 mb-16 p-8 rounded-2xl bg-white shadow-sm border border-gray-100">
-                                <div className="flex items-start gap-6">
+                        {blog.author?.aboutPlain && (
+                            <div className="mt-12 pt-8 border-t border-gray-100">
+                                <div className="flex items-start gap-4">
                                     {blog.author.profilePhoto && (
                                         <Image
                                             src={blog.author.profilePhoto}
                                             alt={blog.author.nickname}
-                                            width={80}
-                                            height={80}
-                                            className="rounded-full object-cover ring-2 ring-gray-200"
+                                            width={64}
+                                            height={64}
+                                            className="rounded-full"
                                         />
                                     )}
                                     <div>
-                                        <h3 className="font-serif text-xl font-bold mb-2">{blog.author.nickname}</h3>
-                                        {blog.author.title && (
-                                            <div className="text-sm text-gray-600 mb-3">{blog.author.title}</div>
-                                        )}
-                                        <p className="text-base text-gray-700 leading-relaxed">{blog.author.aboutPlain}</p>
+                                        <h3 className="font-medium text-gray-900 mb-2">About {blog.author.nickname}</h3>
+                                        <p className="text-gray-600 text-sm leading-relaxed">{blog.author.aboutPlain}</p>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Add a divider and spacing before comments */}
-                        <div className="my-16 border-t border-gray-200"></div>
-
-                        <Suspense fallback={<CommentsSkeleton />}>
-                            <Comments contextId={blog._id} resourceId={blog._id} isAuthenticated={isAuthenticated} />
-                        </Suspense>
+                        {/* Comments Section */}
+                        <div className="mt-12 pt-8 border-t border-gray-100">
+                            <Suspense fallback={<CommentsSkeleton />}>
+                                <Comments contextId={blog._id} resourceId={blog._id} isAuthenticated={isAuthenticated} />
+                            </Suspense>
+                        </div>
                     </article>
 
                     {/* Sidebar */}
-                    <aside className="w-full lg:w-[380px] shrink-0">
-                        <div className="lg:sticky top-24 space-y-6">
-                            <Sidebar books={books} />
-                        </div>
-                    </aside>
+                    <div className="lg:col-span-4 lg:sticky lg:top-8 lg:self-start">
+                        <Sidebar books={books} />
+                    </div>
                 </div>
             </div>
         </div>
