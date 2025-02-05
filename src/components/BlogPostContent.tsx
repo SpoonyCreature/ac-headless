@@ -239,7 +239,7 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
             </div>
 
             {/* Main Content */}
-            <div className="max-w-6xl mx-auto px-4 py-12">
+            <div className="max-w-6xl mx-auto px-10 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                     <article className="lg:col-span-8">
                         {/* Article Content */}
