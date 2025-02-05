@@ -198,45 +198,49 @@ const BookRecommendations = ({ books }: { books: Book[] }) => {
 };
 
 const Sidebar = ({ books }: { books: Book[] }) => (
-    <aside className="space-y-6 sticky top-8">
+    <aside className="space-y-6">
         <BookRecommendations books={books} />
         {/* Newsletter Subscription */}
-        <div className="bg-white/50 border border-gray-100 p-6 rounded-xl">
-            <h3 className="font-serif text-xl mb-3 text-gray-900">Subscribe to My Newsletter</h3>
-            <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                Get exclusive insights and updates delivered straight to your inbox.
-            </p>
-            <form className="space-y-3">
-                <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="w-full px-4 py-2.5 text-base border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900/30 transition-all bg-white/80"
-                />
-                <button className="w-full bg-gray-900 text-white px-6 py-2.5 rounded-lg text-base font-medium hover:bg-gray-800 transition-all">
-                    Subscribe
-                </button>
-            </form>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div className="p-6">
+                <h3 className="font-serif text-xl mb-3 text-gray-900 font-bold">Subscribe to My Newsletter</h3>
+                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                    Get exclusive insights and updates delivered straight to your inbox.
+                </p>
+                <form className="space-y-3">
+                    <input
+                        type="email"
+                        placeholder="Enter your email"
+                        className="w-full px-4 py-2.5 text-base border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900/30 transition-all bg-gray-50"
+                    />
+                    <button className="w-full bg-gray-900 text-white px-6 py-2.5 rounded-lg text-base font-medium hover:bg-gray-800 transition-all">
+                        Subscribe
+                    </button>
+                </form>
+            </div>
         </div>
 
         {/* Latest YouTube Video */}
-        <div className="bg-white/50 border border-gray-100 p-6 rounded-xl">
-            <h3 className="font-serif text-xl mb-4 text-gray-900">Latest Video</h3>
-            <div className="aspect-video bg-gray-50 rounded-lg overflow-hidden mb-3">
-                <iframe
-                    className="w-full h-full"
-                    src="https://www.youtube.com/embed/latest"
-                    title="Latest YouTube video"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                ></iframe>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div className="p-6">
+                <h3 className="font-serif text-xl mb-4 text-gray-900 font-bold">Latest Video</h3>
+                <div className="aspect-video bg-gray-50 rounded-lg overflow-hidden mb-3">
+                    <iframe
+                        className="w-full h-full"
+                        src="https://www.youtube.com/embed/latest"
+                        title="Latest YouTube video"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    ></iframe>
+                </div>
+                <a href="#" className="text-gray-900 hover:text-gray-600 font-medium inline-flex items-center gap-2 text-sm group">
+                    Watch on YouTube
+                    <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </a>
             </div>
-            <a href="#" className="text-gray-900 hover:text-gray-600 font-medium inline-flex items-center gap-2 text-sm group">
-                Watch on YouTube
-                <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-            </a>
         </div>
     </aside>
 );
@@ -247,26 +251,31 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
 
     useEffect(() => {
         const checkAuth = async () => {
-            const cookies = document.cookie.split(';');
-            const hasWixSession = cookies.some(cookie => cookie.trim().startsWith(WIX_SESSION_COOKIE_NAME + '='));
-            setIsAuthenticated(hasWixSession);
+            const response = await fetch('/api/auth/me');
+            const data = await response.json();
+            setIsAuthenticated(!!data.user);
         };
         checkAuth();
     }, []);
 
     return (
-        <div className="min-h-screen pb-24">
-            {/* Content and Sidebar */}
-            <div className="container mx-auto px-4">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Main content */}
-                    <article className="flex-grow">
-                        {/* Title Section */}
-                        <header className="mb-16 mt-12">
-                            {/* Meta Information */}
-                            <div className="flex items-center gap-6 text-gray-600 text-sm tracking-wide mb-8">
+        <div className="min-h-screen pb-24 bg-gray-50">
+            {/* Hero Section with Cover Image */}
+            {blog.coverImage && (
+                <div className="relative bg-gray-900">
+                    <WixMediaImage
+                        media={blog.coverImage}
+                        width={1920}
+                        height={1080}
+                        className="absolute inset-0 w-full h-full object-cover opacity-70"
+                        objectFit="cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/90" />
+                    <div className="relative pt-24 pb-24 px-6 sm:px-8 lg:px-12 xl:px-24 text-white">
+                        <div className="max-w-3xl mx-auto text-center">
+                            <div className="flex flex-wrap justify-center items-center gap-3 mb-6 text-sm text-gray-300">
                                 {blog.publishedAt && (
-                                    <time className="flex items-center gap-2 font-medium">
+                                    <time className="flex items-center gap-2 font-medium ">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
@@ -280,39 +289,48 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                                 {blog.readingTime && (
                                     <span className="flex items-center gap-2 font-medium">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 0118 0 9 9 0 0118 0z" />
                                         </svg>
                                         {blog.readingTime} min read
                                     </span>
                                 )}
                             </div>
-
-                            {/* Title */}
-                            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-gray-900 mb-10 leading-[1.1] tracking-tight">
+                            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                                 {blog.title}
                             </h1>
-
-                            {/* Author Section */}
                             {blog.author && (
-                                <div className="inline-flex items-center gap-3.5 px-5 py-2.5 rounded-full bg-white shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-gray-100" role="contentinfo" aria-label="Article author">
-                                    <span className="text-[14px] font-medium text-gray-500">By</span>
+                                <div className="flex items-center justify-center gap-4 text-gray-300">
                                     {blog.author.profilePhoto && (
-                                        <Image
-                                            src={blog.author.profilePhoto}
-                                            alt={blog.author.nickname}
-                                            width={26}
-                                            height={26}
-                                            className="rounded-full object-cover"
-                                        />
+                                        <div className="shrink-0">
+                                            <Image
+                                                src={blog.author.profilePhoto}
+                                                alt={blog.author.nickname}
+                                                width={48}
+                                                height={48}
+                                                className="rounded-full object-cover ring-2 ring-gray-600"
+                                            />
+                                        </div>
                                     )}
-                                    <span className="text-[14px] font-medium text-gray-700">
-                                        {blog.author.nickname}
-                                    </span>
+                                    <div className="text-left">
+                                        <span className="block text-sm font-medium">By {blog.author.nickname}</span>
+                                        {blog.author.title && (
+                                            <span className="text-sm">{blog.author.title}</span>
+                                        )}
+                                    </div>
                                 </div>
                             )}
-                        </header>
+                        </div>
+                    </div>
+                </div>
+            )}
 
-                        <div className="prose max-w-none">
+            {/* Content and Sidebar */}
+            <div className="container max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 xl:px-24 mt-12 lg:mt-16">
+                <div className="flex flex-col lg:flex-row items-start gap-12">
+                    {/* Main content */}
+                    <article className="flex-grow">
+                        {/* Blog Content */}
+                        <div className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:tracking-tight prose-headings:font-bold prose-p:text-lg prose-p:leading-relaxed prose-a:text-blue-500 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md">
                             {blog.richContent ? (
                                 <Suspense fallback={<RichTextSkeleton />}>
                                     <RichContentViewer content={blog.richContent} />
@@ -322,14 +340,43 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                             )}
                         </div>
 
+                        {/* Author Bio */}
+                        {blog.author && blog.author.aboutPlain && (
+                            <div className="mt-16 mb-16 p-8 rounded-2xl bg-white shadow-sm border border-gray-100">
+                                <div className="flex items-start gap-6">
+                                    {blog.author.profilePhoto && (
+                                        <Image
+                                            src={blog.author.profilePhoto}
+                                            alt={blog.author.nickname}
+                                            width={80}
+                                            height={80}
+                                            className="rounded-full object-cover ring-2 ring-gray-200"
+                                        />
+                                    )}
+                                    <div>
+                                        <h3 className="font-serif text-xl font-bold mb-2">{blog.author.nickname}</h3>
+                                        {blog.author.title && (
+                                            <div className="text-sm text-gray-600 mb-3">{blog.author.title}</div>
+                                        )}
+                                        <p className="text-base text-gray-700 leading-relaxed">{blog.author.aboutPlain}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Add a divider and spacing before comments */}
+                        <div className="my-16 border-t border-gray-200"></div>
+
                         <Suspense fallback={<CommentsSkeleton />}>
                             <Comments contextId={blog._id} resourceId={blog._id} isAuthenticated={isAuthenticated} />
                         </Suspense>
                     </article>
 
                     {/* Sidebar */}
-                    <aside className="w-full lg:w-80 shrink-0 lg:pt-[13.5rem]">
-                        <Sidebar books={books} />
+                    <aside className="w-full lg:w-[380px] shrink-0">
+                        <div className="lg:sticky top-24 space-y-6">
+                            <Sidebar books={books} />
+                        </div>
                     </aside>
                 </div>
             </div>

@@ -34,20 +34,20 @@ export function BlogCard({ blog }: { blog: BlogPost }) {
                         objectFit="cover"
                     />
                 </div>
-                <div className="p-8">
-                    <h3 className="mb-4 text-2xl font-serif  tracking-tight group-hover:text-primary transition-colors">
+                <div className="p-6">
+                    <h3 className="mb-3 text-xl font-serif tracking-tight group-hover:text-primary transition-colors">
                         {blog.title}
                     </h3>
-                    <p className="mb-6 text-base text-muted-foreground line-clamp-3 font-serif leading-relaxed">
+                    <p className="mb-5 text-sm text-muted-foreground line-clamp-3 font-serif leading-relaxed">
                         {blog.excerpt || blog.content?.substring(0, 160)}
                     </p>
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center text-base font-medium text-primary">
+                        <div className="flex items-center text-sm font-medium text-primary">
                             Read article
-                            <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                            <ArrowUpRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                         </div>
                         {blog.author && (
-                            <div className="flex items-center text-sm text-muted-foreground">
+                            <div className="flex items-center text-xs text-muted-foreground">
                                 {blog.author.image ? (
                                     <WixMediaImage
                                         media={blog.author.image}

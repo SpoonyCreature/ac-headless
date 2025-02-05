@@ -85,59 +85,67 @@ interface CommentItemProps {
 
 function CommentItem({ comment, replies, level, onReply, isAuthenticated }: CommentItemProps) {
     const hasReplies = replies.length > 0;
-    const canNest = level < 3; // Limit nesting to 3 levels
+    const canNest = level < 3;
     const [isReplying, setIsReplying] = useState(false);
 
     return (
-        <div className={`relative ${level > 0 ? 'ml-6 md:ml-12' : ''}`}>
+        <div className={`relative ${level > 0 ? 'ml-8 md:ml-16' : ''}`}>
             {/* Comment thread line */}
             {level > 0 && (
-                <div className="absolute left-[-12px] top-0 bottom-0 w-[2px] bg-border/20 hover:bg-border/40 transition-colors" />
+                <div className="absolute left-[-24px] top-[28px] bottom-0 w-px bg-gradient-to-b from-border/40 via-border/30 to-transparent" />
             )}
 
             <div className="relative group">
-                <div className="py-2">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span className="font-medium text-foreground">{comment.author.name}</span>
-                        <span>•</span>
-                        <span>{new Date(comment._createdDate).toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: '2-digit'
-                        })}</span>
-                        {comment.contentEdited && (
-                            <>
-                                <span>•</span>
-                                <span className="italic">edited</span>
-                            </>
-                        )}
-                    </div>
-                    <p className="text-sm leading-relaxed my-2">{extractTextFromRichContent(comment.content)}</p>
-                    <div className="flex items-center gap-4 text-xs">
-                        {isAuthenticated && canNest && (
-                            <button
-                                onClick={() => setIsReplying(!isReplying)}
-                                className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
-                            >
-                                <Reply className="h-3.5 w-3.5" />
-                                {isReplying ? 'Cancel' : 'Reply'}
-                            </button>
-                        )}
-                        {comment.replyCount > 0 && !hasReplies && (
-                            <button
-                                onClick={() => onReply(comment._id)}
-                                className="text-muted-foreground hover:text-primary transition-colors"
-                            >
-                                {comment.replyCount} {comment.replyCount === 1 ? 'reply' : 'replies'}
-                            </button>
-                        )}
+                <div className="py-5 transition-all">
+                    <div className="flex gap-4">
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary font-medium text-sm ring-1 ring-primary/20">
+                            {comment.author?.name?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                        <div className="flex-1 space-y-3">
+                            <div className="flex items-baseline justify-between">
+                                <div className="flex items-center gap-2">
+                                    <span className="font-medium text-sm">{comment.author.name}</span>
+                                    <span className="text-xs text-muted-foreground/60">•</span>
+                                    <span className="text-xs text-muted-foreground/60">{new Date(comment._createdDate).toLocaleString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        hour: 'numeric',
+                                        minute: '2-digit'
+                                    })}</span>
+                                </div>
+                                {comment.contentEdited && (
+                                    <span className="text-xs text-muted-foreground/50 italic">edited</span>
+                                )}
+                            </div>
+                            <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-p:text-foreground/90">
+                                <p>{extractTextFromRichContent(comment.content)}</p>
+                            </div>
+                            <div className="flex items-center gap-4 pt-0.5">
+                                {isAuthenticated && canNest && (
+                                    <button
+                                        onClick={() => setIsReplying(!isReplying)}
+                                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+                                    >
+                                        <Reply className="h-3.5 w-3.5" />
+                                        {isReplying ? 'Cancel' : 'Reply'}
+                                    </button>
+                                )}
+                                {comment.replyCount > 0 && !hasReplies && (
+                                    <button
+                                        onClick={() => onReply(comment._id)}
+                                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+                                    >
+                                        <MessageSquare className="h-3.5 w-3.5" />
+                                        {comment.replyCount} {comment.replyCount === 1 ? 'reply' : 'replies'}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {isReplying && (
-                    <div className="mt-2 mb-4">
+                    <div className="mt-3 ml-12">
                         <ReplyForm
                             onSubmit={(content) => {
                                 onReply(comment._id);
@@ -149,12 +157,12 @@ function CommentItem({ comment, replies, level, onReply, isAuthenticated }: Comm
             </div>
 
             {hasReplies && (
-                <div className="mt-2 space-y-2">
+                <div className="mt-3 space-y-3">
                     {replies.map(reply => (
                         <CommentItem
                             key={reply._id}
                             comment={reply}
-                            replies={[]} // We don't support deeper nesting
+                            replies={[]}
                             level={level + 1}
                             onReply={onReply}
                             isAuthenticated={isAuthenticated}
@@ -206,6 +214,7 @@ export function Comments({ contextId, resourceId, isAuthenticated }: CommentsPro
     const [commentReplies, setCommentReplies] = useState<Record<string, Comment[]>>({});
     const [newComment, setNewComment] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
     const fetchComments = useCallback(async () => {
@@ -213,7 +222,6 @@ export function Comments({ contextId, resourceId, isAuthenticated }: CommentsPro
             setIsLoading(true);
             const response = await fetch(`/api/comments?contextId=${contextId}&resourceId=${resourceId}`);
             const data: CommentsResponse = await response.json();
-            console.log("COMMENTS DATA", data);
             setComments(data.comments);
             const replies: Record<string, Comment[]> = {};
             Object.entries(data.commentReplies).forEach(([parentId, replyData]) => {
@@ -233,10 +241,10 @@ export function Comments({ contextId, resourceId, isAuthenticated }: CommentsPro
 
     const handleSubmitComment = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newComment.trim() || !isAuthenticated) return;
+        if (!newComment.trim() || !isAuthenticated || isSubmitting) return;
 
         try {
-            console.log('Submitting comment with parent:', replyingTo);
+            setIsSubmitting(true);
             const response = await fetch('/api/comments', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -264,10 +272,14 @@ export function Comments({ contextId, resourceId, isAuthenticated }: CommentsPro
             setNewComment('');
             setReplyingTo(null);
 
-            // Reload all comments
-            await fetchComments();
+            // Add a slight delay before refreshing comments for better UX
+            setTimeout(() => {
+                fetchComments();
+                setIsSubmitting(false);
+            }, 1500);
         } catch (error) {
             console.error('Error posting comment:', error);
+            setIsSubmitting(false);
         }
     };
 
@@ -280,6 +292,9 @@ export function Comments({ contextId, resourceId, isAuthenticated }: CommentsPro
         setReplyingTo(null);
         setNewComment('');
     };
+
+    console.log("COMMENTS", comments);
+    console.log("IS AUTHENTICATED", isAuthenticated);
 
     // Organize comments into a tree structure
     const commentTree = comments.reduce((acc, comment) => {
@@ -297,59 +312,75 @@ export function Comments({ contextId, resourceId, isAuthenticated }: CommentsPro
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-12">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold tracking-tight">Discussion</h2>
+                <h2 className="text-2xl font-serif tracking-tight">Discussion</h2>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <MessageSquare className="h-4 w-4" />
                     {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
                 </div>
             </div>
 
-            <div className="space-y-6">
-                {commentTree.map((comment) => (
-                    <CommentItem
-                        key={comment._id}
-                        comment={comment}
-                        replies={comment.replies}
-                        level={0}
-                        onReply={handleReply}
-                        isAuthenticated={isAuthenticated}
-                    />
-                ))}
-                {comments.length === 0 && (
-                    <div className="text-center py-12">
-                        <p className="text-sm text-muted-foreground">
-                            No comments yet. {isAuthenticated ? 'Start the discussion!' : 'Sign in to start the discussion!'}
-                        </p>
-                    </div>
-                )}
-            </div>
-
-            {isAuthenticated ? (
-                <form onSubmit={handleSubmitComment} className="space-y-4 pt-4 border-t border-border/20">
-                    <textarea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="What are your thoughts?"
-                        className="w-full min-h-[120px] p-4 rounded-lg border border-border/50 bg-background resize-y placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
-                    />
-                    <div className="flex justify-end">
-                        <button
-                            type="submit"
-                            disabled={!newComment.trim()}
-                            className="px-5 py-2.5 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            Comment
-                        </button>
+            {isAuthenticated && (
+                <form onSubmit={handleSubmitComment} className="relative">
+                    <div className="flex gap-4">
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary font-medium text-sm ring-1 ring-primary/20">
+                            {/* Add user's initial here */}
+                            A
+                        </div>
+                        <div className="flex-1">
+                            <textarea
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                placeholder="What are your thoughts?"
+                                className="w-full min-h-[120px] p-4 rounded-lg bg-transparent resize-y placeholder:text-muted-foreground/60 focus:outline-none text-base border-b border-border/40 focus:border-primary/30 transition-colors"
+                            />
+                            <div className="flex justify-end mt-3">
+                                <button
+                                    type="submit"
+                                    disabled={!newComment.trim() || isSubmitting}
+                                    className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    {isSubmitting && (
+                                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                        </svg>
+                                    )}
+                                    {isSubmitting ? 'Posting...' : 'Post Comment'}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </form>
-            ) : (
-                <div className="p-6 rounded-lg bg-muted/30 border border-border/50 text-center">
+            )}
+
+            <div className="space-y-6 divide-y divide-border/40">
+                {commentTree.map((comment) => (
+                    <div key={comment._id} className="pt-6 first:pt-0">
+                        <CommentItem
+                            comment={comment}
+                            replies={comment.replies}
+                            level={0}
+                            onReply={handleReply}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    </div>
+                ))}
+            </div>
+
+            {!isAuthenticated && (
+                <div className="text-center py-12">
                     <p className="text-sm text-muted-foreground mb-4">
-                        Join the discussion by signing in
+                        Join the discussion
                     </p>
                     <LoginButton />
+                </div>
+            )}
+
+            {isAuthenticated && comments.length === 0 && (
+                <div className="text-center py-12 text-sm text-muted-foreground">
+                    No comments yet. Be the first to start the discussion!
                 </div>
             )}
         </div>

@@ -76,17 +76,17 @@ export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
     };
 
     return (
-        <div className="space-y-16">
+        <div className="space-y-24">
             {/* Regular Posts Section */}
             <div>
-                <h2 className="font-serif text-3xl  mb-8">Articles</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+                <h2 className="font-serif text-3xl mb-12">Articles</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mb-12">
                     {regularPosts.map((post) => (
                         <BlogCard key={post._id} blog={post} />
                     ))}
                 </div>
                 {hasMorePosts && (
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mt-8">
                         <Button
                             variant="outline"
                             size="lg"
@@ -102,14 +102,14 @@ export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
 
             {/* Nuggets Section */}
             <div>
-                <h2 className="font-serif text-3xl  mb-8">Nuggets</h2>
-                <div className="grid grid-cols-1 gap-4 mb-8">
+                <h2 className="font-serif text-3xl mb-12">Nuggets</h2>
+                <div className="grid grid-cols-1 gap-6 mb-12">
                     {nuggets.map((nugget) => (
                         <NuggetCard key={nugget._id} blog={nugget} />
                     ))}
                 </div>
                 {hasMoreNuggets && (
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mt-8">
                         <Button
                             variant="outline"
                             size="lg"
