@@ -72,122 +72,6 @@ interface Book {
     displayPrice?: string;
 }
 
-const ShareButton = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
-    <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-full transition-all duration-200">
-        {icon}
-        <span className="text-sm font-medium">{label}</span>
-    </button>
-);
-
-const AuthorCard = ({ author }: { author: BlogPost['author'] }) => {
-    if (!author) return null;
-
-    return (
-        <div className="flex items-start gap-6 p-8 rounded-2xl bg-gradient-to-br from-white via-white to-gray-50 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
-            {author.profilePhoto && (
-                <Image
-                    src={author.profilePhoto}
-                    alt={author.nickname}
-                    width={72}
-                    height={72}
-                    className="rounded-2xl object-cover border-2 border-white shadow-md"
-                />
-            )}
-            <div>
-                <h3 className="font-serif text-xl text-gray-900 mb-2 font-semibold">{author.nickname}</h3>
-                {author.title && (
-                    <div className="text-gray-600 text-sm mb-3 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                        {author.title}
-                    </div>
-                )}
-                {author.aboutPlain && (
-                    <p className="text-gray-600 text-base leading-relaxed">{author.aboutPlain}</p>
-                )}
-            </div>
-        </div>
-    );
-};
-
-const BookRecommendations = ({ books }: { books: Book[] }) => {
-    const handleBookClick = useCallback((title: string) => {
-        console.log('Book clicked:', title);
-    }, []);
-
-    if (!books || books.length === 0) return null;
-
-    return (
-        <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="font-serif text-xl text-gray-900 font-semibold">Featured Books</h3>
-                <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full">New</span>
-            </div>
-            <p className="text-gray-600 text-sm mb-6">
-                Curated resources to expand your knowledge
-            </p>
-            <div className="space-y-6">
-                {books.map((book, index) => (
-                    <div
-                        key={index}
-                        className="group relative bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-blue-100"
-                    >
-                        <a
-                            href={book.link}
-                            onClick={() => handleBookClick(book.title)}
-                            className="block"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <div className="flex items-center gap-6">
-                                {/* Book Cover */}
-                                <div className="w-24 h-36 relative overflow-hidden rounded-lg shadow-md transition-transform group-hover:scale-105 bg-gradient-to-b from-gray-50 to-white">
-                                    <WixMediaImage
-                                        media={book.image}
-                                        width={96}
-                                        height={144}
-                                        className="object-cover"
-                                        objectFit="cover"
-                                    />
-                                </div>
-
-                                {/* Book Details */}
-                                <div className="flex-1">
-                                    {index === 0 && (
-                                        <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full mb-2">
-                                            Bestseller
-                                        </span>
-                                    )}
-                                    <h4 className="text-gray-900 font-medium text-lg group-hover:text-gray-700 transition-colors mb-2">
-                                        {book.title}
-                                    </h4>
-                                    <div className="flex items-center gap-3 mb-4">
-                                        {book.displayPrice && (
-                                            <span className="text-sm font-semibold text-gray-900">
-                                                {book.displayPrice}
-                                            </span>
-                                        )}
-                                        <span className="flex items-center text-xs text-amber-600 font-medium">
-                                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zm0 16a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-                                            </svg>
-                                            Special Offer
-                                        </span>
-                                    </div>
-                                    <button className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 group-hover:gap-3">
-                                        View Details
-                                        <svg className="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
 
 const Sidebar = ({ books }: { books: Book[] }) => (
     <aside className="space-y-8">
@@ -280,56 +164,84 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
 
     return (
         <div className="min-h-screen bg-white">
-            <div className="max-w-6xl mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                    {/* Main Content */}
-                    <article className="lg:col-span-8">
-                        {/* Article Header */}
-                        <header className="mb-12">
-                            {blog.coverImage && (
-                                <div className="aspect-[2/1] overflow-hidden rounded-lg mb-8">
-                                    <WixMediaImage
-                                        media={blog.coverImage}
-                                        width={1200}
-                                        height={600}
-                                        className="w-full h-full object-cover"
-                                        objectFit="cover"
-                                    />
+            {/* Hero Header Section */}
+            <div className="relative">
+                {blog.coverImage ? (
+                    <>
+                        {/* Full-width background image with overlay */}
+                        <div className="absolute inset-0 h-[70vh] overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-white z-10" />
+                            <WixMediaImage
+                                media={blog.coverImage}
+                                width={1920}
+                                height={1080}
+                                className="w-full h-full object-cover"
+                                objectFit="cover"
+                            />
+                        </div>
+
+                        {/* Content overlay */}
+                        <div className="relative z-20 pt-20 pb-32 px-4 min-h-[70vh] flex items-center">
+                            <div className="max-w-6xl mx-auto w-full">
+                                <div className="max-w-3xl">
+                                    {/* Category */}
+                                    <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+                                        <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                                        <span className="text-sm font-medium text-gray-900">Apologetics</span>
+                                    </div>
+
+                                    {/* Title */}
+                                    <h1 className="font-serif text-4xl md:text-6xl font-bold text-white mb-8 leading-tight drop-shadow-sm">
+                                        {blog.title}
+                                    </h1>
+
+                                    {/* Author and Meta */}
+                                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-1.5 inline-flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 shadow-xl">
+                                        {/* Author */}
+                                        {blog.author && (
+                                            <div className="flex items-center gap-3 px-2.5 py-1.5">
+                                                {blog.author.profilePhoto && (
+                                                    <div className="relative">
+                                                        <Image
+                                                            src={blog.author.profilePhoto}
+                                                            alt={blog.author.nickname}
+                                                            width={32}
+                                                            height={32}
+                                                            className="rounded-full object-cover ring-2 ring-white/90 shadow-sm"
+                                                        />
+                                                    </div>
+                                                )}
+                                                <div className="text-gray-700 text-sm">
+                                                    written by <span className="font-semibold text-gray-900">{blog.author.nickname}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            )}
-                            <h1 className="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    // Fallback header for posts without cover image
+                    <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
+                        <div className="max-w-3xl">
+                            <div className="inline-flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full mb-6">
+                                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                                <span className="text-sm font-medium text-blue-900">Apologetics</span>
+                            </div>
+                            <h1 className="font-serif text-4xl md:text-6xl font-bold text-gray-900 mb-8 leading-tight">
                                 {blog.title}
                             </h1>
-                            <div className="flex items-center gap-6 text-sm text-gray-500 mb-8">
-                                {blog.author && (
-                                    <div className="flex items-center gap-2">
-                                        {blog.author.profilePhoto && (
-                                            <Image
-                                                src={blog.author.profilePhoto}
-                                                alt={blog.author.nickname}
-                                                width={32}
-                                                height={32}
-                                                className="rounded-full"
-                                            />
-                                        )}
-                                        <span className="text-gray-900 font-medium">{blog.author.nickname}</span>
-                                    </div>
-                                )}
-                                {blog.publishedAt && (
-                                    <time>
-                                        {new Date(blog.publishedAt).toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}
-                                    </time>
-                                )}
-                                {blog.readingTime && (
-                                    <span>{blog.readingTime} read</span>
-                                )}
-                            </div>
-                        </header>
+                            {/* Rest of the header content similar to above but with different styling */}
+                        </div>
+                    </div>
+                )}
+            </div>
 
+            {/* Main Content */}
+            <div className="max-w-6xl mx-auto px-4 py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    <article className="lg:col-span-8">
                         {/* Article Content */}
                         <div className="prose prose-lg max-w-none 
                             prose-headings:font-serif prose-headings:font-bold
@@ -349,26 +261,6 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                             </Suspense>
                         </div>
 
-                        {/* Author Bio */}
-                        {blog.author?.aboutPlain && (
-                            <div className="mt-12 pt-8 border-t border-gray-100">
-                                <div className="flex items-start gap-4">
-                                    {blog.author.profilePhoto && (
-                                        <Image
-                                            src={blog.author.profilePhoto}
-                                            alt={blog.author.nickname}
-                                            width={64}
-                                            height={64}
-                                            className="rounded-full"
-                                        />
-                                    )}
-                                    <div>
-                                        <h3 className="font-medium text-gray-900 mb-2">About {blog.author.nickname}</h3>
-                                        <p className="text-gray-600 text-sm leading-relaxed">{blog.author.aboutPlain}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
 
                         {/* Comments Section */}
                         <div className="mt-12 pt-8 border-t border-gray-100">
