@@ -325,7 +325,12 @@ export default function BibleStudyPage() {
                                 </div>
 
                                 {/* Results Content */}
-                                <BibleStudyResults results={results} />
+                                <div className="mt-8">
+                                    <BibleStudyResults
+                                        results={results}
+                                        originalQuery={query}
+                                    />
+                                </div>
 
                                 {/* Next Steps */}
                                 <div className="bg-gradient-to-b from-primary/5 to-transparent rounded-2xl p-8 text-center space-y-6">

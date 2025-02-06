@@ -1,9 +1,14 @@
 export interface CrossReference {
     reference: string;
+    text: string;
     connection: string;
     period: string;
-    text: string;
     sourceReference: string;
+    originalText?: {
+        reference: string;
+        text: string;
+        language: 'hebrew' | 'greek';
+    };
 }
 
 export interface BibleVerse {
