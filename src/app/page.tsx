@@ -1,5 +1,4 @@
 import { getServerWixClient } from "./serverWixClient";
-import { SearchBox } from '../components/SearchBox';
 import { BlogPosts } from '../components/BlogPosts';
 import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
 import Image from 'next/image';
@@ -79,11 +78,6 @@ export default async function Home() {
                                 Dive into our collection of articles on Reformed Presuppositional Apologetics, biblical wisdom, and Christian thought.
                             </p>
                         </div>
-
-                        <div className="mb-16">
-                            <SearchBox />
-                        </div>
-
                         {blogs.length === 0 ? (
                             <div className="text-center py-8 bg-muted/50 rounded-lg">
                                 <p className="text-base font-medium mb-1">No resources found</p>
