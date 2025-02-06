@@ -169,8 +169,8 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                 {blog.coverImage ? (
                     <>
                         {/* Full-width background image with overlay */}
-                        <div className="absolute inset-0 h-[70vh] overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-white z-10" />
+                        <div className="absolute inset-0 h-[60vh] overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-white z-10" />
                             <WixMediaImage
                                 media={blog.coverImage}
                                 width={1920}
@@ -181,25 +181,26 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                         </div>
 
                         {/* Content overlay */}
-                        <div className="relative z-20 pt-20 pb-32 px-4 min-h-[70vh] flex items-center">
+                        <div className="relative z-20 px-4 min-h-[60vh] flex flex-col justify-center">
                             <div className="max-w-6xl mx-auto w-full">
-                                <div className="max-w-3xl">
+                                <div className="max-w-4xl">
                                     {/* Category */}
-                                    <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-                                        <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                                        <span className="text-sm font-medium text-gray-900">Apologetics</span>
+                                    <div className="mb-6">
+                                        <span className="text-sm tracking-widest font-medium text-white/90 uppercase">
+                                            Articles
+                                        </span>
                                     </div>
 
                                     {/* Title */}
-                                    <h1 className="font-serif text-4xl md:text-6xl font-bold text-white mb-8 leading-tight drop-shadow-sm">
+                                    <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
                                         {blog.title}
                                     </h1>
 
-                                    {/* Author and Meta */}
-                                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-1.5 inline-flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 shadow-xl">
+                                    {/* Meta Container */}
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                         {/* Author */}
                                         {blog.author && (
-                                            <div className="flex items-center gap-3 px-2.5 py-1.5">
+                                            <div className="flex items-center gap-3 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-xl">
                                                 {blog.author.profilePhoto && (
                                                     <div className="relative">
                                                         <Image
@@ -207,15 +208,34 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                                                             alt={blog.author.nickname}
                                                             width={32}
                                                             height={32}
-                                                            className="rounded-full object-cover ring-2 ring-white/90 shadow-sm"
+                                                            className="rounded-full object-cover ring-2 ring-white/90"
                                                         />
                                                     </div>
                                                 )}
-                                                <div className="text-gray-700 text-sm">
-                                                    written by <span className="font-semibold text-gray-900">{blog.author.nickname}</span>
+                                                <div className="text-gray-800 text-sm pr-1">
+                                                    written by <span className="font-semibold">{blog.author.nickname}</span>
                                                 </div>
                                             </div>
                                         )}
+
+                                        {/* Date and Reading Time */}
+                                        <div className="flex items-center gap-4 text-white/90 text-sm">
+                                            {blog.publishedAt && (
+                                                <time className="font-medium">
+                                                    {new Date(blog.publishedAt).toLocaleDateString('en-US', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    })}
+                                                </time>
+                                            )}
+                                            {blog.readingTime && (
+                                                <>
+                                                    <span className="w-1 h-1 rounded-full bg-white/60"></span>
+                                                    <span>{blog.readingTime} read</span>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -223,16 +243,61 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                     </>
                 ) : (
                     // Fallback header for posts without cover image
-                    <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
-                        <div className="max-w-3xl">
-                            <div className="inline-flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full mb-6">
-                                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                                <span className="text-sm font-medium text-blue-900">Apologetics</span>
+                    <div className="max-w-6xl mx-auto px-4 pt-24 pb-16 bg-gray-50">
+                        <div className="max-w-4xl">
+                            {/* Category */}
+                            <div className="mb-8">
+                                <span className="text-sm tracking-widest font-medium text-gray-600 uppercase">
+                                    Articles
+                                </span>
                             </div>
-                            <h1 className="font-serif text-4xl md:text-6xl font-bold text-gray-900 mb-8 leading-tight">
+
+                            {/* Title */}
+                            <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold text-gray-900 mb-8 leading-[1.1] tracking-tight">
                                 {blog.title}
                             </h1>
-                            {/* Rest of the header content similar to above but with different styling */}
+
+                            {/* Meta Container */}
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                                {/* Author */}
+                                {blog.author && (
+                                    <div className="flex items-center gap-3 px-3 py-1.5 bg-white rounded-full shadow-sm">
+                                        {blog.author.profilePhoto && (
+                                            <div className="relative">
+                                                <Image
+                                                    src={blog.author.profilePhoto}
+                                                    alt={blog.author.nickname}
+                                                    width={32}
+                                                    height={32}
+                                                    className="rounded-full object-cover ring-2 ring-white/90"
+                                                />
+                                            </div>
+                                        )}
+                                        <div className="text-gray-800 text-sm pr-1">
+                                            written by <span className="font-semibold">{blog.author.nickname}</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Date and Reading Time */}
+                                <div className="flex items-center gap-4 text-gray-600 text-sm">
+                                    {blog.publishedAt && (
+                                        <time className="font-medium">
+                                            {new Date(blog.publishedAt).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric'
+                                            })}
+                                        </time>
+                                    )}
+                                    {blog.readingTime && (
+                                        <>
+                                            <span className="w-1 h-1 rounded-full bg-gray-400"></span>
+                                            <span>{blog.readingTime} read</span>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
