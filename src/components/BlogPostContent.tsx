@@ -178,9 +178,8 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
             <div className="relative">
                 {blog.coverImage ? (
                     <>
-                        {/* Full-width background image with overlay */}
-                        <div className="absolute inset-0 h-[50vh] sm:h-[60vh] overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-white z-10" />
+                        {/* Full-width background image */}
+                        <div className="h-[40vh] sm:h-[50vh] overflow-hidden">
                             <WixMediaImage
                                 media={blog.coverImage}
                                 width={1920}
@@ -190,100 +189,76 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                             />
                         </div>
 
-                        {/* Content overlay */}
-                        <div className="relative z-20 px-6 min-h-[50vh] sm:min-h-[60vh] flex flex-col justify-between py-16 sm:py-24">
-                            <div className="max-w-6xl mx-auto w-full">
-                                <div className="max-w-4xl space-y-8 sm:space-y-10">
-                                    {/* Category */}
-                                    <div>
-                                        <span className="text-sm tracking-widest font-medium text-white/90 uppercase">
-                                            Articles
-                                        </span>
-                                    </div>
+                        {/* Content section */}
+                        <div className="max-w-6xl mx-auto px-6 -mt-16 sm:-mt-32 relative z-10">
+                            <div className="max-w-4xl">
+                                {/* Category */}
+                                <div className="mb-4">
+                                    <span className="inline-block bg-white px-3 py-1 text-sm tracking-widest font-medium text-gray-600 uppercase rounded-full shadow-sm">
+                                        Articles
+                                    </span>
+                                </div>
 
-                                    {/* Title */}
-                                    <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.1] tracking-tight">
+                                {/* Title and Meta Container */}
+                                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl">
+                                    <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-6">
                                         {blog.title}
                                     </h1>
 
-                                    {/* Meta Container - Reorganized for better mobile layout */}
-                                    <div className="space-y-4 sm:space-y-6">
+                                    <div className="flex items-center flex-wrap gap-x-6 gap-y-2 text-gray-600 text-sm">
                                         {/* Author */}
                                         {blog.author && (
-                                            <div className="inline-flex items-center gap-3 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-xl">
+                                            <div className="flex items-center gap-2">
                                                 {blog.author.profilePhoto && (
                                                     <div className="relative flex-shrink-0">
                                                         <Image
                                                             src={blog.author.profilePhoto}
                                                             alt={blog.author.nickname}
-                                                            width={32}
-                                                            height={32}
-                                                            className="rounded-full object-cover ring-2 ring-white/90"
+                                                            width={24}
+                                                            height={24}
+                                                            className="rounded-full object-cover"
                                                         />
                                                     </div>
                                                 )}
-                                                <div className="text-gray-800 text-sm pr-1 truncate">
-                                                    written by <span className="font-semibold">{blog.author.nickname}</span>
-                                                </div>
+                                                <span>written by <span className="font-medium text-gray-900">{blog.author.nickname}</span></span>
                                             </div>
                                         )}
 
-                                        {/* Date, Reading Time, and Views - Better organized for mobile */}
-                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-grey/90 text-sm">
-                                            {blog.publishedDate && (
-                                                <time className="font-medium">
+                                        {/* Date */}
+                                        {blog.publishedDate && (
+                                            <>
+                                                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                                                <time className="font-medium text-gray-900">
                                                     {formatDate(blog.publishedDate)}
                                                 </time>
-                                            )}
-                                            {blog.timeToRead && (
-                                                <div className="flex items-center gap-2">
-                                                    <span className="hidden sm:block w-1 h-1 rounded-full bg-black/60"></span>
-                                                    <span className="flex items-center gap-1.5">
-                                                        <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        {blog.timeToRead} min read
-                                                    </span>
-                                                </div>
-                                            )}
-                                            {blog.viewCount !== undefined && (
-                                                <div className="flex items-center gap-2">
-                                                    <span className="hidden sm:block w-1 h-1 rounded-full bg-black/60"></span>
-                                                    <span className="flex items-center gap-1.5">
-                                                        <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                        </svg>
-                                                        {blog.viewCount} views
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
+                                            </>
+                                        )}
 
-                                        {/* Author Bio - Adjusted for mobile */}
-                                        {blog.author?.aboutPlain && (
-                                            <div className="mt-2 sm:mt-8 bg-white/95 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-xl">
-                                                <div className="flex items-center gap-4 mb-3 sm:mb-4">
-                                                    {blog.author.profilePhoto && (
-                                                        <Image
-                                                            src={blog.author.profilePhoto}
-                                                            alt={blog.author.nickname}
-                                                            width={48}
-                                                            height={48}
-                                                            className="rounded-full object-cover ring-2 ring-gray-100"
-                                                        />
-                                                    )}
-                                                    <div>
-                                                        <h3 className="font-medium text-gray-900">{blog.author.nickname}</h3>
-                                                        {blog.author.title && (
-                                                            <p className="text-sm text-gray-600">{blog.author.title}</p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 sm:line-clamp-none">
-                                                    {blog.author.aboutPlain}
-                                                </p>
-                                            </div>
+                                        {/* Reading Time */}
+                                        {blog.timeToRead && (
+                                            <>
+                                                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                                                <span className="flex items-center gap-1.5">
+                                                    <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    {blog.timeToRead} min read
+                                                </span>
+                                            </>
+                                        )}
+
+                                        {/* Views */}
+                                        {blog.viewCount !== undefined && (
+                                            <>
+                                                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                                                <span className="flex items-center gap-1.5">
+                                                    <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                    {blog.viewCount} views
+                                                </span>
+                                            </>
                                         )}
                                     </div>
                                 </div>
