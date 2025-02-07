@@ -141,7 +141,7 @@ export function EnhancedBibleStudy({
                     </div>
                     <div className="flex items-start gap-3">
                         <MessageSquare className="w-4 h-4 mt-0.5 text-primary/70" />
-                        <p>Generate AI commentary for deeper insights into the verse's meaning, context, and application.</p>
+                        <p>Generate AI commentary for deeper insights into the verse&apos;s meaning, context, and application.</p>
                     </div>
                     <div className="flex items-start gap-3">
                         <Network className="w-4 h-4 mt-0.5 text-primary/70" />
