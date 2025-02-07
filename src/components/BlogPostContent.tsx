@@ -61,8 +61,10 @@ interface BlogPost {
         slug?: string;
         coverPhoto?: string | null;
     };
-    publishedAt?: string;
-    readingTime?: string;
+    publishedDate?: string;
+    lastPublishedDate?: string;
+    timeToRead?: number;
+    viewCount?: number;
 }
 
 interface Book {
@@ -162,6 +164,14 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
         checkAuth();
     }, []);
 
+    const formatDate = (date: string) => {
+        return new Date(date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Header Section */}
@@ -169,8 +179,8 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                 {blog.coverImage ? (
                     <>
                         {/* Full-width background image with overlay */}
-                        <div className="absolute inset-0 h-[60vh] overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-white z-10" />
+                        <div className="absolute inset-0 h-[50vh] sm:h-[60vh] overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-white z-10" />
                             <WixMediaImage
                                 media={blog.coverImage}
                                 width={1920}
@@ -181,28 +191,28 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                         </div>
 
                         {/* Content overlay */}
-                        <div className="relative z-20 px-4 min-h-[60vh] flex flex-col justify-center">
+                        <div className="relative z-20 px-6 min-h-[50vh] sm:min-h-[60vh] flex flex-col justify-between py-16 sm:py-24">
                             <div className="max-w-6xl mx-auto w-full">
-                                <div className="max-w-4xl">
+                                <div className="max-w-4xl space-y-8 sm:space-y-10">
                                     {/* Category */}
-                                    <div className="mb-6">
+                                    <div>
                                         <span className="text-sm tracking-widest font-medium text-white/90 uppercase">
                                             Articles
                                         </span>
                                     </div>
 
                                     {/* Title */}
-                                    <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
+                                    <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.1] tracking-tight">
                                         {blog.title}
                                     </h1>
 
-                                    {/* Meta Container */}
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                    {/* Meta Container - Reorganized for better mobile layout */}
+                                    <div className="space-y-4 sm:space-y-6">
                                         {/* Author */}
                                         {blog.author && (
-                                            <div className="flex items-center gap-3 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-xl">
+                                            <div className="inline-flex items-center gap-3 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-xl">
                                                 {blog.author.profilePhoto && (
-                                                    <div className="relative">
+                                                    <div className="relative flex-shrink-0">
                                                         <Image
                                                             src={blog.author.profilePhoto}
                                                             alt={blog.author.nickname}
@@ -212,39 +222,78 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
                                                         />
                                                     </div>
                                                 )}
-                                                <div className="text-gray-800 text-sm pr-1">
+                                                <div className="text-gray-800 text-sm pr-1 truncate">
                                                     written by <span className="font-semibold">{blog.author.nickname}</span>
                                                 </div>
                                             </div>
                                         )}
 
-                                        {/* Date and Reading Time */}
-                                        <div className="flex items-center gap-4 text-white/90 text-sm">
-                                            {blog.publishedAt && (
+                                        {/* Date, Reading Time, and Views - Better organized for mobile */}
+                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-grey/90 text-sm">
+                                            {blog.publishedDate && (
                                                 <time className="font-medium">
-                                                    {new Date(blog.publishedAt).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
-                                                    })}
+                                                    {formatDate(blog.publishedDate)}
                                                 </time>
                                             )}
-                                            {blog.readingTime && (
-                                                <>
-                                                    <span className="w-1 h-1 rounded-full bg-white/60"></span>
-                                                    <span>{blog.readingTime} read</span>
-                                                </>
+                                            {blog.timeToRead && (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="hidden sm:block w-1 h-1 rounded-full bg-black/60"></span>
+                                                    <span className="flex items-center gap-1.5">
+                                                        <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        {blog.timeToRead} min read
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {blog.viewCount !== undefined && (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="hidden sm:block w-1 h-1 rounded-full bg-black/60"></span>
+                                                    <span className="flex items-center gap-1.5">
+                                                        <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        {blog.viewCount} views
+                                                    </span>
+                                                </div>
                                             )}
                                         </div>
+
+                                        {/* Author Bio - Adjusted for mobile */}
+                                        {blog.author?.aboutPlain && (
+                                            <div className="mt-2 sm:mt-8 bg-white/95 backdrop-blur-sm rounded-xl p-4 sm:p-6 shadow-xl">
+                                                <div className="flex items-center gap-4 mb-3 sm:mb-4">
+                                                    {blog.author.profilePhoto && (
+                                                        <Image
+                                                            src={blog.author.profilePhoto}
+                                                            alt={blog.author.nickname}
+                                                            width={48}
+                                                            height={48}
+                                                            className="rounded-full object-cover ring-2 ring-gray-100"
+                                                        />
+                                                    )}
+                                                    <div>
+                                                        <h3 className="font-medium text-gray-900">{blog.author.nickname}</h3>
+                                                        {blog.author.title && (
+                                                            <p className="text-sm text-gray-600">{blog.author.title}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 sm:line-clamp-none">
+                                                    {blog.author.aboutPlain}
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </>
                 ) : (
-                    // Fallback header for posts without cover image
-                    <div className="max-w-6xl mx-auto px-4 pt-24 pb-16 bg-gray-50">
-                        <div className="max-w-4xl">
+                    // Fallback header - Also update the no-cover-image version
+                    <div className="max-w-6xl mx-auto px-4 pt-16 sm:pt-24 pb-8 sm:pb-16 bg-gray-50">
+                        <div className="max-w-4xl space-y-6">
                             {/* Category */}
                             <div className="mb-8">
                                 <span className="text-sm tracking-widest font-medium text-gray-600 uppercase">
@@ -281,19 +330,15 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
 
                                 {/* Date and Reading Time */}
                                 <div className="flex items-center gap-4 text-gray-600 text-sm">
-                                    {blog.publishedAt && (
+                                    {blog.publishedDate && (
                                         <time className="font-medium">
-                                            {new Date(blog.publishedAt).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}
+                                            {formatDate(blog.publishedDate)}
                                         </time>
                                     )}
-                                    {blog.readingTime && (
+                                    {blog.timeToRead && (
                                         <>
                                             <span className="w-1 h-1 rounded-full bg-gray-400"></span>
-                                            <span>{blog.readingTime} read</span>
+                                            <span>{blog.timeToRead} min read</span>
                                         </>
                                     )}
                                 </div>
@@ -304,7 +349,7 @@ export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: B
             </div>
 
             {/* Main Content */}
-            <div className="max-w-6xl mx-auto px-10 py-12">
+            <div className="max-w-6xl mx-auto px-6 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                     <article className="lg:col-span-8">
                         {/* Article Content */}

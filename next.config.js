@@ -26,6 +26,15 @@ const nextConfig = {
     },
     distDir: '.next',
     transpilePackages: ['@wix/comments', '@wix/comments_categories'],
+    async redirects() {
+        return [
+            {
+                source: '/post/:slug',
+                destination: '/blog/:slug',
+                permanent: true, // This is a 308 redirect - best for SEO
+            },
+        ];
+    },
 };
 
 module.exports = nextConfig;
