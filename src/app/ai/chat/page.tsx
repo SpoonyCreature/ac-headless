@@ -18,8 +18,6 @@ interface Message {
 }
 
 export default function ChatPage() {
-    console.log('Debug - ChatPage component rendering');
-
     const [privateChats, setPrivateChats] = useState<ChatType[]>([]);
     const [publicChats, setPublicChats] = useState<ChatType[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string>();
@@ -33,11 +31,8 @@ export default function ChatPage() {
     const [showSidebar, setShowSidebar] = useState(false);
 
     useEffect(() => {
-        console.log('Debug - ChatPage init effect running');
         const init = async () => {
-            console.log('Debug - ChatPage init async function starting');
             await fetchCurrentUser();
-            console.log('Debug - ChatPage fetchCurrentUser completed');
         };
         init();
     }, []);
@@ -77,9 +72,7 @@ export default function ChatPage() {
     }, []);
 
     const fetchCurrentUser = async () => {
-        console.log('Debug - Starting fetchCurrentUser');
         try {
-            console.log('Debug - Making request to /api/auth/me');
             const response = await fetch('/api/auth/me', {
                 // Add cache: 'no-store' to prevent caching
                 cache: 'no-store',
@@ -93,18 +86,7 @@ export default function ChatPage() {
                 }
             });
 
-            console.log('Debug - Response received:', {
-                status: response.status,
-                ok: response.ok,
-                statusText: response.statusText,
-                headers: Object.fromEntries(response.headers.entries())
-            });
-
             const data = await response.json();
-            console.log('Debug - Response data:', {
-                hasUser: !!data.user,
-                userId: data.user?._id
-            });
 
             if (data.user) {
                 setCurrentUserId(data.user._id);
@@ -161,10 +143,6 @@ export default function ChatPage() {
             } satisfies Message;
             setMessages(prev => [...prev, userMessage]);
 
-            console.log("Message being sent:", message);
-            console.log("User message object:", userMessage);
-            console.log("Current messages state before fetch:", messages);
-
             // Create the message array to send, including the new user message
             const messagesToSend = [...messages, userMessage].map(m => ({
                 role: 'user',
@@ -182,11 +160,6 @@ export default function ChatPage() {
                     messages: messagesToSend
                 }),
             });
-
-            console.log("Request body sent:", JSON.stringify({
-                threadId,
-                messages: messagesToSend
-            }));
 
             if (!response.ok) {
                 throw new Error('Failed to send message');

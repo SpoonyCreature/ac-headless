@@ -53,8 +53,6 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        console.log("CONTENT SUBMISSION", body);
-
         const comment = await wixClient.comments.createComment({
             appId: WIX_BLOG_APP_ID,
             content,

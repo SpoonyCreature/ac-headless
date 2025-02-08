@@ -5,7 +5,6 @@ const PLACEHOLDER_IMAGE = '/placeholder-image.jpg';
 
 function getImageUrlForMedia(media, width, height) {
     if (!media) {
-        console.log('No media provided, using placeholder');
         return PLACEHOLDER_IMAGE;
     }
 
@@ -28,7 +27,6 @@ function getImageUrlForMedia(media, width, height) {
         return media.src;
     }
 
-    console.log('No valid image format found, using placeholder');
     return PLACEHOLDER_IMAGE;
 }
 

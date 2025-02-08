@@ -20,13 +20,10 @@ export async function POST(request: NextRequest) {
             query,
             translation,
             verses: verses.map((v: any) => ({
-                reference: `${v.bookName} ${v.chapter}:${v.verse}`,
-                text: v.text
+                reference: v.reference,
+                verses: v.verses
             })),
-            crossReferences: crossReferences?.map((v: any) => ({
-                reference: `${v.bookName} ${v.chapter}:${v.verse}`,
-                text: v.text
-            })) || [],
+            crossReferences: [],
             explanation,
             public: false,
             notes: [],

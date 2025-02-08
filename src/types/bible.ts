@@ -1,26 +1,34 @@
 export interface CrossReference {
     reference: string;
-    text: string;
     connection: string;
     period: string;
+    text: string;
     sourceReference: string;
     originalText?: {
         reference: string;
         text: string;
         language: 'hebrew' | 'greek';
+        verses?: Array<{
+            verse: string;
+            text: string;
+        }>;
     };
 }
 
 export interface BibleVerse {
-    bookName: string;
-    chapter: string;
-    verse: string;
-    text: string;
-    reference?: string;
+    reference: string;
+    verses: Array<{
+        verse: string;
+        text: string;
+    }>;
     originalText?: {
         reference: string;
         text: string;
         language: 'hebrew' | 'greek';
+        verses?: Array<{
+            verse: string;
+            text: string;
+        }>;
     };
     commentary?: string[];
     aiInsights?: string[];

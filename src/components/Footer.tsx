@@ -14,7 +14,6 @@ export function Footer() {
         setIsSubmitting(true);
         try {
             // TODO: Implement newsletter subscription
-            console.log('Subscribe:', email);
             setSubscribeStatus('success');
             setEmail('');
         } catch (error) {

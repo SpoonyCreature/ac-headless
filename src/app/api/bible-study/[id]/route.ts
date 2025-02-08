@@ -22,8 +22,6 @@ export async function GET(
 
         const study = items[0];
 
-        console.log('study', study);
-
         // Check if user has access
         if (!study.public) {
             if (!wixClient.auth.loggedIn()) {

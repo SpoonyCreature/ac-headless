@@ -284,7 +284,6 @@ export function Comments({ contextId, resourceId, isAuthenticated }: CommentsPro
     };
 
     const handleReply = (parentId: string) => {
-        console.log('Replying to comment:', parentId);
         setReplyingTo(parentId);
     };
 
@@ -293,8 +292,6 @@ export function Comments({ contextId, resourceId, isAuthenticated }: CommentsPro
         setNewComment('');
     };
 
-    console.log("COMMENTS", comments);
-    console.log("IS AUTHENTICATED", isAuthenticated);
 
     // Organize comments into a tree structure
     const commentTree = comments.reduce((acc, comment) => {

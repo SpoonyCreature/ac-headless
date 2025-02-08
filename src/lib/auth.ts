@@ -12,7 +12,6 @@ export async function refreshTokensIfNeeded(): Promise<Tokens | null> {
 
         // Check if access token is expired or will expire in the next 5 minutes
         if (!tokens.accessToken?.expiresAt || tokens.accessToken.expiresAt - now < 300) {
-            console.log('Debug - Token refresh needed');
             const wixClient = createClient({
                 auth: OAuthStrategy({
                     clientId: process.env.NEXT_PUBLIC_WIX_CLIENT_ID!,

@@ -5,7 +5,6 @@ import { WIX_SESSION_COOKIE_NAME } from "@/src/constants/constants";
 export async function middleware(request: NextRequest) {
     // Skip RSC requests
     if (request.nextUrl.searchParams.has('_rsc')) {
-        console.log('Debug - Middleware: Skipping RSC request:', request.nextUrl.pathname);
         return NextResponse.next();
     }
 
@@ -24,7 +23,6 @@ export async function middleware(request: NextRequest) {
 
             // Token exists but is expired or about to expire, try to refresh
             if (tokens?.refreshToken?.value) {
-                console.log('Debug - Middleware: Refreshing expired tokens');
                 const wixClient = createClient({
                     auth: OAuthStrategy({
                         clientId: process.env.NEXT_PUBLIC_WIX_CLIENT_ID!,
@@ -54,14 +52,12 @@ export async function middleware(request: NextRequest) {
     }
 
     // No valid session or refresh failed, generate new visitor tokens
-    console.log("Debug - Middleware: No valid session found, generating visitor tokens");
     const myWixClient = createClient({
         auth: OAuthStrategy({ clientId: process.env.NEXT_PUBLIC_WIX_CLIENT_ID! }),
     });
 
     try {
         const visitorTokens = await myWixClient.auth.generateVisitorTokens();
-        console.log("Debug - Middleware: Generated visitor tokens");
 
         const response = NextResponse.next();
         response.cookies.set(

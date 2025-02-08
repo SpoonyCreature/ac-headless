@@ -8,14 +8,9 @@ export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
         const { messages, threadId } = body;
-        console.log('Received request:', { messageCount: messages?.length, threadId });
-        console.log('First message:', messages?.[0]);
-        console.log('Last message:', messages?.[messages?.length - 1]);
 
-        console.log("ARNT", JSON.stringify(body, null, 2))
 
         if (!messages || !messages.length) {
-            console.log('No messages provided:', messages);
             return NextResponse.json(
                 { error: 'No message provided' },
                 { status: 400 }
@@ -50,19 +45,12 @@ export async function POST(request: NextRequest) {
         // Combine thread history with new message
         const allMessages = [...threadHistory, ...normalizedMessages];
 
-        console.log('Message history:', {
-            threadHistory: threadHistory.length,
-            newMessages: normalizedMessages.length,
-            total: allMessages.length
-        });
-
         // Get the default prompt template
         const promptTemplate = getPromptTemplate('DEFAULT');
         if (!promptTemplate) {
             console.error('No prompt template found');
             throw new Error('No prompt template found');
         }
-        console.log('Using prompt template:', promptTemplate.id);
 
         // Start with the system message
         const conversationHistory: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
@@ -78,30 +66,19 @@ export async function POST(request: NextRequest) {
         // Add messages to conversation history
         for (let i = 0; i < lastMessages.length; i++) {
             const msg = lastMessages[i];
-            console.log(`Adding message ${i}:`, {
-                role: msg.role,
-                preview: msg.text.substring(0, 50) + '...'
-            });
             conversationHistory.push({
                 role: msg.role === 'Agent' ? 'assistant' : 'user',
                 content: msg.text
             });
         }
 
-        console.log('Final conversation history:', {
-            messageCount: conversationHistory.length,
-            messages: conversationHistory.map(m => ({ role: m.role, contentPreview: m.content.substring(0, 50) + '...' }))
-        });
-
         // Get completion using our lib
-        console.log('Requesting completion from OpenAI...');
         const responseMessage = await completion(conversationHistory) as string;
 
         if (!responseMessage) {
             console.error('No response received from OpenAI');
             throw new Error('No response from OpenAI');
         }
-        console.log('Received response from OpenAI:', responseMessage.substring(0, 50) + '...');
 
         // Create the assistant's message in the DB format
         const now = new Date();
@@ -134,16 +111,13 @@ export async function POST(request: NextRequest) {
             datetime: now.toISOString(),
             public: false
         };
-        console.log('Created assistant message:', { id: assistantMessage._id });
 
         // Save the chat if user is authenticated
         if (wixClient.auth.loggedIn()) {
-            console.log('User is authenticated, saving chat...');
             try {
                 let savedThreadId = threadId;
 
                 if (threadId) {
-                    console.log('Updating existing thread:', threadId);
                     // Update existing thread
                     const { items } = await wixClient.items
                         .query('gptthread')
@@ -158,12 +132,10 @@ export async function POST(request: NextRequest) {
                             personality: existingThread.personality,
                             thread: [...(existingThread.thread || []), userMessage, assistantMessage]
                         });
-                        console.log('Thread updated successfully');
                     } else {
                         console.log('Thread not found:', threadId);
                     }
                 } else {
-                    console.log('Creating new thread');
                     const result = await wixClient.items.insert('gptthread', {
                         question: normalizedMessages[1].text.substring(0, 100) + '...',
                         thread: [userMessage, assistantMessage],
@@ -171,10 +143,8 @@ export async function POST(request: NextRequest) {
                         personality: "CALVIN"
                     });
                     savedThreadId = result._id;
-                    console.log('New thread created successfully with ID:', savedThreadId);
                 }
 
-                console.log('Sending response to client with threadId:', savedThreadId);
                 return NextResponse.json({
                     _id: assistantMessage._id,
                     role: 'Agent',
@@ -190,7 +160,6 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        console.log('Sending response to client without threadId');
         return NextResponse.json({
             _id: assistantMessage._id,
             role: 'Agent',

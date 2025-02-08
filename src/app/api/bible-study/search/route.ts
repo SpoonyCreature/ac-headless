@@ -1,30 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerWixClient } from '@/src/app/serverWixClient';
-import { completion } from '@/src/lib/ai';
+import { completion, JsonSchemaFormat } from '@/src/lib/ai';
 import { getSpecificVerses } from '@/src/lib/bible';
-import type { BibleVerse } from '@/src/types/bible';
+import type { BibleVerse, CrossReference } from '@/src/types/bible';
 
-// Helper to parse verse references from GPT response
-function parseVerseReferences(response: string): string[] {
-    // Split the response into lines and filter out empty lines
-    const lines = response.split('\n').filter(line => line.trim());
+interface SearchRequest {
+    query: string;
+    translation?: string;
+}
 
-    // Extract verse references (ignoring section headers that start with ##)
-    const references = lines
-        .filter(line => !line.startsWith('##'))
-        .join(' ')
-        .split(';')
-        .map(ref => ref.trim())
-        .filter(ref => ref);
+interface SearchResponse {
+    verse_sections: Array<{
+        title: string;
+        verses: Array<string>;
+    }>;
+}
 
-    return references;
+const searchSchema: JsonSchemaFormat = {
+    type: "json_schema",
+    json_schema: {
+        name: "bible_search",
+        schema: {
+            type: "object",
+            properties: {
+                verse_sections: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            title: {
+                                type: "string",
+                                description: "A descriptive title for this section of verses"
+                            },
+                            verses: {
+                                type: "array",
+                                items: {
+                                    type: "string",
+                                    description: "Bible verse reference. Format: {{book name in english}} {{chapter}}:{{verse}}-{{verse}} or {{book name in english}} {{chapter}}:{verse},{verse}"
+                                }
+                            }
+                        },
+                        required: ["title", "verses"],
+                        additionalProperties: false
+                    }
+                }
+            },
+            required: ["verse_sections"],
+            additionalProperties: false
+        },
+        strict: true
+    }
+};
+
+// Helper function to format verses with verse numbers
+function formatVerses(verses: Array<{ reference: string; text: string }>) {
+    return {
+        verses: verses.map(v => ({
+            verse: v.reference.split(':')[1],
+            text: v.text
+        }))
+    };
 }
 
 export async function POST(request: NextRequest) {
     const wixClient = getServerWixClient();
 
     try {
-        const { query, translation = 'web' } = await request.json();
+        const { query, translation = 'web' }: SearchRequest = await request.json();
 
         if (!query) {
             return NextResponse.json(
@@ -33,79 +75,69 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Step 1: Use GPT to find relevant verses
+        // Step 1: Use GPT to find relevant verses with JSON schema
         const searchPrompt = `
+            <identity>
+            You are an expert Bible scholar.
+            Your goal is to curate a list of verses that are relevant to a particular saerch query, that will be able to faciliate a deep Bible study.
+            You will attempt to provide verses that not only superficually relate to a topic, but that can unlock amazing insights that might not be immediately obvious.
+            </identity>
             <instructions>
-            Provide a list of bible verses that match the search query / theme / topic / question / statement / etc.
-            Don't just consider simple matches against the search term, but take into account theological nuance as well.
-            If the user seems to have put in a direct verse, then you can skip that verse in the output
             Try and provide a fairly comprehensive list of verses that are relevant to the search query, which can be used to faciliate a Bible study as well (approx. 10-30 verses)
-            If the user asks for specific verses, chapter, honor that directly.
             Always retrun verses in the requested format ONLY, even if the user asks for something non-sensical - make it work / fit
+            If a user asks for a chapter / chapters, split return chapter verse combinations that make sense for seperate study (i.e., never retrun a full chapter as is, but split it into nice sections for sensible study)
+            Try keep the verses in sequence per book / chapter combination.
+                <notes>
+                Note: Remember the book name is Psalm, not Psalms
+                Note: Strictly only include canonical books in the output.. no Romanist books.
+                Note: if the user asks for "{{book name in english}} {{chapter}}", return something like "{{book name in english}} {{chapter}}:{{verse}}-{{verse}}"
+                </notes>
             </instructions>
             <output-format>
             {{book name in english}} {{chapter}}:{verse},{verse};  // for specific verses in a chapter
             OR
-            {{book name in english}} {{chapter}}:{{verse}}-{{verse}}; // for a range of verses in a chapter
-            OR
-            {{book name in english}} {{chapter}}:{verse},{verse}; {{book name in english}} {{chapter}}:{{verse}}-{{verse}} ... // for a combination of verses from many locations
+            {{book name in english}} {{chapter}}:{{verse}}-{{verse}} // for a range of verses in a chapter
             </output-format>
             <output-example>
             ## Example 1
-            John 3:16,17; 1 John 3:16-19,22
+            John 3:16,17
             
             ## Example 2
-            Genesis 1:1-3; Leviticus 6:1,5,7; Exodus 15:18,21-30
+            Genesis 1:1-3
             </output-example>
-            <query>${query}</query>
-        `;
+                    `;
 
         const searchResponse = await completion([
             { role: 'system', content: searchPrompt },
-            { role: 'user', content: query }
-        ]) as string;
+            { role: 'user', content: `Please provide the verses in the specified format for the following query: ${query}` }
+        ], {
+            temperature: 0.7,
+            response_format: searchSchema
+        }) as SearchResponse;
 
-        if (!searchResponse) {
-            throw new Error('No response from GPT for verse search');
+        if (!searchResponse?.verse_sections) {
+            throw new Error('Invalid response format from GPT');
         }
-
-        // Parse verse references from the response
-        const verseRefs = parseVerseReferences(searchResponse);
-
-        console.log('verseRefs', verseRefs);
 
         // Step 2: Get the actual verses from the Bible API
-        const verses = await getSpecificVerses(verseRefs.join('; '), translation);
+        const allVerseRefs = searchResponse.verse_sections.flatMap(section => section.verses);
+        const verses = await Promise.all(
+            allVerseRefs.map(async (ref) => {
+                const verses = await getSpecificVerses(ref, translation);
+                const formatted = formatVerses(verses);
+                return {
+                    reference: ref,
+                    verses: formatted.verses
+                } as BibleVerse;
+            })
+        );
 
-        // Step 3: If a specific verse was provided, get cross references
-        let crossReferences: BibleVerse[] = [];
-        if (query.match(/[0-9]/) && verseRefs.length === 1) {
-            const crossRefPrompt = `
-                <instructions>
-                    You will be provided with a Bible verse
-                    You have to provide a cross references for the provided Bible verse
-                    You may only provide a maximum of 8 cross reference verses - so ensure they are relevant to the verse and high impact.
-                </instructions>
-                <verse>${query}</verse>
-            `;
-
-            const crossRefResponse = await completion([
-                { role: 'system', content: crossRefPrompt },
-                { role: 'user', content: query }
-            ]) as string;
-
-            if (crossRefResponse) {
-                const crossRefVerseRefs = parseVerseReferences(crossRefResponse);
-                crossReferences = await getSpecificVerses(crossRefVerseRefs.join('; '), translation);
-            }
-        }
-
-        // Step 4: Generate an explanation/overview
+        // Step 3: Generate an explanation/overview
         const explanationPrompt = `
             Based on the following Bible verses, provide a brief overview that could be used as a Bible study introduction.
             Keep the explanation to 2-3 sentences.
             Focus on the main theological themes and how they connect.
-            Verses: ${verses.map(v => `${v.bookName} ${v.chapter}:${v.verse}`).join('; ')}
+            Verses: ${verses.map(v => `${v.reference}`).join('; ')}
         `;
 
         const explanation = await completion([
@@ -113,10 +145,9 @@ export async function POST(request: NextRequest) {
             { role: 'user', content: 'Please provide a Bible study overview.' }
         ]) as string;
 
-        // Return the preview results without saving
         return NextResponse.json({
             verses,
-            crossReferences,
+            sections: searchResponse.verse_sections,
             explanation,
             translation
         });

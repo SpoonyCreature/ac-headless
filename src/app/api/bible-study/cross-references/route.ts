@@ -4,9 +4,7 @@ import { getSpecificVerses } from '@/src/lib/bible';
 import { CrossReference } from '@/src/types/bible';
 
 interface CrossReferenceRequest {
-    bookName: string;
-    chapter: string;
-    verse: string;
+    reference: string;
     text: string;
     translation?: string;
 }
@@ -75,16 +73,16 @@ const crossReferencesSchema: JsonSchemaFormat = {
 
 export async function POST(request: NextRequest) {
     try {
-        const { bookName, chapter, verse, text, translation = 'web' }: CrossReferenceRequest = await request.json();
+        const { reference, text, translation = 'web' }: CrossReferenceRequest = await request.json();
 
-        if (!bookName || !chapter || !verse || !text) {
+        if (!reference || !text) {
             return NextResponse.json(
-                { error: 'Book name, chapter, verse, and text are required' },
+                { error: 'Reference and text are required' },
                 { status: 400 }
             );
         }
 
-        const sourceReference = `${bookName} ${chapter}:${verse}`;
+        const sourceReference = reference;
 
         // Step 1: Get cross references using GPT with JSON schema
         const crossRefPrompt = `
@@ -108,13 +106,6 @@ export async function POST(request: NextRequest) {
             response_format: crossReferencesSchema
         }) as CrossReferenceResponse;
 
-        // Add detailed logging
-        console.log('Cross References API Response:', {
-            input: { bookName, chapter, verse, text },
-            gptResponse: crossRefResponse,
-            timestamp: new Date().toISOString()
-        });
-
         if (!crossRefResponse?.cross_references || !Array.isArray(crossRefResponse.cross_references)) {
             throw new Error('Invalid response format from GPT');
         }
@@ -130,7 +121,6 @@ export async function POST(request: NextRequest) {
                     period: ref.historical_period,
                     text: verseText,
                     sourceReference,
-                    verses
                 } as CrossReference;
             })
         );

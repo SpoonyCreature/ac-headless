@@ -1,7 +1,5 @@
 interface BibleVerse {
-    bookName: string;
-    chapter: string;
-    verse: string;
+    reference: string;
     text: string;
 }
 
@@ -111,7 +109,12 @@ export async function getSpecificVerses(
     query: string,
     translation: string = 'web'
 ): Promise<BibleVerse[]> {
-    const encodedQuery = encodeURIComponent(query);
+    let modifiedQuery = query;
+    if (query.toLowerCase().includes('psalm') && !query.toLowerCase().includes('psalms')) {
+        modifiedQuery = query.replace(/psalm/gi, 'psalms');
+    }
+
+    const encodedQuery = encodeURIComponent(modifiedQuery);
     const url = `https://query.getbible.net/v2/${getBibleId(translation)}/${encodedQuery}`;
 
     const response = await fetch(url);
@@ -124,9 +127,7 @@ export async function getSpecificVerses(
 
     for (const bookData of Object.values(data)) {
         const bookVerses = (bookData as any).verses.map((verse: any) => ({
-            bookName: (bookData as any).book_name,
-            chapter: `${verse.chapter}`,
-            verse: `${verse.verse}`,
+            reference: `${(bookData as any).book_name} ${verse.chapter}:${verse.verse}`,
             text: decodeUnicode(verse.text),
         }));
         verses.push(...bookVerses);

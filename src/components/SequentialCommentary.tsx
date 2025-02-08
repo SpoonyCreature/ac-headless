@@ -52,7 +52,6 @@ export function SequentialCommentary({
             newCommentary = await onGenerateCommentary(verseRef, relevantCommentaries);
 
             // Debug log to see the actual response structure
-            console.log('Commentary response:', newCommentary);
 
             // Validate the response has the expected structure
             if (!newCommentary?.sections || !Array.isArray(newCommentary.sections)) {

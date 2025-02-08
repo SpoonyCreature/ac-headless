@@ -53,7 +53,6 @@ export default function BibleStudyDetailPage({
                         .map((v: any) => v.reference)
                         .join(';');
 
-                    // Fetch original verses if we have any
                     if (otVerses || ntVerses) {
                         const originalResponse = await fetch('/api/bible-study/original-text', {
                             method: 'POST',
@@ -70,7 +69,7 @@ export default function BibleStudyDetailPage({
                             const originalData = await originalResponse.json();
                             data.study.originalVerses = originalData.verses;
 
-                            // Update the study in the database with the original verses
+                            // Update the study in the database
                             await fetch(`/api/bible-study/${params.id}`, {
                                 method: 'PATCH',
                                 headers: {
@@ -98,8 +97,6 @@ export default function BibleStudyDetailPage({
 
                         return {
                             ...v,
-                            bookName: bookChapter.slice(0, lastSpaceIndex),
-                            chapter: bookChapter.slice(lastSpaceIndex + 1),
                             verse: verse,
                             originalText: originalVerse
                         };
@@ -120,7 +117,7 @@ export default function BibleStudyDetailPage({
 
     const handleGenerateCommentary = async (verseRef: string, previousCommentaries: any[]) => {
         try {
-            const verse = study?.verses.find(v => `${v.bookName} ${v.chapter}:${v.verse}` === verseRef);
+            const verse = study?.verses.find(v => `${v.reference}` === verseRef);
             if (!verse) throw new Error('Verse not found');
 
             // Find cross references for this verse if they exist
@@ -134,7 +131,7 @@ export default function BibleStudyDetailPage({
 
             // Map previous commentaries to include original text
             const mappedPreviousCommentaries = previousCommentaries.map(pc => {
-                const verse = study?.verses.find(v => `${v.bookName} ${v.chapter}:${v.verse}` === pc.verseRef);
+                const verse = study?.verses.find(v => `${v.reference}` === pc.verseRef);
                 return {
                     ...pc,
                     originalText: verse?.originalText
@@ -148,8 +145,8 @@ export default function BibleStudyDetailPage({
                 },
                 body: JSON.stringify({
                     verseRef,
-                    verseText: verse.text,
-                    originalText: verse.originalText,
+                    verseText: verse.verses.map(v => v.text).join(' '),
+                    originalText: verse.originalText?.verses?.map(v => v.text).join(' '),
                     previousCommentaries: mappedPreviousCommentaries,
                     crossReferences: verseCrossRefs,
                     originalQuery: study?.query,
@@ -176,10 +173,8 @@ export default function BibleStudyDetailPage({
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    bookName: verse.bookName,
-                    chapter: verse.chapter,
-                    verse: verse.verse,
-                    text: verse.text,
+                    reference: verse.reference,
+                    text: verse.verses.map(v => v.text).join(' '),
                     translation: study?.translation
                 }),
             });
@@ -192,13 +187,31 @@ export default function BibleStudyDetailPage({
 
             // Update the study with new cross references
             if (study) {
+                const updatedCrossReferences = [
+                    ...(study.crossReferences || []).filter(ref => ref.sourceReference !== `${verse.reference}`),
+                    ...crossReferences
+                ];
+
+                // Update local state
                 setStudy({
                     ...study,
-                    crossReferences: [
-                        ...(study.crossReferences || []).filter(ref => ref.sourceReference !== `${verse.bookName} ${verse.chapter}:${verse.verse}`),
-                        ...crossReferences
-                    ]
+                    crossReferences: updatedCrossReferences
                 });
+
+                // Persist to backend
+                const updateResponse = await fetch(`/api/bible-study/${params.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        crossReferences: updatedCrossReferences
+                    }),
+                });
+
+                if (!updateResponse.ok) {
+                    throw new Error('Failed to persist cross references');
+                }
             }
         } catch (error) {
             console.error('Error generating cross references:', error);
