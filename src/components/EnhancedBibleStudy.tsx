@@ -116,10 +116,10 @@ export function EnhancedBibleStudy({
             {explanation && (
                 <div className="relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 blur-3xl" />
-                    <div className="relative rounded-2xl border border-border/50 backdrop-blur-sm p-8 space-y-4">
+                    <div className="relative rounded-2xl border border-border/50 backdrop-blur-sm p-4 sm:p-8 space-y-4">
                         <div className="flex items-center gap-3 text-primary">
                             <Info className="w-5 h-5" />
-                            <h2 className="text-xl font-medium">Study Overview</h2>
+                            <h2 className="text-lg sm:text-xl font-medium">Study Overview</h2>
                         </div>
                         <div className="prose prose-sm max-w-none">
                             <p className="text-muted-foreground leading-relaxed">{explanation}</p>
@@ -129,29 +129,29 @@ export function EnhancedBibleStudy({
             )}
 
             {/* Quick Guide */}
-            <div className="bg-muted/30 rounded-xl p-6 space-y-4">
+            <div className="bg-muted/30 rounded-xl p-4 sm:p-6 space-y-4">
                 <div className="flex items-center gap-3 text-primary">
                     <Lightbulb className="w-5 h-5" />
-                    <h2 className="text-lg font-medium">How to Use This Study</h2>
+                    <h2 className="text-base sm:text-lg font-medium">How to Use This Study</h2>
                 </div>
                 <div className="grid gap-4 text-sm text-muted-foreground">
                     <div className="flex items-start gap-3">
-                        <BookOpen className="w-4 h-4 mt-0.5 text-primary/70" />
+                        <BookOpen className="w-4 h-4 mt-0.5 text-primary/70 shrink-0" />
                         <p>Each verse card shows the English text and original language (when available). Click the language icon to toggle between them.</p>
                     </div>
                     <div className="flex items-start gap-3">
-                        <MessageSquare className="w-4 h-4 mt-0.5 text-primary/70" />
+                        <MessageSquare className="w-4 h-4 mt-0.5 text-primary/70 shrink-0" />
                         <p>Generate AI commentary for deeper insights into the verse&apos;s meaning, context, and application.</p>
                     </div>
                     <div className="flex items-start gap-3">
-                        <Network className="w-4 h-4 mt-0.5 text-primary/70" />
+                        <Network className="w-4 h-4 mt-0.5 text-primary/70 shrink-0" />
                         <p>Explore cross-references to see how this verse connects with other parts of Scripture, including a visual timeline.</p>
                     </div>
                 </div>
             </div>
 
             {/* Sequential Study */}
-            <div className="relative space-y-8">
+            <div className="relative space-y-6 sm:space-y-8">
                 {verses.map((verse, index) => {
                     const commentary = commentaries.find(c => c.verseRef === `${verse.bookName} ${verse.chapter}:${verse.verse}`);
                     const hasCommentary = !!commentary;
@@ -165,43 +165,43 @@ export function EnhancedBibleStudy({
                             key={verseRef}
                             className={cn(
                                 "group relative rounded-2xl border border-border/50 transition-all duration-300",
-                                "bg-card shadow-lg"
+                                "bg-card shadow-lg overflow-hidden"
                             )}
                         >
                             {/* Verse Header */}
-                            <div className="p-6 flex items-center justify-between border-b border-border/50">
+                            <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/50 gap-4">
                                 <div className="flex items-center gap-4">
                                     <div className={cn(
-                                        "w-12 h-12 rounded-xl flex items-center justify-center transition-colors",
+                                        "w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-colors shrink-0",
                                         hasCommentary ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                                     )}>
-                                        <BookOpen className="w-6 h-6" />
+                                        <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-medium text-foreground">{verseRef}</h3>
-                                        <div className="flex items-center gap-2 mt-1">
+                                        <h3 className="text-lg sm:text-xl font-medium text-foreground">{verseRef}</h3>
+                                        <div className="flex flex-wrap items-center gap-2 mt-1">
                                             {verse.originalText && (
                                                 <span className="inline-flex items-center gap-1 text-xs text-primary/70">
                                                     <Languages className="w-3 h-3" />
-                                                    {verse.originalText.language === 'hebrew' ? 'Hebrew' : 'Greek'} available
+                                                    {verse.originalText.language === 'hebrew' ? 'Hebrew' : 'Greek'}
                                                 </span>
                                             )}
                                             {verseCrossRefs.length > 0 && (
                                                 <span className="inline-flex items-center gap-1 text-xs text-primary/70">
                                                     <Network className="w-3 h-3" />
-                                                    {verseCrossRefs.length} cross-references
+                                                    {verseCrossRefs.length}
                                                 </span>
                                             )}
                                             {hasCommentary && (
                                                 <span className="inline-flex items-center gap-1 text-xs text-primary/70">
                                                     <MessageSquare className="w-3 h-3" />
-                                                    Commentary available
+                                                    Commentary
                                                 </span>
                                             )}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
                                     {verse.originalText && (
                                         <button
                                             onClick={() => setShowOriginalText(prev => ({ ...prev, [index]: !prev[index] }))}
@@ -224,71 +224,139 @@ export function EnhancedBibleStudy({
                                 </div>
                             </div>
 
-                            {/* Tab Navigation */}
-                            <div className="flex items-center gap-1 px-6 pt-4">
-                                <button
-                                    onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'text' }))}
-                                    className={cn(
-                                        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                                        activeTab === 'text'
-                                            ? "bg-primary text-primary-foreground"
-                                            : "text-muted-foreground hover:text-primary hover:bg-primary/5"
-                                    )}
-                                >
-                                    <BookOpen className="w-4 h-4" />
-                                    Text & Original
-                                </button>
+                            {/* Modern Navigation - Desktop Tabs, Mobile Action Menu */}
+                            <div className="px-4 sm:px-6 pt-4">
+                                {/* Desktop Tabs */}
+                                <div className="hidden sm:flex items-center gap-2 border-b border-border/50">
+                                    <button
+                                        onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'text' }))}
+                                        className={cn(
+                                            "flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all relative -mb-px",
+                                            activeTab === 'text'
+                                                ? "text-primary border-b-2 border-primary"
+                                                : "text-muted-foreground hover:text-primary"
+                                        )}
+                                    >
+                                        <BookOpen className="w-4 h-4" />
+                                        Text & Original
+                                    </button>
 
-                                <button
-                                    onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'commentary' }))}
-                                    className={cn(
-                                        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                                        activeTab === 'commentary'
-                                            ? "bg-primary text-primary-foreground"
-                                            : "text-muted-foreground hover:text-primary hover:bg-primary/5"
-                                    )}
-                                >
-                                    <MessageSquare className="w-4 h-4" />
-                                    Commentary
-                                    {hasCommentary && (
-                                        <span className="w-2 h-2 rounded-full bg-primary/50" />
-                                    )}
-                                </button>
+                                    <button
+                                        onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'commentary' }))}
+                                        className={cn(
+                                            "flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all relative -mb-px",
+                                            activeTab === 'commentary'
+                                                ? "text-primary border-b-2 border-primary"
+                                                : "text-muted-foreground hover:text-primary"
+                                        )}
+                                    >
+                                        <MessageSquare className="w-4 h-4" />
+                                        Commentary
+                                        {hasCommentary && (
+                                            <span className="w-2 h-2 rounded-full bg-primary" />
+                                        )}
+                                    </button>
 
-                                <button
-                                    onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'references' }))}
-                                    className={cn(
-                                        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                                        activeTab === 'references'
-                                            ? "bg-primary text-primary-foreground"
-                                            : "text-muted-foreground hover:text-primary hover:bg-primary/5"
-                                    )}
-                                >
-                                    <Network className="w-4 h-4" />
-                                    Cross References
-                                    {verseCrossRefs.length > 0 && (
-                                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                                            {verseCrossRefs.length}
-                                        </span>
-                                    )}
-                                </button>
+                                    <button
+                                        onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'references' }))}
+                                        className={cn(
+                                            "flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all relative -mb-px",
+                                            activeTab === 'references'
+                                                ? "text-primary border-b-2 border-primary"
+                                                : "text-muted-foreground hover:text-primary"
+                                        )}
+                                    >
+                                        <Network className="w-4 h-4" />
+                                        Cross References
+                                        {verseCrossRefs.length > 0 && (
+                                            <span className="min-w-[1.25rem] h-5 flex items-center justify-center rounded-full bg-primary/10 text-primary text-xs px-1">
+                                                {verseCrossRefs.length}
+                                            </span>
+                                        )}
+                                    </button>
+                                </div>
+
+                                {/* Mobile Action Menu */}
+                                <div className="sm:hidden flex flex-col bg-muted/30 rounded-lg overflow-hidden">
+                                    <button
+                                        onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'text' }))}
+                                        className={cn(
+                                            "flex items-center justify-between px-4 py-3 text-sm font-medium transition-all",
+                                            activeTab === 'text'
+                                                ? "bg-primary text-primary-foreground"
+                                                : "text-muted-foreground hover:bg-muted/50"
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <BookOpen className="w-4 h-4" />
+                                            <span>Read Verse</span>
+                                        </div>
+                                        {activeTab === 'text' && (
+                                            <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
+                                        )}
+                                    </button>
+
+                                    <button
+                                        onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'commentary' }))}
+                                        className={cn(
+                                            "flex items-center justify-between px-4 py-3 text-sm font-medium transition-all border-t border-border/10",
+                                            activeTab === 'commentary'
+                                                ? "bg-primary text-primary-foreground"
+                                                : "text-muted-foreground hover:bg-muted/50"
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <MessageSquare className="w-4 h-4" />
+                                            <span>Commentary</span>
+                                            {hasCommentary && (
+                                                <span className="text-xs bg-primary-foreground/20 text-primary-foreground px-2 py-0.5 rounded-full">Available</span>
+                                            )}
+                                        </div>
+                                        {activeTab === 'commentary' && (
+                                            <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
+                                        )}
+                                    </button>
+
+                                    <button
+                                        onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'references' }))}
+                                        className={cn(
+                                            "flex items-center justify-between px-4 py-3 text-sm font-medium transition-all border-t border-border/10",
+                                            activeTab === 'references'
+                                                ? "bg-primary text-primary-foreground"
+                                                : "text-muted-foreground hover:bg-muted/50"
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <Network className="w-4 h-4" />
+                                            <span>Cross References</span>
+                                            {verseCrossRefs.length > 0 && (
+                                                <span className="min-w-[1.25rem] h-5 flex items-center justify-center rounded-full bg-primary-foreground/20 text-primary-foreground text-xs px-1.5">
+                                                    {verseCrossRefs.length}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {activeTab === 'references' && (
+                                            <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
+                                        )}
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Tab Content */}
-                            <div className="p-6">
+                            <div className="p-4 sm:p-6">
                                 {activeTab === 'text' && (
-                                    <div className="space-y-6">
-                                        <div className="relative rounded-xl bg-muted/30 p-6">
-                                            <p className="text-xl leading-relaxed">{verse.text}</p>
+                                    <div className="space-y-4 sm:space-y-6">
+                                        <div className="relative rounded-xl bg-muted/30 p-4 sm:p-6">
+                                            <p className="text-lg sm:text-xl leading-relaxed">{verse.text}</p>
                                             {verse.originalText && showOriginalText[index] && (
-                                                <div className="mt-6 pt-6 border-t border-border/50">
+                                                <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-border/50">
                                                     <div className="flex items-center gap-2 mb-3 text-sm text-muted-foreground">
                                                         <Languages className="w-4 h-4" />
                                                         <span>Original {verse.originalText.language} Text</span>
                                                     </div>
                                                     <div
                                                         className={cn(
-                                                            "font-serif text-lg leading-relaxed p-4 rounded-lg bg-background/50",
+                                                            "font-serif text-base sm:text-lg leading-relaxed p-3 sm:p-4 rounded-lg bg-background/50",
                                                             verse.originalText.language === 'hebrew' ? "text-right" : "text-left"
                                                         )}
                                                         dir={verse.originalText.language === 'hebrew' ? 'rtl' : 'ltr'}
@@ -299,12 +367,12 @@ export function EnhancedBibleStudy({
                                             )}
                                         </div>
 
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                                             {verse.originalText && (
                                                 <button
                                                     onClick={() => setShowOriginalText(prev => ({ ...prev, [index]: !prev[index] }))}
                                                     className={cn(
-                                                        "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all",
+                                                        "flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm",
                                                         showOriginalText[index] ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-primary hover:bg-primary/5"
                                                     )}
                                                 >
@@ -316,7 +384,7 @@ export function EnhancedBibleStudy({
                                                 href={`https://biblehub.com/${verse.bookName.toLowerCase()}/${verse.chapter}-${verse.verse}.htm`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                                                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
                                             >
                                                 <ExternalLink className="w-4 h-4" />
                                                 Study Tools
@@ -326,7 +394,7 @@ export function EnhancedBibleStudy({
                                 )}
 
                                 {activeTab === 'commentary' && (
-                                    <div className="space-y-6">
+                                    <div className="space-y-4 sm:space-y-6">
                                         {hasCommentary ? (
                                             <div className="space-y-6">
                                                 {commentary.commentary.sections.map((section, idx) => (
@@ -335,7 +403,7 @@ export function EnhancedBibleStudy({
                                                             {section.title}
                                                         </h4>
                                                         <div className="prose prose-sm max-w-none">
-                                                            <p className="text-muted-foreground leading-relaxed">
+                                                            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                                                                 {renderContent(section.content)}
                                                             </p>
                                                         </div>
@@ -344,23 +412,23 @@ export function EnhancedBibleStudy({
                                                 <button
                                                     onClick={() => handleGenerateCommentary(verseRef)}
                                                     disabled={isGenerating}
-                                                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                                                    className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
                                                 >
                                                     <RefreshCw className={cn("w-4 h-4", isGenerating && "animate-spin")} />
                                                     Regenerate Commentary
                                                 </button>
                                             </div>
                                         ) : (
-                                            <div className="text-center py-12">
-                                                <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                                                <h3 className="text-lg font-medium mb-2">No Commentary Yet</h3>
-                                                <p className="text-muted-foreground mb-6">
+                                            <div className="text-center py-8 sm:py-12">
+                                                <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-4" />
+                                                <h3 className="text-base sm:text-lg font-medium mb-2">No Commentary Yet</h3>
+                                                <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
                                                     Generate AI-powered commentary to explore deeper insights into this verse.
                                                 </p>
                                                 <button
                                                     onClick={() => handleGenerateCommentary(verseRef)}
                                                     disabled={isGenerating}
-                                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
+                                                    className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
                                                 >
                                                     {isGenerating ? (
                                                         <>
@@ -380,13 +448,13 @@ export function EnhancedBibleStudy({
                                 )}
 
                                 {activeTab === 'references' && (
-                                    <div className="space-y-6">
+                                    <div className="space-y-4 sm:space-y-6">
                                         {verseCrossRefs.length > 0 ? (
                                             <>
                                                 {/* Timeline Section */}
-                                                <div className="bg-muted/30 rounded-xl p-6 space-y-4">
+                                                <div className="bg-muted/30 rounded-xl p-4 sm:p-6 space-y-4">
                                                     <h5 className="text-sm font-medium text-primary/70">Biblical Timeline</h5>
-                                                    <div className="max-w-3xl mx-auto">
+                                                    <div className="max-w-3xl mx-auto overflow-x-auto">
                                                         <VerseTimeline
                                                             sourceReference={verseRef}
                                                             crossReferences={verseCrossRefs}
@@ -395,23 +463,23 @@ export function EnhancedBibleStudy({
                                                 </div>
 
                                                 {/* Cross References List */}
-                                                <div className="space-y-4">
+                                                <div className="space-y-3 sm:space-y-4">
                                                     {verseCrossRefs.map((ref, idx) => (
-                                                        <div key={idx} className="rounded-lg bg-muted/30 p-4 space-y-3">
-                                                            <div className="flex items-center justify-between">
-                                                                <h4 className="font-medium text-primary">{ref.reference}</h4>
+                                                        <div key={idx} className="rounded-lg bg-muted/30 p-3 sm:p-4 space-y-2 sm:space-y-3">
+                                                            <div className="flex items-center justify-between flex-wrap gap-2">
+                                                                <h4 className="font-medium text-primary text-sm sm:text-base">{ref.reference}</h4>
                                                                 <span className="text-xs text-muted-foreground">{ref.period}</span>
                                                             </div>
                                                             <p className="text-sm italic border-l-2 border-primary/20 pl-3">{ref.text}</p>
-                                                            <p className="text-sm text-muted-foreground">{ref.connection}</p>
+                                                            <p className="text-xs sm:text-sm text-muted-foreground">{ref.connection}</p>
                                                             {ref.originalText && (
-                                                                <div className="mt-3 pt-3 border-t border-border/50">
+                                                                <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border/50">
                                                                     <div className="text-xs text-muted-foreground mb-2">
                                                                         Original {ref.originalText.language}:
                                                                     </div>
                                                                     <div
                                                                         className={cn(
-                                                                            "p-3 bg-background/50 rounded-lg font-serif text-sm",
+                                                                            "p-2 sm:p-3 bg-background/50 rounded-lg font-serif text-xs sm:text-sm",
                                                                             ref.originalText.language === 'hebrew' ? "text-right" : "text-left"
                                                                         )}
                                                                         dir={ref.originalText.language === 'hebrew' ? 'rtl' : 'ltr'}
@@ -427,23 +495,23 @@ export function EnhancedBibleStudy({
                                                 <button
                                                     onClick={() => handleGenerateCrossRefs(verse)}
                                                     disabled={generatingCrossRefs === verseRef}
-                                                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                                                    className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
                                                 >
                                                     <RefreshCw className={cn("w-4 h-4", generatingCrossRefs === verseRef && "animate-spin")} />
                                                     Find More References
                                                 </button>
                                             </>
                                         ) : (
-                                            <div className="text-center py-12">
-                                                <Network className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                                                <h3 className="text-lg font-medium mb-2">No Cross References Yet</h3>
-                                                <p className="text-muted-foreground mb-6">
+                                            <div className="text-center py-8 sm:py-12">
+                                                <Network className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-4" />
+                                                <h3 className="text-base sm:text-lg font-medium mb-2">No Cross References Yet</h3>
+                                                <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
                                                     Find connections between this verse and other parts of Scripture.
                                                 </p>
                                                 <button
                                                     onClick={() => handleGenerateCrossRefs(verse)}
                                                     disabled={generatingCrossRefs === verseRef}
-                                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
+                                                    className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
                                                 >
                                                     {generatingCrossRefs === verseRef ? (
                                                         <>
