@@ -153,6 +153,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@google/generative-ai@npm:^0.21.0":
+  version: 0.21.0
+  resolution: "@google/generative-ai@npm:0.21.0"
+  checksum: 91345a8399b5e71382193d0eac47a4b264613a9d7e48a431290b523e3fbb44a207a33bdead304f181987e5a0127a84168c4e21cf461c1087cd3b0ebc5125d13d
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.8":
   version: 0.11.10
   resolution: "@humanwhocodes/config-array@npm:0.11.10"
@@ -10295,6 +10302,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wix-headless-example@workspace:."
   dependencies:
+    "@google/generative-ai": ^0.21.0
     "@playwright/test": ^1.34.3
     "@wix/bookings": ^1.0.127
     "@wix/comments": ^1.0.89

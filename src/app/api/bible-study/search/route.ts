@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerWixClient } from '@/src/app/serverWixClient';
-import { completion } from '@/src/lib/openai';
+import { completion } from '@/src/lib/ai';
 import { getSpecificVerses } from '@/src/lib/bible';
+import type { BibleVerse } from '@/src/types/bible';
 
 // Helper to parse verse references from GPT response
 function parseVerseReferences(response: string): string[] {
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
         const searchResponse = await completion([
             { role: 'system', content: searchPrompt },
             { role: 'user', content: query }
-        ]);
+        ]) as string;
 
         if (!searchResponse) {
             throw new Error('No response from GPT for verse search');
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
         const verses = await getSpecificVerses(verseRefs.join('; '), translation);
 
         // Step 3: If a specific verse was provided, get cross references
-        let crossReferences = [];
+        let crossReferences: BibleVerse[] = [];
         if (query.match(/[0-9]/) && verseRefs.length === 1) {
             const crossRefPrompt = `
                 <instructions>
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
             const crossRefResponse = await completion([
                 { role: 'system', content: crossRefPrompt },
                 { role: 'user', content: query }
-            ]);
+            ]) as string;
 
             if (crossRefResponse) {
                 const crossRefVerseRefs = parseVerseReferences(crossRefResponse);
@@ -110,7 +111,7 @@ export async function POST(request: NextRequest) {
         const explanation = await completion([
             { role: 'system', content: explanationPrompt },
             { role: 'user', content: 'Please provide a Bible study overview.' }
-        ]);
+        ]) as string;
 
         // Return the preview results without saving
         return NextResponse.json({

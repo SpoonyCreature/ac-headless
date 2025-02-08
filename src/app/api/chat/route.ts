@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerWixClient } from '@/src/app/serverWixClient';
-import { completion, getPromptTemplate } from '@/src/lib/openai';
+import { completion, getPromptTemplate } from '@/src/lib/ai';
 
 export async function POST(request: NextRequest) {
     const wixClient = getServerWixClient();
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 
         // Get completion using our lib
         console.log('Requesting completion from OpenAI...');
-        const responseMessage = await completion(conversationHistory);
+        const responseMessage = await completion(conversationHistory) as string;
 
         if (!responseMessage) {
             console.error('No response received from OpenAI');

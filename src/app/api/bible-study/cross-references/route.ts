@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { completion, JsonSchemaFormat } from '@/src/lib/openai';
+import { completion, JsonSchemaFormat } from '@/src/lib/ai';
 import { getSpecificVerses } from '@/src/lib/bible';
 import { CrossReference } from '@/src/types/bible';
 
@@ -9,6 +9,14 @@ interface CrossReferenceRequest {
     verse: string;
     text: string;
     translation?: string;
+}
+
+interface CrossReferenceResponse {
+    cross_references: Array<{
+        reference: string;
+        connection: string;
+        historical_period: string;
+    }>;
 }
 
 // Define the JSON schema for cross references
@@ -98,7 +106,7 @@ export async function POST(request: NextRequest) {
         ], {
             temperature: 0.7,
             response_format: crossReferencesSchema
-        });
+        }) as CrossReferenceResponse;
 
         // Add detailed logging
         console.log('Cross References API Response:', {
@@ -111,20 +119,19 @@ export async function POST(request: NextRequest) {
             throw new Error('Invalid response format from GPT');
         }
 
-        // Create the cross references array
-        const crossReferences: CrossReference[] = await Promise.all(
+        // Map the response to match the CrossReference type
+        const crossReferences = await Promise.all(
             crossRefResponse.cross_references.map(async (ref) => {
-                // Fetch the verse text for this reference
                 const verses = await getSpecificVerses(ref.reference, translation);
                 const verseText = verses.map(v => v.text).join(' ');
-
                 return {
                     reference: ref.reference,
                     connection: ref.connection,
-                    period: ref.period,
+                    period: ref.historical_period,
                     text: verseText,
-                    sourceReference
-                };
+                    sourceReference,
+                    verses
+                } as CrossReference;
             })
         );
 

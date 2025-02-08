@@ -1,5 +1,16 @@
 import { NextResponse } from 'next/server';
-import { completion, JsonSchemaFormat } from '@/src/lib/openai';
+import { completion, JsonSchemaFormat } from '@/src/lib/ai';
+
+// Define the commentary response type
+interface CommentaryResponse {
+    sections: Array<{
+        title: string;
+        content: Array<{
+            type: 'text' | 'greek' | 'hebrew' | 'emphasis' | 'reference';
+            text: string;
+        }>;
+    }>;
+}
 
 // Define the JSON schema for commentary
 const commentarySchema: JsonSchemaFormat = {
@@ -40,20 +51,16 @@ const commentarySchema: JsonSchemaFormat = {
                                             description: "The actual content text"
                                         }
                                     },
-                                    required: ["type", "text"],
-                                    additionalProperties: false
+                                    required: ["type", "text"]
                                 }
                             }
                         },
-                        required: ["title", "content"],
-                        additionalProperties: false
-                    },
+                        required: ["title", "content"]
+                    }
                 }
             },
-            required: ["sections"],
-            additionalProperties: false
-        },
-        strict: true
+            required: ["sections"]
+        }
     }
 };
 
@@ -115,12 +122,16 @@ export async function POST(request: Request) {
         prompt += `\n\nProvide your insights in a structured format.
             Keep each section focused and build upon previous commentaries without repetition.
 
-            Given the provided context - bring out the most signficant things that you see, and the most amazing connections.
+            Given the provided context - bring out the most significant things that you see, and the most amazing connections.
             nothing else.
 
-            In particular, note the use of Hebrew and Greek words not just in the verse, but in the entire provided context - as sometimes there is meaning there that cannot be captured in English (e.g. the various types of "love" in the Greek).
+            In particular, note the use of Hebrew and Greek words not just in the verse, but in the entire provided context.
+            When mentioning Hebrew or Greek words, wrap them in the appropriate content type ("hebrew" or "greek").
+            When emphasizing key points, use the "emphasis" content type.
+            When referencing Bible verses, use the "reference" content type.
+            For normal text, use the "text" content type.
 
-            You may only respond, in aggregate, with 1 - 3 sentences.
+            You may only respond, in aggregate, with 1 - 3 sentences per section.
             Responses must be incredibly short and to the point.
             Every additional word causes an elf to suffer in the nether.`;
 
@@ -129,7 +140,7 @@ export async function POST(request: Request) {
         const commentary = await completion([
             {
                 role: "system",
-                content: "You are a biblical scholar and commentator with expertise in biblical languages, theology, and hermeneutics. Provide clear, accurate, and insightful commentary that helps readers understand the depth and significance of Scripture, always keeping in view the broader context and purpose of the study."
+                content: "You are a biblical scholar and commentator with expertise in biblical languages, theology, and hermeneutics. Provide clear, accurate, and insightful commentary that helps readers understand the depth and significance of Scripture. Your responses should be structured with appropriate content types: 'text' for normal text, 'greek' for Greek terms, 'hebrew' for Hebrew terms, 'emphasis' for key points, and 'reference' for Bible verse references."
             },
             {
                 role: "user",
@@ -138,7 +149,7 @@ export async function POST(request: Request) {
         ], {
             temperature: 0.7,
             response_format: commentarySchema
-        });
+        }) as CommentaryResponse;
 
         // Add detailed logging
         console.log('Commentary API Response:', {
