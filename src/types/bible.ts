@@ -106,6 +106,13 @@ export interface BibleStudy {
     explanation?: string;
     notes?: string[];
     comments?: string[];
+    commentaries?: Array<{
+        verseRef: string;
+        commentary: {
+            markdown: string;
+        };
+        timestamp: number;
+    }>;
     _owner?: string;
     _createdDate?: string;
     public?: boolean;
