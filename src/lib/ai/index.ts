@@ -1,11 +1,12 @@
 import { AIProviderFactory } from './factory';
 import type { Message, CompletionOptions, PromptTemplate, HydratedPrompt, JsonSchemaFormat } from './types';
+import type { PDFFile } from './base';
 
 // Get the default provider (OpenAI for now)
 const defaultProvider = AIProviderFactory.getProvider('gemini');
 
 // Re-export types
-export type { Message, CompletionOptions, PromptTemplate, HydratedPrompt, JsonSchemaFormat };
+export type { Message, CompletionOptions, PromptTemplate, HydratedPrompt, JsonSchemaFormat, PDFFile };
 
 // Prompts management
 const prompts: Record<string, PromptTemplate> = {
@@ -50,4 +51,9 @@ export async function completion(
     options: CompletionOptions = {}
 ): Promise<string | object> {
     return defaultProvider.completion(messages, options);
+}
+
+// PDF handling functions
+export async function uploadPDF(file: PDFFile): Promise<PDFFile> {
+    return defaultProvider.uploadPDF(file);
 } 

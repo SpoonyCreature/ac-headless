@@ -9,7 +9,6 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { messages, threadId } = body;
 
-
         if (!messages || !messages.length) {
             return NextResponse.json(
                 { error: 'No message provided' },
@@ -76,8 +75,8 @@ export async function POST(request: NextRequest) {
         const responseMessage = await completion(conversationHistory) as string;
 
         if (!responseMessage) {
-            console.error('No response received from OpenAI');
-            throw new Error('No response from OpenAI');
+            console.error('No response received from AI');
+            throw new Error('No response from AI');
         }
 
         // Create the assistant's message in the DB format

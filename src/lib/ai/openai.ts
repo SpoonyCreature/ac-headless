@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { AIProvider } from './base';
+import { AIProvider, PDFFile } from './base';
 import { CompletionOptions, Message } from './types';
 
 export class OpenAIProvider extends AIProvider {
@@ -26,10 +26,13 @@ export class OpenAIProvider extends AIProvider {
             stop,
         } = options;
 
+        // Filter out messages with PDF content
+        const textOnlyMessages = messages.filter(msg => typeof msg.content === 'string');
+
         const completionRequest: any = {
             model,
             temperature,
-            messages,
+            messages: textOnlyMessages,
             stream: false,
             store,
         };
@@ -57,5 +60,9 @@ export class OpenAIProvider extends AIProvider {
         }
 
         return response.choices[0].message.content || '';
+    }
+
+    async uploadPDF(file: PDFFile): Promise<PDFFile> {
+        throw new Error('PDF functionality is not supported by the OpenAI provider');
     }
 } 
