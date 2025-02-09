@@ -41,7 +41,7 @@ export function LoadingMessage() {
                 {/* Loading Message */}
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground animate-pulse">
-                        Considering the questions...
+                        Considering the message...
                     </span>
                     <span className="inline-flex gap-1">
                         <span className="h-1.5 w-1.5 rounded-full bg-primary/40 animate-[bounce_1.4s_infinite]" style={{ animationDelay: '0.2s' }} />
