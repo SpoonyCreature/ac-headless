@@ -1,17 +1,10 @@
 import { useState } from 'react';
 import { Lightbulb, RefreshCw } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
-
-interface CommentarySection {
-    title: string;
-    content: {
-        type: 'text' | 'greek' | 'hebrew' | 'emphasis' | 'reference';
-        text: string;
-    }[];
-}
+import ReactMarkdown from 'react-markdown';
 
 interface CommentaryResponse {
-    sections: CommentarySection[];
+    markdown: string;
 }
 
 interface Commentary {
@@ -51,10 +44,8 @@ export function SequentialCommentary({
 
             newCommentary = await onGenerateCommentary(verseRef, relevantCommentaries);
 
-            // Debug log to see the actual response structure
-
             // Validate the response has the expected structure
-            if (!newCommentary?.sections || !Array.isArray(newCommentary.sections)) {
+            if (!newCommentary?.markdown) {
                 console.error('Invalid commentary format received:', newCommentary);
                 throw new Error('Invalid commentary response format');
             }
@@ -73,7 +64,6 @@ export function SequentialCommentary({
             ]);
         } catch (error) {
             console.error('Failed to generate commentary:', error);
-            // Add more detailed error logging
             if (error instanceof Error) {
                 console.error('Error details:', {
                     message: error.message,
@@ -91,23 +81,6 @@ export function SequentialCommentary({
         setCommentaries(prev => prev.filter(c => c.verseRef !== verseRef));
         // Generate a new one
         await handleGenerateCommentary(verseRef);
-    };
-
-    const renderContent = (content: CommentarySection['content']) => {
-        return content.map((item, index) => {
-            switch (item.type) {
-                case 'greek':
-                    return <span key={index} className="font-serif text-primary/80 italic">{item.text}</span>;
-                case 'hebrew':
-                    return <span key={index} className="font-serif text-primary/80 italic" dir="rtl">{item.text}</span>;
-                case 'emphasis':
-                    return <strong key={index} className="font-medium text-foreground">{item.text}</strong>;
-                case 'reference':
-                    return <span key={index} className="text-primary underline decoration-primary/30 underline-offset-2">{item.text}</span>;
-                default:
-                    return <span key={index}>{item.text}</span>;
-            }
-        });
     };
 
     return (
@@ -170,21 +143,10 @@ export function SequentialCommentary({
                             {commentary && (
                                 <div className="relative">
                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary/10 rounded-full" />
-                                    <div className="pl-4 space-y-4">
-                                        {commentary.commentary?.sections?.map((section, idx) => (
-                                            <div key={idx} className="space-y-2">
-                                                <h4 className="text-sm font-medium text-primary">
-                                                    {section.title}
-                                                </h4>
-                                                <p className="text-sm text-muted-foreground leading-relaxed">
-                                                    {renderContent(section.content)}
-                                                </p>
-                                            </div>
-                                        )) || (
-                                                <div className="text-sm text-muted-foreground">
-                                                    No commentary sections available
-                                                </div>
-                                            )}
+                                    <div className="pl-4 prose prose-sm max-w-none prose-headings:text-primary prose-headings:font-medium prose-p:text-muted-foreground prose-p:leading-relaxed prose-strong:text-foreground prose-em:text-primary/80 prose-em:font-serif">
+                                        <ReactMarkdown>
+                                            {commentary.commentary.markdown}
+                                        </ReactMarkdown>
                                     </div>
                                 </div>
                             )}

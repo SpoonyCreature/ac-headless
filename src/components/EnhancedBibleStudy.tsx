@@ -4,17 +4,12 @@ import { cn } from '@/src/lib/utils';
 import { BibleVerse, CrossReference } from '@/src/types/bible';
 import { VerseTimeline } from './VerseTimeline';
 import { FormattedVerseText } from './FormattedVerseText';
-
-interface CommentarySection {
-    title: string;
-    content: {
-        type: 'text' | 'greek' | 'hebrew' | 'emphasis' | 'reference';
-        text: string;
-    }[];
-}
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
 interface CommentaryResponse {
-    sections: CommentarySection[];
+    markdown: string;
 }
 
 interface Commentary {
@@ -30,6 +25,8 @@ interface EnhancedBibleStudyProps {
     query?: string;
     onGenerateCommentary: (verseRef: string, previousCommentaries: Commentary[]) => Promise<CommentaryResponse>;
     onGenerateCrossReferenceMap?: (verse: BibleVerse) => Promise<void>;
+    onSaveCommentary?: (verseRef: string, commentary: CommentaryResponse) => Promise<void>;
+    initialCommentaries?: Commentary[];
 }
 
 export function EnhancedBibleStudy({
@@ -39,8 +36,10 @@ export function EnhancedBibleStudy({
     query,
     onGenerateCommentary,
     onGenerateCrossReferenceMap,
+    onSaveCommentary,
+    initialCommentaries = []
 }: EnhancedBibleStudyProps) {
-    const [commentaries, setCommentaries] = useState<Commentary[]>([]);
+    const [commentaries, setCommentaries] = useState<Commentary[]>(initialCommentaries);
     const [isLoading, setIsLoading] = useState<string | null>(null);
     const [activeVerse, setActiveVerse] = useState<number | null>(null);
     const [activeTab, setActiveTab] = useState<'verse' | 'commentary' | 'cross-references'>('verse');
@@ -61,6 +60,11 @@ export function EnhancedBibleStudy({
                 .sort((a, b) => a.timestamp - b.timestamp);
 
             const newCommentary = await onGenerateCommentary(verseRef, relevantCommentaries);
+
+            // Save the commentary if handler provided
+            if (onSaveCommentary) {
+                await onSaveCommentary(verseRef, newCommentary);
+            }
 
             // Remove any existing commentary for this verse and add the new one
             setCommentaries(prev => [
@@ -92,23 +96,6 @@ export function EnhancedBibleStudy({
         const text = `${verse.reference} - ${verse.verses?.map(v => v.text).join(' ')}`;
         navigator.clipboard.writeText(text);
         // TODO: Add toast notification
-    };
-
-    const renderContent = (content: CommentarySection['content']) => {
-        return content.map((item, index) => {
-            switch (item.type) {
-                case 'greek':
-                    return <span key={index} className="font-serif text-primary/80 italic">{item.text}</span>;
-                case 'hebrew':
-                    return <span key={index} className="font-serif text-primary/80 italic" dir="rtl">{item.text}</span>;
-                case 'emphasis':
-                    return <strong key={index} className="font-medium text-foreground">{item.text}</strong>;
-                case 'reference':
-                    return <span key={index} className="text-primary underline decoration-primary/30 underline-offset-2">{item.text}</span>;
-                default:
-                    return <span key={index}>{item.text}</span>;
-            }
-        });
     };
 
     return (
@@ -153,7 +140,9 @@ export function EnhancedBibleStudy({
 
             {/* Sequential Study */}
             <div className="relative space-y-6 sm:space-y-8">
-                {verses.map((verse, index) => {
+                {verses?.map((verse, index) => {
+                    if (!verse?.verses) return null;
+
                     const commentary = commentaries.find(c => c.verseRef === `${verse.reference}`);
                     const hasCommentary = !!commentary;
                     const isGenerating = isLoading === `${verse.reference}`;
@@ -225,7 +214,7 @@ export function EnhancedBibleStudy({
                                 </div>
                             </div>
 
-                            {/* Main Verse Content - Always Visible */}
+                            {/* Main Verse Content */}
                             <div className="p-4 sm:p-6">
                                 <div className="relative rounded-xl bg-muted/30 p-4 sm:p-6">
                                     <FormattedVerseText verses={verse.verses} />
@@ -275,12 +264,12 @@ export function EnhancedBibleStudy({
                                     >
                                         <ExternalLink className="w-4 h-4" />
                                         Study Tools
-                                    </a >
-                                </div >
-                            </div >
+                                    </a>
+                                </div>
+                            </div>
 
                             {/* Navigation for Additional Content */}
-                            < div className="px-4 sm:px-6" >
+                            <div className="px-4 sm:px-6">
                                 <div className="border-t border-border/50 -mx-4 sm:-mx-6" />
 
                                 {/* Desktop Tabs */}
@@ -366,157 +355,179 @@ export function EnhancedBibleStudy({
                                         )}
                                     </button>
                                 </div>
-                            </div >
+                            </div>
 
                             {/* Additional Content */}
-                            {
-                                (activeTab === 'commentary' || activeTab === 'references') && (
-                                    <div className="border-t border-border/50">
-                                        <div className="p-4 sm:p-6">
-                                            {activeTab === 'commentary' && (
-                                                <div className="space-y-4">
-                                                    {hasCommentary ? (
-                                                        <div className="space-y-4">
-                                                            {commentary.commentary.sections.map((section, idx) => (
-                                                                <div key={idx} className="space-y-2">
-                                                                    <h4 className="text-sm font-medium text-primary">
-                                                                        {section.title}
-                                                                    </h4>
-                                                                    <div className="prose prose-sm max-w-none">
-                                                                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                                                                            {renderContent(section.content)}
-                                                                        </p>
+                            {(activeTab === 'commentary' || activeTab === 'references') && (
+                                <div className="border-t border-border/50">
+                                    <div className="p-4 sm:p-6">
+                                        {activeTab === 'commentary' && (
+                                            <div className="space-y-4">
+                                                {hasCommentary ? (
+                                                    <div className="space-y-4">
+                                                        <div className="prose prose-sm max-w-none dark:prose-invert">
+                                                            <ReactMarkdown
+                                                                remarkPlugins={[remarkGfm]}
+                                                                rehypePlugins={[rehypeRaw]}
+                                                                components={{
+                                                                    h1: ({ node, ...props }) => <h1 className="text-lg font-semibold mb-3 mt-0 text-primary/80" {...props} />,
+                                                                    h2: ({ node, ...props }) => <h2 className="text-base font-medium mb-2 mt-4 text-primary/70" {...props} />,
+                                                                    h3: ({ node, ...props }) => <h3 className="text-sm font-medium mb-2 mt-3 text-primary/60" {...props} />,
+                                                                    p: ({ node, ...props }) => <p className="text-sm text-muted-foreground mb-3 leading-relaxed" {...props} />,
+                                                                    ul: ({ node, ...props }) => <ul className="text-sm list-disc pl-4 mb-3 text-muted-foreground" {...props} />,
+                                                                    ol: ({ node, ...props }) => <ol className="text-sm list-decimal pl-4 mb-3 text-muted-foreground" {...props} />,
+                                                                    li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                                                                    blockquote: ({ node, ...props }) => (
+                                                                        <blockquote className="border-l-2 border-primary/20 pl-3 italic my-3 text-sm text-muted-foreground/80" {...props} />
+                                                                    ),
+                                                                    code: ({ node, inline, className, children, ...props }: {
+                                                                        node?: any;
+                                                                        inline?: boolean;
+                                                                        className?: string;
+                                                                        children?: React.ReactNode;
+                                                                    } & React.HTMLAttributes<HTMLElement>) =>
+                                                                        inline ? (
+                                                                            <code className="bg-muted px-1 py-0.5 text-xs rounded" {...props}>{children}</code>
+                                                                        ) : (
+                                                                            <code className="block bg-muted p-3 my-3 text-xs rounded overflow-x-auto" {...props}>{children}</code>
+                                                                        ),
+                                                                    a: ({ node, ...props }) => (
+                                                                        <a className="text-primary/80 hover:text-primary no-underline hover:underline" {...props} />
+                                                                    ),
+                                                                    strong: ({ node, ...props }) => <strong className="font-medium text-foreground" {...props} />,
+                                                                    em: ({ node, ...props }) => <em className="italic text-primary/70" {...props} />,
+                                                                }}
+                                                            >
+                                                                {commentary.commentary.markdown}
+                                                            </ReactMarkdown>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => handleGenerateCommentary(verseRef)}
+                                                            disabled={isGenerating}
+                                                            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                                                        >
+                                                            <RefreshCw className={cn("w-4 h-4", isGenerating && "animate-spin")} />
+                                                            Regenerate Commentary
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-center py-6">
+                                                        <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-4" />
+                                                        <h3 className="text-base sm:text-lg font-medium mb-2">No Commentary Yet</h3>
+                                                        <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
+                                                            Generate AI-powered commentary to explore deeper insights into this verse.
+                                                        </p>
+                                                        <button
+                                                            onClick={() => handleGenerateCommentary(verseRef)}
+                                                            disabled={isGenerating}
+                                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
+                                                        >
+                                                            {isGenerating ? (
+                                                                <>
+                                                                    <RefreshCw className="w-4 h-4 animate-spin" />
+                                                                    Generating...
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <MessageSquare className="w-4 h-4" />
+                                                                    Generate Commentary
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {activeTab === 'references' && (
+                                            <div className="space-y-4">
+                                                {verseCrossRefs.length > 0 ? (
+                                                    <>
+                                                        {/* Timeline Section */}
+                                                        <div className="bg-muted/30 rounded-xl p-4 sm:p-6 space-y-4">
+                                                            <h5 className="text-sm font-medium text-primary/70">Biblical Timeline</h5>
+                                                            <div className="max-w-3xl mx-auto overflow-x-auto">
+                                                                <VerseTimeline
+                                                                    sourceReference={verseRef}
+                                                                    crossReferences={verseCrossRefs}
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Cross References List */}
+                                                        <div className="space-y-3 sm:space-y-4">
+                                                            {verseCrossRefs.map((ref, idx) => (
+                                                                <div key={idx} className="rounded-lg bg-muted/30 p-3 sm:p-4 space-y-2 sm:space-y-3">
+                                                                    <div className="flex items-center justify-between flex-wrap gap-2">
+                                                                        <h4 className="font-medium text-primary text-sm sm:text-base">{ref.reference}</h4>
+                                                                        <span className="text-xs text-muted-foreground">{ref.period}</span>
                                                                     </div>
+                                                                    <p className="text-sm italic border-l-2 border-primary/20 pl-3">{ref.text}</p>
+                                                                    <p className="text-xs sm:text-sm text-muted-foreground">{ref.connection}</p>
+                                                                    {ref.originalText && (
+                                                                        <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border/50">
+                                                                            <div className="text-xs text-muted-foreground mb-2">
+                                                                                Original {ref.originalText.language}:
+                                                                            </div>
+                                                                            <div
+                                                                                className={cn(
+                                                                                    "p-2 sm:p-3 bg-background/50 rounded-lg font-serif text-xs sm:text-sm",
+                                                                                    ref.originalText.language === 'hebrew' ? "text-right" : "text-left"
+                                                                                )}
+                                                                                dir={ref.originalText.language === 'hebrew' ? 'rtl' : 'ltr'}
+                                                                            >
+                                                                                {ref.originalText.text}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             ))}
-                                                            <button
-                                                                onClick={() => handleGenerateCommentary(verseRef)}
-                                                                disabled={isGenerating}
-                                                                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
-                                                            >
-                                                                <RefreshCw className={cn("w-4 h-4", isGenerating && "animate-spin")} />
-                                                                Regenerate Commentary
-                                                            </button>
                                                         </div>
-                                                    ) : (
-                                                        <div className="text-center py-6">
-                                                            <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-4" />
-                                                            <h3 className="text-base sm:text-lg font-medium mb-2">No Commentary Yet</h3>
-                                                            <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
-                                                                Generate AI-powered commentary to explore deeper insights into this verse.
-                                                            </p>
-                                                            <button
-                                                                onClick={() => handleGenerateCommentary(verseRef)}
-                                                                disabled={isGenerating}
-                                                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
-                                                            >
-                                                                {isGenerating ? (
-                                                                    <>
-                                                                        <RefreshCw className="w-4 h-4 animate-spin" />
-                                                                        Generating...
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <MessageSquare className="w-4 h-4" />
-                                                                        Generate Commentary
-                                                                    </>
-                                                                )}
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
 
-                                            {activeTab === 'references' && (
-                                                <div className="space-y-4">
-                                                    {verseCrossRefs.length > 0 ? (
-                                                        <>
-                                                            {/* Timeline Section */}
-                                                            <div className="bg-muted/30 rounded-xl p-4 sm:p-6 space-y-4">
-                                                                <h5 className="text-sm font-medium text-primary/70">Biblical Timeline</h5>
-                                                                <div className="max-w-3xl mx-auto overflow-x-auto">
-                                                                    <VerseTimeline
-                                                                        sourceReference={verseRef}
-                                                                        crossReferences={verseCrossRefs}
-                                                                    />
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Cross References List */}
-                                                            <div className="space-y-3 sm:space-y-4">
-                                                                {verseCrossRefs.map((ref, idx) => (
-                                                                    <div key={idx} className="rounded-lg bg-muted/30 p-3 sm:p-4 space-y-2 sm:space-y-3">
-                                                                        <div className="flex items-center justify-between flex-wrap gap-2">
-                                                                            <h4 className="font-medium text-primary text-sm sm:text-base">{ref.reference}</h4>
-                                                                            <span className="text-xs text-muted-foreground">{ref.period}</span>
-                                                                        </div>
-                                                                        <p className="text-sm italic border-l-2 border-primary/20 pl-3">{ref.text}</p>
-                                                                        <p className="text-xs sm:text-sm text-muted-foreground">{ref.connection}</p>
-                                                                        {ref.originalText && (
-                                                                            <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border/50">
-                                                                                <div className="text-xs text-muted-foreground mb-2">
-                                                                                    Original {ref.originalText.language}:
-                                                                                </div>
-                                                                                <div
-                                                                                    className={cn(
-                                                                                        "p-2 sm:p-3 bg-background/50 rounded-lg font-serif text-xs sm:text-sm",
-                                                                                        ref.originalText.language === 'hebrew' ? "text-right" : "text-left"
-                                                                                    )}
-                                                                                    dir={ref.originalText.language === 'hebrew' ? 'rtl' : 'ltr'}
-                                                                                >
-                                                                                    {ref.originalText.text}
-                                                                                </div>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-
-                                                            <button
-                                                                onClick={() => handleGenerateCrossRefs(verse)}
-                                                                disabled={generatingCrossRefs === verseRef}
-                                                                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
-                                                            >
-                                                                <RefreshCw className={cn("w-4 h-4", generatingCrossRefs === verseRef && "animate-spin")} />
-                                                                Find More References
-                                                            </button>
-                                                        </>
-                                                    ) : (
-                                                        <div className="text-center py-6">
-                                                            <Network className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-4" />
-                                                            <h3 className="text-base sm:text-lg font-medium mb-2">No Cross References Yet</h3>
-                                                            <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
-                                                                Find connections between this verse and other parts of Scripture.
-                                                            </p>
-                                                            <button
-                                                                onClick={() => handleGenerateCrossRefs(verse)}
-                                                                disabled={generatingCrossRefs === verseRef}
-                                                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
-                                                            >
-                                                                {generatingCrossRefs === verseRef ? (
-                                                                    <>
-                                                                        <RefreshCw className="w-4 h-4 animate-spin" />
-                                                                        Finding Connections...
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <Network className="w-4 h-4" />
-                                                                        Find Cross References
-                                                                    </>
-                                                                )}
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
+                                                        <button
+                                                            onClick={() => handleGenerateCrossRefs(verse)}
+                                                            disabled={generatingCrossRefs === verseRef}
+                                                            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                                                        >
+                                                            <RefreshCw className={cn("w-4 h-4", generatingCrossRefs === verseRef && "animate-spin")} />
+                                                            Find More References
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-center py-6">
+                                                        <Network className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-4" />
+                                                        <h3 className="text-base sm:text-lg font-medium mb-2">No Cross References Yet</h3>
+                                                        <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
+                                                            Find connections between this verse and other parts of Scripture.
+                                                        </p>
+                                                        <button
+                                                            onClick={() => handleGenerateCrossRefs(verse)}
+                                                            disabled={generatingCrossRefs === verseRef}
+                                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
+                                                        >
+                                                            {generatingCrossRefs === verseRef ? (
+                                                                <>
+                                                                    <RefreshCw className="w-4 h-4 animate-spin" />
+                                                                    Finding Connections...
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <Network className="w-4 h-4" />
+                                                                    Find Cross References
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
-                                )
-                            }
-                        </div >
+                                </div>
+                            )}
+                        </div>
                     );
                 })}
-            </div >
-        </div >
+            </div>
+        </div>
     );
 } 

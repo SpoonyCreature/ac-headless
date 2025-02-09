@@ -118,7 +118,7 @@ export default function BibleStudyDetailPage({
     const handleGenerateCommentary = async (verseRef: string, previousCommentaries: any[]) => {
         try {
             const verse = study?.verses.find(v => `${v.reference}` === verseRef);
-            if (!verse) throw new Error('Verse not found');
+            if (!verse || !verse.verses) throw new Error('Verse not found or invalid');
 
             // Find cross references for this verse if they exist
             const verseCrossRefs = study?.crossReferences?.filter(ref =>
@@ -165,8 +165,50 @@ export default function BibleStudyDetailPage({
         }
     };
 
+    const handleSaveCommentary = async (verseRef: string, commentary: any) => {
+        try {
+            if (!study) return;
+
+            // Update the study with new commentary
+            const updatedCommentaries = [
+                ...(study.commentaries || []).filter(c => c.verseRef !== verseRef),
+                {
+                    verseRef,
+                    commentary,
+                    timestamp: Date.now()
+                }
+            ];
+
+            // Update local state
+            setStudy({
+                ...study,
+                commentaries: updatedCommentaries
+            });
+
+            // Persist to backend
+            const updateResponse = await fetch(`/api/bible-study/${params.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    commentaries: updatedCommentaries
+                }),
+            });
+
+            if (!updateResponse.ok) {
+                throw new Error('Failed to persist commentary');
+            }
+        } catch (error) {
+            console.error('Error saving commentary:', error);
+            throw error;
+        }
+    };
+
     const handleGenerateCrossReferenceMap = async (verse: any) => {
         try {
+            if (!verse?.verses) throw new Error('Invalid verse data');
+
             const response = await fetch('/api/bible-study/cross-references', {
                 method: 'POST',
                 headers: {
@@ -282,6 +324,8 @@ export default function BibleStudyDetailPage({
                         query={study.query}
                         onGenerateCommentary={handleGenerateCommentary}
                         onGenerateCrossReferenceMap={handleGenerateCrossReferenceMap}
+                        onSaveCommentary={handleSaveCommentary}
+                        initialCommentaries={study.commentaries || []}
                     />
                 </div>
             </div>

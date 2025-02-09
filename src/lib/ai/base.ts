@@ -1,5 +1,12 @@
 import { CompletionOptions, Message, PromptTemplate, HydratedPrompt } from './types';
 
+export interface PDFFile {
+    uri?: string;
+    displayName: string;
+    mimeType: string;
+    path: string;
+}
+
 export abstract class AIProvider {
     protected prompts: Record<string, PromptTemplate> = {
         DEFAULT: {
@@ -41,4 +48,6 @@ export abstract class AIProvider {
         messages: Message[],
         options?: CompletionOptions
     ): Promise<string | object>;
+
+    abstract uploadPDF(file: PDFFile): Promise<PDFFile>;
 } 

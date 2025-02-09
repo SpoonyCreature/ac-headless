@@ -8,6 +8,7 @@ import { Chat as ChatType } from '@/src/types/chat';
 import { useRouter } from 'next/navigation';
 import { LoadingMessage } from '@/src/components/LoadingMessage';
 import { Menu, X } from 'lucide-react';
+import { cn } from '@/src/lib/utils';
 
 interface Message {
     _id: string;
@@ -144,24 +145,44 @@ export default function ChatPage() {
             setMessages(prev => [...prev, userMessage]);
 
             // Create the message array to send, including the new user message
-            const messagesToSend = [...messages, userMessage].map(m => ({
-                role: 'user',
-                content: m.text
-            }));
+            const messagesToSend = [
+                {
+                    role: 'system',
+                    content: 'You are a helpful AI assistant that can analyze PDFs. Please use the provided PDFs to help answer questions accurately.'
+                },
+                ...messages.map(m => ({
+                    role: m.role === 'Agent' ? 'assistant' : 'user',
+                    content: m.text
+                })),
+                {
+                    role: 'user',
+                    content: userMessage.text
+                }
+            ];
 
             // Send to API
-            const response = await fetch('/api/chat', {
+            const response = await fetch('/api/chat/pdf', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    threadId,
                     messages: messagesToSend
                 }),
             });
 
             if (!response.ok) {
+                if (response.status === 404) {
+                    // Add an error message to the chat
+                    const errorMessage = {
+                        _id: `msg-${messages.length + 1}`,
+                        role: 'Agent' as const,
+                        text: 'Sorry, I need PDF files in src/lib/ai/knowledge to answer questions. Please add some PDFs to that directory and try again.',
+                        time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+                    };
+                    setMessages(prev => [...prev, errorMessage]);
+                    return;
+                }
                 throw new Error('Failed to send message');
             }
 
@@ -174,10 +195,10 @@ export default function ChatPage() {
 
             // Add AI response
             const aiMessage = {
-                _id: data._id,
+                _id: data._id || `msg-${messages.length + 1}`,
                 role: 'Agent' as const,
-                text: data.text,
-                time: data.time,
+                text: data.text || data,
+                time: data.time || new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
                 public: data.public
             } satisfies Message;
             setMessages(prev => [...prev, aiMessage]);
@@ -195,20 +216,20 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="flex h-screen relative">
+        <main className="flex min-h-screen bg-gradient-to-b from-background to-background/95">
             {/* Mobile Sidebar Toggle */}
             <button
                 onClick={() => setShowSidebar(!showSidebar)}
-                className="lg:hidden fixed left-4 bottom-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+                className="lg:hidden fixed left-4 bottom-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-all hover:scale-105 active:scale-95"
             >
                 <Menu className="w-6 h-6" />
             </button>
 
             {/* Sidebar */}
-            <div className={`
-                fixed inset-y-0 left-0 z-50 transform lg:relative lg:translate-x-0 transition-transform duration-200 ease-in-out
-                ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
-            `}>
+            <div className={cn(
+                "fixed inset-y-0 left-0 z-50 w-80 transform lg:relative lg:translate-x-0 transition-all duration-300 ease-out",
+                showSidebar ? "translate-x-0" : "-translate-x-full"
+            )}>
                 <ChatSidebar
                     privateChats={privateChats}
                     publicChats={publicChats}
@@ -220,39 +241,47 @@ export default function ChatPage() {
             {/* Overlay for mobile */}
             {showSidebar && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm transition-opacity duration-300"
                     onClick={() => setShowSidebar(false)}
                 />
             )}
 
             {/* Main chat area */}
-            <div className="flex-1 lg:ml-0 flex flex-col h-full relative">
-                {/* Messages container with padding bottom for input */}
-                <div className="flex-1 overflow-y-auto pb-32">
-                    {messages.map((message) => (
-                        <ChatMessage
-                            key={message._id}
-                            message={message}
-                        />
-                    ))}
-                    {isLoading && <LoadingMessage />}
-                    <div ref={messagesEndRef} />
-                </div>
+            <div className="flex-1 flex flex-col min-h-screen relative">
+                {/* Header */}
+                <header className="sticky top-0 z-30 flex-none border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <div className="h-14 flex items-center justify-between px-4">
+                        <h1 className="text-lg font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Chat</h1>
+                    </div>
+                </header>
 
-                {/* Fixed chat input container */}
-                <div className="fixed bottom-0 left-0 right-0 lg:left-80 z-20">
-                    <div className="bg-gradient-to-t from-background via-background to-transparent h-32 w-full absolute bottom-full pointer-events-none" />
-                    <div className="bg-background/80 backdrop-blur-lg border-t border-border/50 p-4 shadow-lg">
-                        <div className="max-w-5xl mx-auto">
-                            <ChatInput
-                                onSend={handleSend}
-                                disabled={isLoading}
-                                isAuthenticated={isAuthenticated}
-                            />
+                {/* Messages Container - Single Scroll Container */}
+                <div className="flex-1 overflow-y-auto">
+                    <div className="flex flex-col min-h-full">
+                        <div className="flex-1">
+                            {messages.map((message) => (
+                                <ChatMessage
+                                    key={message._id}
+                                    message={message}
+                                />
+                            ))}
+                            {isLoading && <LoadingMessage />}
+                            <div ref={messagesEndRef} className="h-4" />
                         </div>
                     </div>
                 </div>
+
+                {/* Input Container */}
+                <div className="flex-none border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <div className="max-w-3xl mx-auto px-4 py-4">
+                        <ChatInput
+                            onSend={handleSend}
+                            disabled={isLoading}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
     );
 } 

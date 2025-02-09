@@ -1,6 +1,13 @@
 export interface Message {
     role: 'system' | 'user' | 'assistant';
-    content: string;
+    content: string | PDFContent;
+}
+
+export interface PDFContent {
+    fileData: {
+        fileUri: string;
+        mimeType: string;
+    };
 }
 
 export interface JsonSchemaFormat {

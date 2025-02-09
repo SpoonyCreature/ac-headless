@@ -27,7 +27,8 @@ export async function POST(request: NextRequest) {
             explanation,
             public: false,
             notes: [],
-            comments: []
+            comments: [],
+            commentaries: []
         });
 
         return NextResponse.json({
