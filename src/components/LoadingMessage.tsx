@@ -1,48 +1,61 @@
 import { Bot } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { useEffect, useState } from 'react';
+
+const loadingMessages = [
+    "Reflecting on your question...",
+    "Searching through my sources...",
+    "Preparing a response...",
+    "Adding the finishing touches..."
+];
 
 export function LoadingMessage() {
+    const [messageIndex, setMessageIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setMessageIndex((current) => (current + 1) % loadingMessages.length);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, []);
+
     return (
-        <div className="group relative flex gap-3 px-4 py-3">
+        <div className={cn(
+            "group relative flex gap-3 px-4 py-4",
+            "animate-in slide-in-from-bottom-2 duration-300 ease-out",
+            "bg-background",
+            "border-b border-border/5"
+        )}>
             {/* Avatar */}
-            <div className="flex-shrink-0 mt-1">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 ring-4 ring-background flex items-center justify-center shadow-lg">
-                    <Bot className="w-4 h-4 text-primary" />
+            <div className="flex h-6 w-6 shrink-0 select-none items-center justify-center">
+                <div className={cn(
+                    "flex h-6 w-6 items-center justify-center rounded-full",
+                    "bg-muted animate-pulse"
+                )}>
+                    <Bot className="h-3 w-3 text-primary" />
                 </div>
             </div>
 
             {/* Message Content */}
-            <div className="flex flex-col gap-1 max-w-[85%] md:max-w-[75%]">
+            <div className="flex flex-col gap-1 min-w-0 max-w-full flex-1">
                 {/* Name and Time */}
-                <div className="flex gap-2 items-center text-xs">
-                    <span className="font-medium text-foreground/80">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="font-medium">
                         Assistant
-                    </span>
-                    <span className="text-muted-foreground/50">
-                        <div className="w-12 h-3 bg-muted-foreground/10 rounded-full animate-pulse" />
                     </span>
                 </div>
 
-                {/* Message Bubble */}
-                <div className="rounded-2xl px-4 py-3 bg-gradient-to-br from-muted/80 to-muted border border-border/50 text-foreground shadow-sm">
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '0ms' }} />
-                            <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '150ms' }} />
-                            <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '300ms' }} />
-                        </div>
-                        <div className="space-y-2">
-                            <div className="flex space-x-2">
-                                <div className="h-3 bg-muted-foreground/10 rounded-full w-24 animate-pulse" style={{ animationDelay: '0ms' }} />
-                                <div className="h-3 bg-muted-foreground/10 rounded-full w-32 animate-pulse" style={{ animationDelay: '100ms' }} />
-                                <div className="h-3 bg-muted-foreground/10 rounded-full w-20 animate-pulse" style={{ animationDelay: '200ms' }} />
-                            </div>
-                            <div className="flex space-x-2">
-                                <div className="h-3 bg-muted-foreground/10 rounded-full w-36 animate-pulse" style={{ animationDelay: '300ms' }} />
-                                <div className="h-3 bg-muted-foreground/10 rounded-full w-28 animate-pulse" style={{ animationDelay: '400ms' }} />
-                            </div>
-                        </div>
-                    </div>
+                {/* Loading Message */}
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground animate-pulse">
+                        {loadingMessages[messageIndex]}
+                    </span>
+                    <span className="inline-flex gap-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary/40 animate-[bounce_1.4s_infinite]" style={{ animationDelay: '0.2s' }} />
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary/40 animate-[bounce_1.4s_infinite]" style={{ animationDelay: '0.4s' }} />
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary/40 animate-[bounce_1.4s_infinite]" style={{ animationDelay: '0.6s' }} />
+                    </span>
                 </div>
             </div>
         </div>
