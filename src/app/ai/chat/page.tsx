@@ -55,7 +55,7 @@ export default function ChatPage() {
     }, [isAuthenticated]);
 
     useEffect(() => {
-        // Add welcome message when component mounts (now always on reload)
+        // Add welcome message when component mounts
         setMessages([{
             _id: 'welcome',
             role: 'Agent',
@@ -248,26 +248,16 @@ export default function ChatPage() {
 
             {/* Main chat area */}
             <div className="flex-1 flex flex-col min-h-screen relative">
-                {/* Header */}
-                <header className="sticky top-0 z-30 flex-none border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                    <div className="h-14 flex items-center justify-between px-4">
-                        <h1 className="text-lg font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Chat</h1>
-                    </div>
-                </header>
-
-                {/* Messages Container - Single Scroll Container */}
                 <div className="flex-1 overflow-y-auto">
-                    <div className="flex flex-col min-h-full">
-                        <div className="flex-1">
-                            {messages.map((message) => (
-                                <ChatMessage
-                                    key={message._id}
-                                    message={message}
-                                />
-                            ))}
-                            {isLoading && <LoadingMessage />}
-                            <div ref={messagesEndRef} className="h-4" />
-                        </div>
+                    <div className="max-w-4xl mx-auto pt-4 pb-[100px]">
+                        {messages.map((message) => (
+                            <ChatMessage
+                                key={message._id}
+                                message={message}
+                            />
+                        ))}
+                        {isLoading && <LoadingMessage />}
+                        <div ref={messagesEndRef} />
                     </div>
                 </div>
 

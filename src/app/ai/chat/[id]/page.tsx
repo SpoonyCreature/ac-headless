@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { ChatSkeleton } from '@/src/components/Skeletons';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { LoadingMessage } from '@/src/components/LoadingMessage';
 
 export default function ChatViewPage({ params }: { params: { id: string } }) {
     const [chats, setChats] = useState<ChatType[]>([]);
@@ -81,24 +82,52 @@ export default function ChatViewPage({ params }: { params: { id: string } }) {
 
     if (isLoading) {
         return (
-            <div className="flex h-screen bg-background">
-                <ChatSkeleton />
+            <div className="flex min-h-screen bg-gradient-to-b from-background to-background/95">
+                <div className="flex-1">
+                    <div className="p-4 border-t border-border border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
+                        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <span className="text-sm text-muted-foreground">
+                                    Loading chat...
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto py-5">
+                        <div className="max-w-4xl mx-auto">
+                            <LoadingMessage />
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
 
     if (!currentChat) {
-        return <div>Chat not found</div>;
+        return (
+            <div className="flex min-h-screen bg-gradient-to-b from-background to-background/95 items-center justify-center">
+                <div className="text-center space-y-4">
+                    <h2 className="text-lg font-medium">Chat not found</h2>
+                    <Link
+                        href="/ai/chat"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Start New Chat
+                    </Link>
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div className="flex h-screen bg-background">
-            <div className="flex-1 flex flex-col">
+        <div className="flex min-h-screen bg-gradient-to-b from-background to-background/95">
+            <div className="flex-1">
                 <div className="p-4 border-t border-border border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
                     <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             <span className="text-sm text-muted-foreground">
-                                Read-only chat view
+                                Read-only chat
                             </span>
                             <span className="text-sm font-medium">
                                 {currentChat.question || 'Untitled Chat'}
