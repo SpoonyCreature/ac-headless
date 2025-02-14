@@ -61,7 +61,7 @@ export default function ChatViewPage({ params }: { params: { id: string } }) {
 
             if (!response.ok) {
                 console.error('Error fetching chat:', data.error);
-                router.push('/ai/chat');
+                router.push('/study/chat');
                 return;
             }
 

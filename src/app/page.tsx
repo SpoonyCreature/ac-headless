@@ -1,7 +1,8 @@
 import { getServerWixClient } from "./serverWixClient";
 import { BlogPosts } from '../components/BlogPosts';
-import { ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, Search, BookMarked } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface BlogPost {
     _id: string;
@@ -37,15 +38,15 @@ export default async function Home() {
                                 </span>
                             </h1>
                             <p className="text-lg text-muted-foreground mb-8 font-serif leading-relaxed max-w-xl">
-                                Empowering Christians with Reformed Presuppositional Apologetics through rigorous scholarship and biblical wisdom.
+                                Empowering Christians with Reformed Presuppositional Apologetics through interactive study tools, scholarly resources, and biblical wisdom.
                             </p>
-                            <div className="flex gap-4">
-                                <a href="#writings" className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all text-base font-medium">
-                                    Start Reading
+                            <div className="flex flex-wrap gap-4">
+                                <Link href="/study" className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all text-base font-medium">
+                                    Start Studying
                                     <ArrowRight className="w-5 h-5" />
-                                </a>
-                                <a href="/about" className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg border border-border hover:bg-muted transition-all text-base font-medium">
-                                    About Us
+                                </Link>
+                                <a href="#resources" className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg border border-border hover:bg-muted transition-all text-base font-medium">
+                                    Explore Resources
                                 </a>
                             </div>
                         </div>
@@ -65,14 +66,55 @@ export default async function Home() {
                 </div>
             </section>
 
-            {/* Content Section */}
-            <section id="writings" className="py-16 md:py-24">
+            {/* Study Tools Section */}
+            <section className="py-16 md:py-24 bg-gradient-to-b from-primary/5 to-transparent">
+                <div className="container mx-auto px-4">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="max-w-2xl mb-12">
+                            <div className="flex items-center gap-3 mb-4">
+                                <BookOpen className="w-5 h-5 text-primary" />
+                                <h2 className="font-serif text-4xl md:text-5xl">Interactive Study</h2>
+                            </div>
+                            <p className="text-lg text-muted-foreground font-serif leading-relaxed">
+                                Deepen your understanding of Scripture through our comprehensive study tools and theological discussions.
+                            </p>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <Link href="/study/chat" className="group">
+                                <div className="p-8 rounded-xl border border-border bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all h-full">
+                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                                        <BookMarked className="w-6 h-6 text-primary" />
+                                    </div>
+                                    <h3 className="text-2xl font-serif mb-3 group-hover:text-primary transition-colors">Theological Discussions</h3>
+                                    <p className="text-muted-foreground">
+                                        Engage in meaningful conversations about faith, doctrine, and Reformed theology with our interactive guide.
+                                    </p>
+                                </div>
+                            </Link>
+                            <Link href="/study/bible-study" className="group">
+                                <div className="p-8 rounded-xl border border-border bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all h-full">
+                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                                        <Search className="w-6 h-6 text-primary" />
+                                    </div>
+                                    <h3 className="text-2xl font-serif mb-3 group-hover:text-primary transition-colors">Bible Study Guide</h3>
+                                    <p className="text-muted-foreground">
+                                        Explore Scripture deeply with our interactive study tool featuring cross-references, commentary, and guided reflections.
+                                    </p>
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Articles Section */}
+            <section id="resources" className="py-16 md:py-24">
                 <div className="container mx-auto px-4">
                     <div className="max-w-7xl mx-auto">
                         <div className="max-w-2xl mb-12">
                             <div className="flex items-center gap-3 mb-4">
                                 <Sparkles className="w-5 h-5 text-primary" />
-                                <h2 className="font-serif text-4xl md:text-5xl">Latest Resources</h2>
+                                <h2 className="font-serif text-4xl md:text-5xl">Latest Articles</h2>
                             </div>
                             <p className="text-lg text-muted-foreground font-serif leading-relaxed">
                                 Dive into our collection of articles on Reformed Presuppositional Apologetics, biblical wisdom, and Christian thought.
@@ -80,7 +122,7 @@ export default async function Home() {
                         </div>
                         {blogs.length === 0 ? (
                             <div className="text-center py-8 bg-muted/50 rounded-lg">
-                                <p className="text-base font-medium mb-1">No resources found</p>
+                                <p className="text-base font-medium mb-1">No articles found</p>
                                 <p className="text-sm text-muted-foreground">Please check back later for new content.</p>
                             </div>
                         ) : (

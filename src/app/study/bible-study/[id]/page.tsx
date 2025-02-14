@@ -288,7 +288,7 @@ export default function BibleStudyDetailPage({
                 {/* Back Button */}
                 <div className="mb-8">
                     <Link
-                        href="/ai/bible-study"
+                        href="/study/bible-study"
                         className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <ChevronLeft className="w-4 h-4" />

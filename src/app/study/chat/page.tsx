@@ -74,7 +74,7 @@ export default function ChatPage() {
         setMessages([{
             _id: 'welcome',
             role: 'Agent',
-            text: 'Hello! I am an AI assistant. How can I help you today?',
+            text: 'Welcome to our theological discussion space! I am here to help you explore questions about Reformed theology, doctrine, and faith. How may I assist you today?',
             time: new Date().toLocaleString('en-GB', {
                 day: '2-digit',
                 month: '2-digit',
