@@ -5,6 +5,7 @@ import { ChatMessage as ChatMessageType } from '@/src/types/chat';
 import { User, Bot, ExternalLink } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import React from 'react';
+import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface ChatMessageProps {
     message: ChatMessageType;
@@ -81,28 +82,63 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 parts.push(renderMarkdown(beforeText, `before-${localStart}`));
             }
 
+            // Calculate average confidence score
+            const avgConfidence = support.confidenceScores?.length
+                ? support.confidenceScores.reduce((a, b) => a + b, 0) / support.confidenceScores.length
+                : 1;
+
             // Add the segment text with its references
             parts.push(
                 <span key={`segment-${localStart}`} className="inline group/ref">
-                    <span className="inline border-b border-dashed border-primary/30">
+                    <span
+                        className={cn(
+                            "inline border-b border-dashed transition-colors duration-200",
+                            avgConfidence > 0.8 ? "border-primary/50" : "border-yellow-500/50",
+                            "group-hover/ref:border-primary"
+                        )}
+                    >
                         {renderMarkdown(supportText)}
                     </span>
-                    {support.groundingChunkIndices.map((chunkIndex, i) => {
-                        const refNum = chunkIndex + 1;
-                        const source = message.sources?.find(s => s.id === `ref${refNum}`);
-                        if (!source) return null;
-                        return (
-                            <span key={`ref-${refNum}-${i}`}>
-                                <button
-                                    onClick={() => handleReferenceClick(refNum.toString())}
-                                    className="relative -top-1 ml-0.5 inline-flex h-3.5 min-w-[1.5rem] items-center justify-center rounded-full bg-primary/10 px-1 text-[10px] font-medium text-primary hover:bg-primary/20 transition-colors"
-                                >
-                                    {refNum}
-                                </button>
-                                {' '}
-                            </span>
-                        );
-                    })}
+                    <span className="inline-flex gap-0.5 ml-0.5">
+                        {support.groundingChunkIndices.map((chunkIndex, i) => {
+                            const refNum = chunkIndex + 1;
+                            const source = message.sources?.find(s => s.id === `ref${refNum}`);
+                            if (!source) return null;
+
+                            return (
+                                <Tooltip.Provider key={`ref-${refNum}-${i}`}>
+                                    <Tooltip.Root delayDuration={300}>
+                                        <Tooltip.Trigger asChild>
+                                            <button
+                                                onClick={() => handleReferenceClick(refNum.toString())}
+                                                className={cn(
+                                                    "relative -top-1 inline-flex h-3.5 min-w-[1.5rem] items-center justify-center",
+                                                    "rounded-full px-1 text-[10px] font-medium transition-colors",
+                                                    "bg-primary/10 text-primary hover:bg-primary/20",
+                                                    avgConfidence > 0.8 ? "bg-primary/10" : "bg-yellow-500/10",
+                                                    avgConfidence > 0.8 ? "text-primary" : "text-yellow-600",
+                                                    avgConfidence > 0.8 ? "hover:bg-primary/20" : "hover:bg-yellow-500/20"
+                                                )}
+                                            >
+                                                {refNum}
+                                            </button>
+                                        </Tooltip.Trigger>
+                                        <Tooltip.Portal>
+                                            <Tooltip.Content
+                                                className="z-50 max-w-[300px] rounded-md bg-popover px-3 py-2 text-sm text-popover-foreground shadow-md"
+                                                side="top"
+                                                sideOffset={5}
+                                            >
+                                                <p className="font-medium mb-1">{source.title}</p>
+                                                <p className="text-xs text-muted-foreground line-clamp-2">{source.text}</p>
+                                                <Tooltip.Arrow className="fill-popover" />
+                                            </Tooltip.Content>
+                                        </Tooltip.Portal>
+                                    </Tooltip.Root>
+                                </Tooltip.Provider>
+                            );
+                        })}
+                    </span>
                 </span>
             );
 
@@ -223,12 +259,20 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
             <style jsx global>{`
                 @keyframes highlightSource {
-                    0% { background-color: hsl(var(--primary) / 0.2); }
-                    100% { background-color: hsl(var(--muted) / 0.3); }
+                    0% { 
+                        background-color: hsl(var(--primary) / 0.3);
+                        transform: scale(1.02);
+                    }
+                    10% {
+                        transform: scale(1);
+                    }
+                    100% { 
+                        background-color: hsl(var(--muted) / 0.3);
+                    }
                 }
                 
                 .highlight-source {
-                    animation: highlightSource 2s ease-out;
+                    animation: highlightSource 2s cubic-bezier(0.4, 0, 0.2, 1);
                 }
             `}</style>
         </div>

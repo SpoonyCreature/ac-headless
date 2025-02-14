@@ -17,6 +17,7 @@
   "dependencies": {
     "@google-cloud/vertexai": "latest",
     "@google/generative-ai": "^0.21.0",
+    "@radix-ui/react-tooltip": "^1.1.8",
     "@wix/bookings": "^1.0.127",
     "@wix/comments": "^1.0.89",
     "@wix/data": "^1.0.2",
