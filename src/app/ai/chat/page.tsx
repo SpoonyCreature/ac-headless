@@ -16,6 +16,21 @@ interface Message {
     text: string;
     time: string;
     public?: boolean;
+    sources?: {
+        id: string;
+        title: string;
+        uri: string;
+        text: string;
+    }[];
+    groundingSupports?: {
+        segment: {
+            startIndex: number;
+            endIndex: number;
+            text: string;
+        };
+        groundingChunkIndices: number[];
+        confidenceScores: number[];
+    }[];
 }
 
 export default function ChatPage() {
@@ -146,10 +161,6 @@ export default function ChatPage() {
 
             // Create the message array to send, including the new user message
             const messagesToSend = [
-                {
-                    role: 'system',
-                    content: 'You are a helpful AI assistant that can analyze PDFs. Please use the provided PDFs to help answer questions accurately.'
-                },
                 ...messages.map(m => ({
                     role: m.role === 'Agent' ? 'assistant' : 'user',
                     content: m.text
@@ -187,6 +198,13 @@ export default function ChatPage() {
             }
 
             const data = await response.json();
+            console.log('API Response:', {
+                text: data.text,
+                sourcesLength: data.sources?.length,
+                groundingSupportsLength: data.groundingSupports?.length,
+                firstSource: data.sources?.[0],
+                firstGroundingSupport: data.groundingSupports?.[0]
+            });
 
             // Store threadId from first response
             if (!threadId && data.threadId) {
@@ -195,10 +213,12 @@ export default function ChatPage() {
 
             // Add AI response
             const aiMessage = {
-                _id: data._id || `msg-${messages.length + 1}`,
+                _id: `msg-${messages.length + 1}`,
                 role: 'Agent' as const,
-                text: data.text || data,
+                text: data.text,
                 time: data.time || new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+                sources: data.sources,
+                groundingSupports: data.groundingSupports,
                 public: data.public
             } satisfies Message;
             setMessages(prev => [...prev, aiMessage]);

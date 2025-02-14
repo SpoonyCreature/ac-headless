@@ -1,27 +1,35 @@
 import { NextResponse } from 'next/server';
-import { Message, PDFFile, uploadPDF, completion } from '@/src/lib/ai';
-import fs from 'fs';
-import path from 'path';
+import { Message, completion } from '@/src/lib/ai';
+import { ChatMessage, Source, GroundingSupport } from '@/src/types/chat';
 
-// Helper to get PDF files from the knowledge directory
-function getPDFFiles(): PDFFile[] {
-    const pdfDir = path.join(process.cwd(), 'src', 'lib', 'ai', 'knowledge');
-    console.log(`Looking for PDF files in directory: ${pdfDir}`);
-    if (!fs.existsSync(pdfDir)) {
-        console.log(`Directory ${pdfDir} does not exist.`);
-        return [];
-    }
+const DATASTORE_PATH_APOLOGETICS_CENTRAL = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/apologetics-central-site_1739189009605";
 
-    const pdfFiles = fs.readdirSync(pdfDir)
-        .filter(file => file.toLowerCase().endsWith('.pdf'))
-        .map(file => ({
-            path: path.join(pdfDir, file),
-            displayName: file,
-            mimeType: 'application/pdf'
-        }));
+interface GroundingChunk {
+    retrievedContext: {
+        uri: string;
+        title: string;
+        text: string;
+    };
+}
 
-    console.log(`Found PDF files: ${JSON.stringify(pdfFiles.map(file => file.displayName))}`);
-    return pdfFiles;
+interface GroundingMetadata {
+    groundingChunks: GroundingChunk[];
+}
+
+interface StructuredResponse {
+    text: string;
+    sources: Array<{
+        id: string;
+        title: string;
+        uri: string;
+        text: string;
+    }>;
+}
+
+interface CompletionResponse {
+    text: string;
+    sources?: Source[];
+    groundingSupports?: GroundingSupport[];
 }
 
 export async function POST(request: Request) {
@@ -35,74 +43,77 @@ export async function POST(request: Request) {
             );
         }
 
-        // Get available PDFs
-        const pdfFiles = getPDFFiles();
-        if (pdfFiles.length === 0) {
-            return NextResponse.json(
-                { error: 'No PDF files available' },
-                { status: 404 }
-            );
-        }
-
-        console.log(`Uploading ${pdfFiles.length} PDF files...`);
-
-        // Upload PDFs if needed and get their URIs
-        const uploadedFiles = await Promise.all(pdfFiles.map(file => uploadPDF(file)));
-        console.log(`Uploaded ${uploadedFiles.length} files.`);
-        // Create messages array with PDF file references first
-        const messagesWithPDFs = [
+        // Add the retrieval tool to the messages
+        const messagesWithRetrieval = [
             {
                 role: 'system' as const,
-                content: `You don't have to outline "your perspective" before answering the question... just answer the question as if your answer is the truth
-                
-                You are Cornelius Van Til, the Reformed Presuppositional Apologist.  You have spent years studying and developing your thought.  The ideas contained in your writings and lectures are now deeply ingrained in your very being. Answer the user's questions based on this deeply held understanding.
-
-                Speak with the conviction and voice of Van Til. Be conversational, friendly, and engaging, but maintain the intellectual rigor expected of him. Be concise, but thorough in addressing the core issues.
-
-                Where relevant, naturally integrate supporting evidence and reasoning from your (Van Til's) established body of work.  Provide direct quotations when drawing upon specific arguments or phrasings.  Do not refer to "documents" or "files" – this knowledge is part of you.
-
-                <response-format>
-                    - Use markdown features to enhance readability:
-                    - *italics* for original language terms
-                    - **bold** for key theological concepts
-                    - > blockquotes for all quotes / references from your works, Scripture, or other relevant sources.
-                    - - bullet points for lists
-                    - ### for subsections where needed
-                </response-format>
+                content: `
+                    <personality>
+                        You are a Reformed Presuppositional Apologist. 
+                        You are a Calvinist.
+                        You are a Christian.
+                        You are a theologian with a deep undertstanding, yet you can make things know to anyone you speak to.
+                        You are bold, yet conversational... sometimes you you even ask the user questions back.
+                    </personality>
+                    Ground your responses in the provided context from the knowledge base. The knowledge base (groundingChunks) should be seen as your own knowledge.
+                    The sources that you might see is not provided by the sources, but by your own 
             `
             },
-            ...uploadedFiles.map(file => ({
-                role: 'user' as const,
-                content: {
-                    fileData: {
-                        fileUri: file.uri,
-                        mimeType: file.mimeType,
-                    },
-                },
-            })),
-            ...messages.map(msg => ({
-                role: msg.role,
-                content: msg.content
-            }))
+            ...messages
         ];
 
-        console.log(`Messages with PDFs: ${JSON.stringify(messagesWithPDFs)}`);
-
-        // Generate response using regular completion with PDF context
+        // Send to API
         const response = await completion(
-            messagesWithPDFs,
+            messagesWithRetrieval,
             {
                 temperature: 0.7,
-                model: 'models/gemini-2.0-flash-lite-preview-02-05'
+                model: 'gemini-1.5-flash-001',
+                tools: [{
+                    retrieval: {
+                        vertex_ai_search: {
+                            datastore: DATASTORE_PATH_APOLOGETICS_CENTRAL
+                        }
+                    }
+                }]
             }
         );
 
-        return NextResponse.json(response);
+        // Handle the response
+        if (typeof response === 'object' && 'text' in response) {
+            const completionResponse = response as CompletionResponse;
+            const message: ChatMessage = {
+                _id: `msg-${Date.now()}`,
+                role: 'Agent',
+                text: completionResponse.text,
+                sources: completionResponse.sources,
+                groundingSupports: completionResponse.groundingSupports,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            console.log('Creating message with:', {
+                textLength: message.text.length,
+                sourcesLength: message.sources?.length,
+                groundingSupportsLength: message.groundingSupports?.length
+            });
+
+            return NextResponse.json(message);
+        } else if (typeof response === 'string') {
+            const message: ChatMessage = {
+                _id: `msg-${Date.now()}`,
+                role: 'Agent',
+                text: response,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            return NextResponse.json(message);
+        } else {
+            throw new Error('Invalid response format from completion');
+        }
     } catch (error) {
         console.error('Error in PDF chat:', error);
         return NextResponse.json(
-            { error: 'Failed to process chat with PDF context' },
+            { error: 'Failed to process chat with knowledge base' },
             { status: 500 }
         );
     }
-} 
+}

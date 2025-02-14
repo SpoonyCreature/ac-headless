@@ -115,6 +115,8 @@ export async function POST(request: NextRequest) {
             response_format: searchSchema
         }) as SearchResponse;
 
+        console.log('Search response:', JSON.stringify(searchResponse, null, 2));
+
         if (!searchResponse?.verse_sections) {
             throw new Error('Invalid response format from GPT');
         }

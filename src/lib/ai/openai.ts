@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { AIProvider, PDFFile } from './base';
+import { AIProvider } from './base';
 import { CompletionOptions, Message } from './types';
 
 export class OpenAIProvider extends AIProvider {
@@ -60,9 +60,5 @@ export class OpenAIProvider extends AIProvider {
         }
 
         return response.choices[0].message.content || '';
-    }
-
-    async uploadPDF(file: PDFFile): Promise<PDFFile> {
-        throw new Error('PDF functionality is not supported by the OpenAI provider');
     }
 } 

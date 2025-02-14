@@ -1,17 +1,62 @@
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
-import { GoogleAIFileManager } from '@google/generative-ai/server';
-import { AIProvider, PDFFile } from './base';
+import { VertexAI, SchemaType } from '@google-cloud/vertexai';
+import type { Tool } from '@google-cloud/vertexai/build/src/types/content';
+import { AIProvider } from './base';
 import { CompletionOptions, Message, JsonSchemaFormat } from './types';
+import { Source } from '@/src/types/chat';
+
+interface GroundingChunk {
+    retrievedContext: {
+        uri: string;
+        title: string;
+        content: string;  // Gemini actually returns content, not text
+    };
+}
+
+interface GroundingMetadata {
+    groundingChunks: GroundingChunk[];
+}
+
+interface GroundingSupport {
+    segment: {
+        startIndex: number;
+        endIndex: number;
+        text: string;
+    };
+    groundingChunkIndices: number[];
+    confidenceScores: number[];
+}
+
+interface CompletionResponse {
+    text: string;
+    sources?: Source[];
+    groundingSupports?: GroundingSupport[];
+}
 
 export class GeminiProvider extends AIProvider {
-    private client: GoogleGenerativeAI;
-    private fileManager: GoogleAIFileManager;
-    private fileCache: Map<string, { uri: string, expiresAt: number }> = new Map(); // displayName -> {uri, expiresAt}
+    private vertexAI: VertexAI;
+    private textModel: string;
+    private project: string;
+    private location: string;
 
-    constructor(apiKey: string) {
-        super(apiKey);
-        this.client = new GoogleGenerativeAI(apiKey);
-        this.fileManager = new GoogleAIFileManager(apiKey);
+    constructor(projectId: string, location: string = 'us-central1', modelName: string = 'gemini-pro') {
+        super('not-needed'); // API key not needed for Vertex AI as it uses GCP auth
+        this.project = projectId;
+        this.location = location;
+        this.textModel = modelName;
+
+        if (!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+            throw new Error('Missing GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable');
+        }
+
+        // Initialize Vertex AI with service account credentials
+        this.vertexAI = new VertexAI({
+            project: this.project,
+            location: this.location,
+            googleAuthOptions: {
+                credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON),
+                scopes: ['https://www.googleapis.com/auth/cloud-platform']
+            }
+        });
     }
 
     private convertJsonSchemaToGeminiSchema(jsonSchema: JsonSchemaFormat): any {
@@ -62,146 +107,183 @@ export class GeminiProvider extends AIProvider {
         return convertProperty(schema);
     }
 
+    private formatReferencesAsMarkdown(text: string): string {
+
+        // First, handle comma-separated references with numbers
+        text = text.replace(/\[(\d+(?:\s*,\s*\d+)*)\]/g, (match, numbers) => {
+            const refs = numbers.split(/\s*,\s*/).map(num => `[ref${num.trim()}]`);
+            return refs.join(' ');
+        });
+
+        // Then handle any remaining single number references
+        text = text.replace(/\[(\d+)\]/g, (match, num) => {
+            const ref = `[ref${num}]`;
+            return ref;
+        });
+
+        // Handle any malformed references
+        text = text
+            .replace(/\[ref(\d+)\}/g, '[ref$1]')
+            .replace(/\{ref(\d+)\}/g, '[ref$1]')
+            .replace(/\[#ref(\d+)\]\(#ref\d+\)/g, '[ref$1]');
+
+        return text;
+    }
+
     async completion(
         messages: Message[],
         options: CompletionOptions = {}
-    ): Promise<string | object> {
+    ): Promise<CompletionResponse | string> {
         const {
             temperature = 0.7,
-            model: modelName = 'gemini-2.0-flash-lite-preview-02-05',
             top_p,
             stop,
-            response_format = 'text'
+            response_format = 'text',
+            tools
         } = options;
-
         const generationConfig: any = {
             temperature,
             topP: top_p,
             stopSequences: stop,
         };
-
-        // Handle structured output if requested
         if (response_format !== 'text') {
             generationConfig.responseMimeType = 'application/json';
             generationConfig.responseSchema = this.convertJsonSchemaToGeminiSchema(response_format);
         }
-
         // Find system message if it exists
         const systemMessage = messages.find(msg => msg.role === 'system');
 
-        const model = this.client.getGenerativeModel({
-            model: modelName,
+        // Get the model
+        const model = this.vertexAI.preview.getGenerativeModel({
+            model: "gemini-1.5-flash-001",
             generationConfig,
-            systemInstruction: systemMessage?.content as string | undefined
-        });
+            systemInstruction: systemMessage?.content as string
+        })
 
-        // Filter out system message and prepare chat history
-        const chatMessages = messages
-            .filter(msg => msg.role !== 'system')
-            .map(msg => ({
-                role: msg.role === 'assistant' ? 'model' : msg.role,
-                parts: typeof msg.content === 'string' ? [{ text: msg.content }] : [msg.content]
-            }));
+        console.log('Generation config:', JSON.stringify(generationConfig, null, 2));
 
-        console.log(`Chat messages: ${JSON.stringify(chatMessages)}`);
+        // Prepare the messages
+        const contents = [
+            ...(systemMessage ? [{
+                role: 'user',
+                parts: [{ text: systemMessage.content as string }]
+            }] : []),
+            ...messages
+                .filter(msg => msg.role !== 'system')
+                .map(msg => ({
+                    role: msg.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: msg.content as string }]
+                }))
+        ];
 
-        const chat = model.startChat({
-            history: chatMessages.slice(0, -1) // Exclude the last message
-        });
+        const request = {
+            contents,
+            tools
+        };
 
-        // Send the last message
-        const lastMessage = chatMessages[chatMessages.length - 1];
-        const result = await chat.sendMessage(lastMessage.parts);
+        console.log('Request to Gemini:', JSON.stringify(request, null, 2));
+
+        // Generate content
+        const result = await model.generateContent(request);
         const response = await result.response;
-        const text = response.text();
+
+        console.log('Result from Gemini:', JSON.stringify(result, null, 2));
+        console.log('Response from Gemini:', JSON.stringify(response, null, 2));
 
         if (response_format !== 'text') {
             try {
-                return JSON.parse(text);
+                return JSON.parse(response.candidates?.[0]?.content?.parts?.[0]?.text || '');
             } catch (error) {
                 throw new Error('Failed to parse JSON response from Gemini');
             }
         }
 
-        console.log(`RAW GEMINI RESPONSE: ${JSON.stringify(response)}`);
-
-        return text;
-    }
-
-    private async getRemoteFile(displayName: string): Promise<string | null> {
-        try {
-            // Check in-memory cache first
-            const cached = this.fileCache.get(displayName);
-            if (cached && Date.now() < cached.expiresAt) {
-                return cached.uri;
-            }
-
-            // Clear expired cache entry
-            if (cached) {
-                this.fileCache.delete(displayName);
-            }
-
-            // List all files and find matching one
-            const files = await this.fileManager.listFiles();
-            const matchingFile = files.files.find(f => f.displayName === displayName && f.uri);
-
-            if (matchingFile?.uri) {
-                // Store in cache with 48hr expiry
-                this.fileCache.set(displayName, {
-                    uri: matchingFile.uri,
-                    expiresAt: Date.now() + 172800000 // 48 hours in milliseconds
-                });
-                return matchingFile.uri;
-            }
-
-            return null;
-        } catch (error) {
-            console.error('Error checking remote file:', error);
-            return null;
+        const candidates = response.candidates;
+        if (!candidates || candidates.length === 0) {
+            throw new Error('No response generated from Gemini');
         }
-    }
 
-    async uploadPDF(file: PDFFile): Promise<PDFFile> {
-        try {
-            // Check if file already exists remotely
-            const existingUri = await this.getRemoteFile(file.displayName);
-            if (existingUri) {
-                console.log(`File ${file.displayName} already exists remotely at ${existingUri}`);
-                return {
-                    ...file,
-                    uri: existingUri
-                };
+        const candidate = candidates[0];
+
+        let text = candidate.content?.parts[0]?.text;
+
+        if (!text) {
+            throw new Error('Invalid response format from Gemini');
+        }
+
+        // Format references in the text
+        text = this.formatReferencesAsMarkdown(text);
+
+        // If the response has grounding metadata with supports, return a structured response
+        if (candidate.groundingMetadata?.groundingSupports) {
+            console.log('Found grounding supports:', JSON.stringify(candidate.groundingMetadata.groundingSupports, null, 2));
+
+            // Extract grounding supports if available
+            const groundingSupports = candidate.groundingMetadata.groundingSupports?.filter(support =>
+                support?.segment?.startIndex != null &&
+                support?.segment?.endIndex != null &&
+                support?.segment?.text != null &&
+                support?.groundingChunkIndices != null &&
+                support?.confidenceScores != null
+            ).map(support => ({
+                segment: {
+                    startIndex: support.segment!.startIndex!,
+                    endIndex: support.segment!.endIndex!,
+                    text: support.segment!.text!
+                },
+                groundingChunkIndices: support.groundingChunkIndices!,
+                confidenceScores: support.confidenceScores!
+            })) as GroundingSupport[];
+
+            console.log('Extracted groundingSupports:', JSON.stringify(groundingSupports, null, 2));
+
+            // Get all unique chunk indices from the supports
+            const uniqueChunkIndices = new Set(groundingSupports.flatMap(s => s.groundingChunkIndices));
+            const chunks = candidate.groundingMetadata!.groundingChunks;
+            if (!chunks) {
+                console.log('No chunks found in metadata');
+                return { text };
             }
 
-            // File doesn't exist, upload it
-            const uploadResult = await this.fileManager.uploadFile(
-                file.path,
-                {
-                    mimeType: file.mimeType,
-                    displayName: file.displayName,
+            // Create sources from the grounding chunks
+            const sources = Array.from(uniqueChunkIndices).map((chunkIndex): Source => {
+                const chunk = chunks[chunkIndex];
+                if (!chunk?.retrievedContext) {
+                    console.log(`No retrievedContext for chunk ${chunkIndex}`);
+                    return {
+                        id: `ref${chunkIndex + 1}`,
+                        title: 'Unknown Source',
+                        uri: '',
+                        text: ''
+                    };
                 }
-            );
-
-            // Poll getFile() to check file state
-            let uploadedFile = await this.fileManager.getFile(uploadResult.file.name);
-            while (uploadedFile.state === 'PROCESSING') {
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-                uploadedFile = await this.fileManager.getFile(uploadResult.file.name);
-            }
-
-            // Cache the new URI with 48hr expiry
-            this.fileCache.set(file.displayName, {
-                uri: uploadResult.file.uri,
-                expiresAt: Date.now() + 172800000 // 48 hours in milliseconds
+                const context = chunk.retrievedContext as { uri: string; title: string; text: string };
+                return {
+                    id: `ref${chunkIndex + 1}`,
+                    title: context.title || 'Unknown Source',
+                    uri: context.uri || '',
+                    text: context.text || '' // Use the full chunk text
+                };
             });
 
-            return {
-                ...file,
-                uri: uploadResult.file.uri
+            console.log('Created sources:', JSON.stringify(sources, null, 2));
+
+            const finalResult = {
+                text,
+                sources,
+                groundingSupports
             };
-        } catch (error) {
-            console.error('Error uploading PDF:', error);
-            throw new Error('Failed to upload PDF to Gemini');
+
+            console.log('Final result structure:', {
+                text: typeof text,
+                sourcesLength: sources.length,
+                groundingSupportsLength: groundingSupports?.length
+            });
+
+            return finalResult;
+        } else {
+            console.log('No grounding metadata found in response');
+            return text;
         }
     }
 } 
