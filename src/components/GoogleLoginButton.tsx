@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { usePathname } from 'next/navigation';
 
 interface GoogleLoginButtonProps {
     variant?: 'default' | 'outline' | 'minimal';
@@ -16,11 +17,12 @@ export function GoogleLoginButton({
     className
 }: GoogleLoginButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
+    const pathname = usePathname();
 
     const handleLogin = async () => {
         try {
             setIsLoading(true);
-            window.location.href = '/api/auth/google/login';
+            window.location.href = `/api/auth/google/login?redirect=${encodeURIComponent(pathname)}`;
         } catch (error) {
             console.error('Login error:', error);
             setIsLoading(false);

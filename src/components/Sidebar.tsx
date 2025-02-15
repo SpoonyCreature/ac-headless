@@ -1,0 +1,118 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import {
+    Home, FileText, BookOpen,
+    MessageSquare, BookMarked, ChevronRight,
+    Info
+} from 'lucide-react';
+import { cn } from '@/src/lib/utils';
+
+interface SidebarProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
+    const [isStudyOpen, setIsStudyOpen] = useState(false);
+
+    // Update body overflow when isOpen changes
+    useEffect(() => {
+        document.body.style.overflow = isOpen ? 'hidden' : 'auto';
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [isOpen]);
+
+    return (
+        <>
+            {/* Backdrop */}
+            <div
+                className={cn(
+                    "fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity z-40",
+                    isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                )}
+                onClick={onClose}
+            />
+
+            {/* Sidebar Panel */}
+            <aside className={cn(
+                "fixed top-0 bottom-0 right-0 z-50 w-[min(20rem,calc(100vw-2rem))] bg-background/95 backdrop-blur-md shadow-2xl border-l border-border/40",
+                "transform transition-transform duration-300 ease-in-out",
+                "flex flex-col",
+                isOpen ? "translate-x-0" : "translate-x-full"
+            )}>
+                {/* Navigation */}
+                <nav className="flex-1 overflow-y-auto py-8 px-6">
+                    <div className="space-y-2.5">
+                        <Link
+                            href="/"
+                            className="flex items-center gap-3 px-4 py-3 text-base font-medium text-muted-foreground rounded-md hover:text-foreground hover:bg-muted/50 transition-colors"
+                            onClick={onClose}
+                        >
+                            <Home className="w-5 h-5" />
+                            Home
+                        </Link>
+                        <Link
+                            href="/blog"
+                            className="flex items-center gap-3 px-4 py-3 text-base font-medium text-muted-foreground rounded-md hover:text-foreground hover:bg-muted/50 transition-colors"
+                            onClick={onClose}
+                        >
+                            <FileText className="w-5 h-5" />
+                            Articles
+                        </Link>
+
+                        {/* Study Section */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsStudyOpen(!isStudyOpen)}
+                                className="w-full flex items-center justify-between gap-3 px-4 py-3 text-base font-medium text-muted-foreground rounded-md hover:text-foreground hover:bg-muted/50 transition-colors group"
+                            >
+                                <span className="flex items-center gap-3">
+                                    <BookOpen className="w-5 h-5" />
+                                    Study
+                                </span>
+                                <ChevronRight className={cn(
+                                    "w-5 h-5 text-muted-foreground/70 transition-transform duration-200",
+                                    isStudyOpen && "rotate-90"
+                                )} />
+                            </button>
+
+                            <div className={cn(
+                                "overflow-hidden transition-all duration-200",
+                                isStudyOpen ? "max-h-40 mt-1" : "max-h-0"
+                            )}>
+                                <Link
+                                    href="/study/chat"
+                                    className="flex items-center gap-3 px-4 py-3 pl-12 text-[15px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors rounded-md"
+                                    onClick={onClose}
+                                >
+                                    <MessageSquare className="w-5 h-5" />
+                                    Discussion
+                                </Link>
+                                <Link
+                                    href="/study/bible-study"
+                                    className="flex items-center gap-3 px-4 py-3 pl-12 text-[15px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors rounded-md"
+                                    onClick={onClose}
+                                >
+                                    <BookMarked className="w-5 h-5" />
+                                    Bible Study
+                                </Link>
+                            </div>
+                        </div>
+
+                        <Link
+                            href="/about"
+                            className="flex items-center gap-3 px-4 py-3 text-base font-medium text-muted-foreground rounded-md hover:text-foreground hover:bg-muted/50 transition-colors"
+                            onClick={onClose}
+                        >
+                            <Info className="w-5 h-5" />
+                            About
+                        </Link>
+                    </div>
+                </nav>
+            </aside>
+        </>
+    );
+}

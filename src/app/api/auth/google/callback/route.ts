@@ -47,10 +47,11 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const code = searchParams.get('code');
     const error = searchParams.get('error');
+    const state = searchParams.get('state') || '/'; // Get the redirect path from state
 
     if (error) {
         console.error('Google OAuth error:', error);
-        return NextResponse.redirect(new URL('/?error=' + encodeURIComponent('Google authentication failed'), request.url));
+        return NextResponse.redirect(new URL(`${state}?error=${encodeURIComponent('Google authentication failed')}`, request.url));
     }
 
     if (!code) {
@@ -71,9 +72,8 @@ export async function GET(request: NextRequest) {
         const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
         const { data: googleUser } = await oauth2.userinfo.get();
 
-
         if (!googleUser?.email) {
-            return NextResponse.redirect(new URL('/?error=' + encodeURIComponent('No email provided by Google'), request.url));
+            return NextResponse.redirect(new URL(`${state}?error=${encodeURIComponent('No email provided by Google')}`, request.url));
         }
 
         // Step 2: Get or create Wix member
@@ -82,16 +82,14 @@ export async function GET(request: NextRequest) {
             picture: googleUser.picture || ''
         });
 
-
         // Step 3: Get member tokens
         const memberTokens = await getServerWixClient().auth.getMemberTokensForExternalLogin(
             member._id,
             process.env.WIX_API_KEY_ADMIN!
         );
 
-
-        // Create response with redirect
-        const response = NextResponse.redirect(new URL('/', request.url));
+        // Create response with redirect to the original path
+        const response = NextResponse.redirect(new URL(state, request.url));
 
         // Set the cookie with updated settings - session only, no maxAge
         response.cookies.set("wixSession", JSON.stringify(memberTokens), {
@@ -101,11 +99,10 @@ export async function GET(request: NextRequest) {
             httpOnly: true
         });
 
-
         return response;
     } catch (error) {
         console.error('Error in Google callback:', error);
         console.error('Error details:', error.response?.data || error.message);
-        return NextResponse.redirect(new URL('/?error=' + encodeURIComponent('Authentication failed'), request.url));
+        return NextResponse.redirect(new URL(`${state}?error=${encodeURIComponent('Authentication failed')}`, request.url));
     }
 }
