@@ -331,30 +331,30 @@ export default function BibleStudyDetailPage({
         )}>
             <div className="flex-1">
                 {/* Header */}
-                <div className="p-4 border-t border-border border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
+                <div className="p-3 sm:p-4 border-t border-border border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
                     <div className="max-w-4xl mx-auto">
-                        <div className="flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+                            <div className="flex items-center gap-2 sm:gap-4">
                                 <button
                                     onClick={() => navigateWithTransition('/study/bible-study')}
-                                    className="p-2 hover:bg-muted rounded-lg transition-colors"
+                                    className="p-1.5 sm:p-2 hover:bg-muted rounded-lg transition-colors"
                                 >
-                                    <ArrowLeft className="w-5 h-5" />
+                                    <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                                 </button>
-                                <div>
-                                    <h1 className="font-medium">
+                                <div className="flex flex-col sm:block">
+                                    <h1 className="font-medium text-sm sm:text-base">
                                         {study.query || 'Untitled Study'}
                                     </h1>
-                                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                        <span className="flex items-center gap-1.5">
+                                    <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground">
+                                        <span className="flex items-center gap-1">
                                             {study.public ? (
                                                 <>
-                                                    <Globe className="w-3.5 h-3.5" />
+                                                    <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                                     Public study
                                                 </>
                                             ) : (
                                                 <>
-                                                    <Lock className="w-3.5 h-3.5" />
+                                                    <Lock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                                     Private study
                                                 </>
                                             )}
@@ -364,12 +364,12 @@ export default function BibleStudyDetailPage({
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1 sm:gap-2">
                                 <button
                                     onClick={handleShare}
-                                    className="p-2 hover:bg-muted rounded-lg transition-colors relative group"
+                                    className="p-1.5 sm:p-2 hover:bg-muted rounded-lg transition-colors relative group"
                                 >
-                                    <Share2 className="w-5 h-5" />
+                                    <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                     {showShareTooltip && (
                                         <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-background border border-border rounded shadow-lg whitespace-nowrap">
                                             Copied to clipboard!
@@ -378,10 +378,10 @@ export default function BibleStudyDetailPage({
                                 </button>
                                 <Link
                                     href="/study/bible-study"
-                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium"
+                                    className="inline-flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-xs sm:text-sm font-medium"
                                 >
-                                    <Plus className="w-4 h-4" />
-                                    New Study
+                                    <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                                    <span className="hidden sm:inline">New Study</span>
                                 </Link>
                             </div>
                         </div>
@@ -389,8 +389,8 @@ export default function BibleStudyDetailPage({
                 </div>
 
                 {/* Study Content */}
-                <div className="flex-1 overflow-y-auto py-8">
-                    <div className="max-w-4xl mx-auto px-4">
+                <div className="flex-1 overflow-y-auto py-4 sm:py-8">
+                    <div className="max-w-4xl mx-auto sm:px-4">
                         <EnhancedBibleStudy
                             verses={study.verses}
                             crossReferences={study.crossReferences}
