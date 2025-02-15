@@ -1,10 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Bot, Book, Globe, Lock, ChevronLeft } from 'lucide-react';
+import { Bot, BookMarked, Globe, Lock, ChevronLeft, Share2, Plus, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { EnhancedBibleStudy } from '@/src/components/EnhancedBibleStudy';
 import { BibleStudy } from '@/src/types/bible';
+import { cn } from '@/src/lib/utils';
+import { usePageTransition } from '@/src/hooks/usePageTransition';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function BibleStudyDetailPage({
     params
@@ -14,6 +17,8 @@ export default function BibleStudyDetailPage({
     const [study, setStudy] = useState<BibleStudy | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showShareTooltip, setShowShareTooltip] = useState(false);
+    const { isTransitioning, navigateWithTransition } = usePageTransition();
 
     useEffect(() => {
         const fetchStudy = async () => {
@@ -261,12 +266,33 @@ export default function BibleStudyDetailPage({
         }
     };
 
+    const handleShare = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setShowShareTooltip(true);
+        setTimeout(() => setShowShareTooltip(false), 2000);
+    };
+
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-[url('/paper-texture.png')] bg-repeat flex items-center justify-center">
-                <div className="text-center">
-                    <Bot className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-                    <div className="text-muted-foreground">Loading study...</div>
+            <div className={cn(
+                "flex min-h-screen bg-gradient-to-b from-background to-background/95",
+                "transition-opacity duration-300",
+                isTransitioning ? "opacity-50" : "opacity-100"
+            )}>
+                <div className="flex-1">
+                    <div className="p-4 border-t border-border border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="h-6 w-48 bg-muted-foreground/20 rounded animate-pulse" />
+                        </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto py-5">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="animate-pulse space-y-4">
+                                <div className="h-4 bg-muted-foreground/20 rounded w-3/4" />
+                                <div className="h-4 bg-muted-foreground/20 rounded w-1/2" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -274,59 +300,108 @@ export default function BibleStudyDetailPage({
 
     if (error || !study) {
         return (
-            <div className="min-h-screen bg-[url('/paper-texture.png')] bg-repeat flex items-center justify-center">
-                <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive">
-                    {error || 'Failed to load study'}
+            <div className={cn(
+                "flex min-h-screen bg-gradient-to-b from-background to-background/95 items-center justify-center",
+                "transition-opacity duration-300",
+                isTransitioning ? "opacity-50" : "opacity-100"
+            )}>
+                <div className="text-center space-y-4">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+                        <BookMarked className="w-6 h-6 text-primary" />
+                    </div>
+                    <h2 className="text-xl font-medium">Study not found</h2>
+                    <p className="text-muted-foreground">This Bible study may have been deleted or is not accessible.</p>
+                    <Link
+                        href="/study/bible-study"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium"
+                    >
+                        <Plus className="w-4 h-4" />
+                        New Bible Study
+                    </Link>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[url('/paper-texture.png')] bg-repeat py-8">
-            <div className="container mx-auto px-4">
-                {/* Back Button */}
-                <div className="mb-8">
-                    <Link
-                        href="/study/bible-study"
-                        className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                        <ChevronLeft className="w-4 h-4" />
-                        Back to Bible Studies
-                    </Link>
-                </div>
-
+        <div className={cn(
+            "flex min-h-screen bg-gradient-to-b from-background to-background/95",
+            "transition-opacity duration-300",
+            isTransitioning ? "opacity-50" : "opacity-100"
+        )}>
+            <div className="flex-1">
                 {/* Header */}
-                <div className="text-center mb-12">
-                    <Book className="w-16 h-16 text-primary mx-auto mb-6" />
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                        <h1 className="font-serif text-4xl md:text-5xl">Bible Study</h1>
-                        {study.public ? (
-                            <Globe className="w-5 h-5 text-muted-foreground" />
-                        ) : (
-                            <Lock className="w-5 h-5 text-muted-foreground" />
-                        )}
+                <div className="p-4 border-t border-border border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => navigateWithTransition('/study/bible-study')}
+                                    className="p-2 hover:bg-muted rounded-lg transition-colors"
+                                >
+                                    <ArrowLeft className="w-5 h-5" />
+                                </button>
+                                <div>
+                                    <h1 className="font-medium">
+                                        {study.query || 'Untitled Study'}
+                                    </h1>
+                                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                        <span className="flex items-center gap-1.5">
+                                            {study.public ? (
+                                                <>
+                                                    <Globe className="w-3.5 h-3.5" />
+                                                    Public study
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Lock className="w-3.5 h-3.5" />
+                                                    Private study
+                                                </>
+                                            )}
+                                        </span>
+                                        <span>•</span>
+                                        <time>{study._createdDate ? formatDistanceToNow(new Date(study._createdDate)) : 'Recently'} ago</time>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={handleShare}
+                                    className="p-2 hover:bg-muted rounded-lg transition-colors relative group"
+                                >
+                                    <Share2 className="w-5 h-5" />
+                                    {showShareTooltip && (
+                                        <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-background border border-border rounded shadow-lg whitespace-nowrap">
+                                            Copied to clipboard!
+                                        </span>
+                                    )}
+                                </button>
+                                <Link
+                                    href="/study/bible-study"
+                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    New Study
+                                </Link>
+                            </div>
+                        </div>
                     </div>
-                    <p className="text-xl text-muted-foreground font-serif leading-relaxed mb-4">
-                        {study.query}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                        Translation: {study.translation.toUpperCase()}
-                    </p>
                 </div>
 
-                {/* Enhanced Bible Study Component */}
-                <div className="max-w-4xl mx-auto">
-                    <EnhancedBibleStudy
-                        verses={study.verses}
-                        crossReferences={study.crossReferences}
-                        explanation={study.explanation}
-                        query={study.query}
-                        onGenerateCommentary={handleGenerateCommentary}
-                        onGenerateCrossReferenceMap={handleGenerateCrossReferenceMap}
-                        onSaveCommentary={handleSaveCommentary}
-                        initialCommentaries={study.commentaries || []}
-                    />
+                {/* Study Content */}
+                <div className="flex-1 overflow-y-auto py-8">
+                    <div className="max-w-4xl mx-auto px-4">
+                        <EnhancedBibleStudy
+                            verses={study.verses}
+                            crossReferences={study.crossReferences}
+                            explanation={study.explanation}
+                            query={study.query}
+                            onGenerateCommentary={handleGenerateCommentary}
+                            onSaveCommentary={handleSaveCommentary}
+                            onGenerateCrossReferenceMap={handleGenerateCrossReferenceMap}
+                            initialCommentaries={study.commentaries || []}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

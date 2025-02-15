@@ -9,6 +9,7 @@ import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface ChatMessageProps {
     message: ChatMessageType;
+    isLastMessage?: boolean;
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
@@ -90,6 +91,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             // Add the segment text with its references
             parts.push(
                 <span key={`segment-${localStart}`} className="inline group/ref">
+                    &nbsp;
                     <span
                         className={cn(
                             "inline border-b border-dashed transition-colors duration-200",

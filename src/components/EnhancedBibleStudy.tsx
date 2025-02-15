@@ -45,7 +45,7 @@ export function EnhancedBibleStudy({
     const [activeTab, setActiveTab] = useState<'verse' | 'commentary' | 'cross-references'>('verse');
     const [generatingCrossRefs, setGeneratingCrossRefs] = useState<string | null>(null);
     const [showOriginalText, setShowOriginalText] = useState<Record<number, boolean>>({});
-    const [activeVerseTab, setActiveVerseTab] = useState<Record<number, 'text' | 'commentary' | 'references'>>({});
+    const [activeVerseTab, setActiveVerseTab] = useState<Record<number, string>>({});
 
     const handleGenerateCommentary = async (verseRef: string) => {
         if (isLoading) return;
@@ -99,41 +99,159 @@ export function EnhancedBibleStudy({
     };
 
     return (
-        <div className="space-y-12">
-            {/* Study Overview */}
-            {explanation && (
-                <div className="relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 blur-3xl" />
-                    <div className="relative rounded-2xl border border-border/50 backdrop-blur-sm p-4 sm:p-8 space-y-4">
-                        <div className="flex items-center gap-3 text-primary">
-                            <Info className="w-5 h-5" />
-                            <h2 className="text-lg sm:text-xl font-medium">Study Overview</h2>
-                        </div>
-                        <div className="prose prose-sm max-w-none">
-                            <p className="text-muted-foreground leading-relaxed">{explanation}</p>
+        <div className="space-y-8 sm:space-y-12">
+            {/* Overview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                {/* Study Overview Card */}
+                {explanation && (
+                    <div className="md:col-span-2 relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/50 bg-card">
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 blur-3xl opacity-50" />
+                        <div className="relative p-4 sm:p-6 space-y-4">
+                            <div className="flex items-center gap-3 text-primary">
+                                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                    <Info className="w-4 h-4" />
+                                </div>
+                                <h2 className="text-lg font-medium">Study Overview</h2>
+                            </div>
+                            <div className="prose prose-sm max-w-none">
+                                <p className="text-muted-foreground leading-relaxed">{explanation}</p>
+                            </div>
+                            <div className="flex flex-wrap gap-2 sm:gap-3 pt-2">
+                                <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground bg-muted/50 px-2.5 sm:px-3 py-1.5 rounded-full">
+                                    <BookOpen className="w-3.5 h-3.5" />
+                                    <span>{verses.length} verses</span>
+                                </div>
+                                {crossReferences && crossReferences.length > 0 && (
+                                    <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground bg-muted/50 px-2.5 sm:px-3 py-1.5 rounded-full">
+                                        <Network className="w-3.5 h-3.5" />
+                                        <span>{crossReferences.length} cross-references</span>
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground bg-muted/50 px-2.5 sm:px-3 py-1.5 rounded-full">
+                                    <Languages className="w-3.5 h-3.5" />
+                                    <span>Original text available</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Quick Guide */}
-            <div className="bg-muted/30 rounded-xl p-4 sm:p-6 space-y-4">
-                <div className="flex items-center gap-3 text-primary">
-                    <Lightbulb className="w-5 h-5" />
-                    <h2 className="text-base sm:text-lg font-medium">How to Use This Study</h2>
+                {/* Quick Guide Card */}
+                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/50 bg-card">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 blur-3xl opacity-50" />
+                    <div className="relative p-4 sm:p-6 space-y-4">
+                        <div className="flex items-center gap-3 text-primary">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Lightbulb className="w-4 h-4" />
+                            </div>
+                            <h2 className="text-lg font-medium">Quick Guide</h2>
+                        </div>
+                        <div className="grid gap-2 sm:gap-3">
+                            <div className="flex items-start gap-3 p-2 sm:p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
+                                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                    <BookOpen className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-medium mb-0.5">Read & Compare</h3>
+                                    <p className="text-xs text-muted-foreground">View verses in English and original languages</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3 p-2 sm:p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
+                                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                    <MessageSquare className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-medium mb-0.5">Study Deeper</h3>
+                                    <p className="text-xs text-muted-foreground">Get AI-powered verse commentary</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3 p-2 sm:p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
+                                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                    <Network className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-medium mb-0.5">Connect Scripture</h3>
+                                    <p className="text-xs text-muted-foreground">Explore related verses on the timeline</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="grid gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-start gap-3">
-                        <BookOpen className="w-4 h-4 mt-0.5 text-primary/70 shrink-0" />
-                        <p>Each verse card shows the English text and original language (when available). Click the language icon to toggle between them.</p>
+            </div>
+
+            {/* Verse Timeline */}
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/50 bg-card">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 blur-3xl opacity-50" />
+                <div className="relative p-4 sm:p-6 space-y-4 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex items-center gap-3 text-primary">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Network className="w-4 h-4" />
+                            </div>
+                            <h2 className="text-lg font-medium">Verse Timeline</h2>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-2 h-2 rounded-full bg-amber-500" />
+                                <span>Old Testament</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                                <span>New Testament</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                        <MessageSquare className="w-4 h-4 mt-0.5 text-primary/70 shrink-0" />
-                        <p>Generate AI commentary for deeper insights into the verse&apos;s meaning, context, and application.</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                        <Network className="w-4 h-4 mt-0.5 text-primary/70 shrink-0" />
-                        <p>Explore cross-references to see how this verse connects with other parts of Scripture, including a visual timeline.</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                        {verses?.map((verse, index) => {
+                            const verseRef = `${verse.reference}`;
+                            const verseCrossRefs = crossReferences?.filter(ref => ref.sourceReference === verseRef) || [];
+                            const [book] = verseRef.split(' ');
+                            const isOldTestament = !['Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans', 'Corinthians', 'Galatians', 'Ephesians', 'Philippians', 'Colossians', 'Thessalonians', 'Timothy', 'Titus', 'Philemon', 'Hebrews', 'James', 'Peter', 'John', 'Jude', 'Revelation'].some(b => verseRef.startsWith(b));
+
+                            return (
+                                <button
+                                    key={verseRef}
+                                    onClick={() => {
+                                        const element = document.getElementById(`verse-${index}`);
+                                        if (element) {
+                                            element.scrollIntoView({ behavior: 'smooth' });
+                                            element.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+                                            setTimeout(() => {
+                                                element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
+                                            }, 2000);
+                                        }
+                                    }}
+                                    className="group relative overflow-hidden rounded-lg sm:rounded-xl border border-border/50 bg-card hover:bg-muted/50 transition-all duration-300"
+                                >
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-transparent via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <div className="p-3 sm:p-4 flex gap-3 sm:gap-4">
+                                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 text-primary text-sm font-medium flex items-center justify-center">
+                                            {index + 1}
+
+                                        </div>
+                                        <div className="flex-1 min-w-0 text-left">
+                                            <div className="flex items-center gap-2 mb-1 sm:mb-1.5">
+                                                <span className="font-medium text-sm">{verseRef}</span>
+                                                <div className={cn(
+                                                    "w-1.5 h-1.5 rounded-full",
+                                                    isOldTestament ? "bg-amber-500" : "bg-blue-500"
+                                                )} />
+                                            </div>
+                                            <p className="text-xs text-muted-foreground line-clamp-2 mb-1.5 sm:mb-2">
+                                                {verse.verses?.[0]?.text}
+                                            </p>
+                                            {verseCrossRefs.length > 0 && (
+                                                <div className="flex items-center gap-1.5 text-xs text-primary/70">
+                                                    <Network className="w-3 h-3" />
+                                                    <span>{verseCrossRefs.length} references</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </button>
+                            );
+                        })}
+
                     </div>
                 </div>
             </div>
@@ -152,6 +270,7 @@ export function EnhancedBibleStudy({
 
                     return (
                         <div
+                            id={`verse-${index}`}
                             key={verseRef}
                             className={cn(
                                 "group relative rounded-2xl border border-border/50 transition-all duration-300",

@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { LoadingMessage } from '@/src/components/LoadingMessage';
 import { History } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { usePageTransition } from '@/src/hooks/usePageTransition';
 
 interface Message {
     _id: string;
@@ -45,6 +46,7 @@ export default function ChatPage() {
     const router = useRouter();
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [showSidebar, setShowSidebar] = useState(false);
+    const { isTransitioning } = usePageTransition();
 
     useEffect(() => {
         const init = async () => {
@@ -236,45 +238,40 @@ export default function ChatPage() {
     };
 
     return (
-        <main className="flex min-h-screen bg-gradient-to-b from-background to-background/95">
+        <main className={cn(
+            "flex min-h-screen bg-gradient-to-b from-background to-background/95",
+            "transition-opacity duration-300",
+            isTransitioning ? "opacity-50" : "opacity-100"
+        )}>
             {/* Mobile Sidebar Toggle */}
             <button
                 onClick={() => setShowSidebar(!showSidebar)}
-                className="lg:hidden fixed right-4 bottom-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+                className="lg:hidden fixed right-4 bottom-24 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
             >
-                <History className="w-6 h-6" />
+                <History className="w-5 h-5" />
             </button>
 
             {/* Sidebar */}
-            <div className={cn(
-                'fixed inset-y-0 left-0 z-50 transform lg:relative lg:translate-x-0 transition-transform duration-200 ease-in-out',
-                'bg-background border-r border-border w-80',
-                showSidebar ? 'translate-x-0' : '-translate-x-full'
-            )}>
-                <ChatSidebar
-                    privateChats={privateChats}
-                    publicChats={publicChats}
-                    currentUserId={currentUserId}
-                    isLoading={isInitialLoad}
-                />
-            </div>
+            <ChatSidebar
+                privateChats={privateChats}
+                publicChats={publicChats}
+                currentUserId={currentUserId}
+                isAuthenticated={isAuthenticated}
+                isLoading={isInitialLoad}
+                showSidebar={showSidebar}
+                onCloseSidebar={() => setShowSidebar(false)}
+            />
 
-            {/* Overlay for mobile */}
-            {showSidebar && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm transition-opacity duration-300"
-                    onClick={() => setShowSidebar(false)}
-                />
-            )}
-
-            {/* Main chat area */}
-            <div className="flex-1 flex flex-col min-h-screen relative">
-                <div className="flex-1 overflow-y-auto">
-                    <div className="max-w-4xl mx-auto pt-4 pb-[100px]">
-                        {messages.map((message) => (
+            {/* Main Chat Area */}
+            <div className="flex-1 flex flex-col h-screen relative">
+                {/* Messages Container */}
+                <div className="flex-1 overflow-y-auto pb-36">
+                    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+                        {messages.map((message, index) => (
                             <ChatMessage
                                 key={message._id}
                                 message={message}
+                                isLastMessage={index === messages.length - 1}
                             />
                         ))}
                         {isLoading && <LoadingMessage />}
@@ -282,9 +279,9 @@ export default function ChatPage() {
                     </div>
                 </div>
 
-                {/* Input Container */}
-                <div className="flex-none border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                    <div className="max-w-3xl mx-auto px-4 py-4">
+                {/* Fixed Chat Input Container */}
+                <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-background/95">
+                    <div className="max-w-3xl mx-auto p-4">
                         <ChatInput
                             onSend={handleSend}
                             disabled={isLoading}
