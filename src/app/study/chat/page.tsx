@@ -263,10 +263,10 @@ export default function ChatPage() {
             />
 
             {/* Main Chat Area */}
-            <div className="flex-1 flex flex-col h-screen relative">
+            <div className="flex-1 flex flex-col h-[100dvh] relative">
                 {/* Messages Container */}
                 <div className="flex-1 overflow-y-auto pb-36">
-                    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+                    <div className="max-w-3xl mx-auto ">
                         {messages.map((message, index) => (
                             <ChatMessage
                                 key={message._id}
@@ -280,7 +280,7 @@ export default function ChatPage() {
                 </div>
 
                 {/* Fixed Chat Input Container */}
-                <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-background/95">
+                <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-background/95 border-t border-border/50">
                     <div className="max-w-3xl mx-auto p-4">
                         <ChatInput
                             onSend={handleSend}
@@ -290,6 +290,22 @@ export default function ChatPage() {
                     </div>
                 </div>
             </div>
+
+            <style jsx global>{`
+                html {
+                    height: -webkit-fill-available;
+                }
+                body {
+                    height: 100vh;
+                    height: -webkit-fill-available;
+                    overflow: hidden;
+                }
+                @supports (-webkit-touch-callout: none) {
+                    .h-screen {
+                        height: -webkit-fill-available;
+                    }
+                }
+            `}</style>
         </main>
     );
 } 
