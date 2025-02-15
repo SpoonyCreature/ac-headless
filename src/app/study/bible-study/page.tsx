@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot, Book, Search, Save, Menu, ChevronRight } from 'lucide-react';
+import { Bot, Book, Search, Save, History, ChevronRight } from 'lucide-react';
 import { BibleStudyResults } from '@/src/components/BibleStudyResults';
 import { BibleStudySidebar } from '@/src/components/BibleStudySidebar';
 import { useRouter } from 'next/navigation';
@@ -162,7 +162,7 @@ export default function BibleStudyPage() {
                 onClick={() => setShowSidebar(!showSidebar)}
                 className="lg:hidden fixed right-4 bottom-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
             >
-                <Menu className="w-6 h-6" />
+                <History className="w-6 h-6" />
             </button>
 
             {/* Sidebar */}

@@ -3,6 +3,7 @@ import { Header } from '@/src/components/Header';
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
 import { Footer } from '../components/Footer';
+import { LayoutWrapper } from '../components/LayoutWrapper';
 
 const inter = Inter({
     subsets: ['latin'],
@@ -38,9 +39,17 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`min-h-screen bg-background font-sans antialiased ${inter.variable}`}>
-                <Header />
-                {children}
-                <Footer />
+                <LayoutWrapper>
+                    <div className="flex min-h-screen flex-col">
+                        <Header />
+                        <main className="flex-1">
+                            <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                                {children}
+                            </div>
+                        </main>
+                        <Footer />
+                    </div>
+                </LayoutWrapper>
             </body>
         </html>
     );

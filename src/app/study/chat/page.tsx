@@ -7,7 +7,7 @@ import { ChatInput } from '@/src/components/ChatInput';
 import { Chat as ChatType } from '@/src/types/chat';
 import { useRouter } from 'next/navigation';
 import { LoadingMessage } from '@/src/components/LoadingMessage';
-import { Menu, X } from 'lucide-react';
+import { History } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
 interface Message {
@@ -240,15 +240,16 @@ export default function ChatPage() {
             {/* Mobile Sidebar Toggle */}
             <button
                 onClick={() => setShowSidebar(!showSidebar)}
-                className="lg:hidden fixed left-4 bottom-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-all hover:scale-105 active:scale-95"
+                className="lg:hidden fixed right-4 bottom-4 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
             >
-                <Menu className="w-6 h-6" />
+                <History className="w-6 h-6" />
             </button>
 
             {/* Sidebar */}
             <div className={cn(
-                "fixed inset-y-0 left-0 z-50 w-80 transform lg:relative lg:translate-x-0 transition-all duration-300 ease-out",
-                showSidebar ? "translate-x-0" : "-translate-x-full"
+                'fixed inset-y-0 left-0 z-50 transform lg:relative lg:translate-x-0 transition-transform duration-200 ease-in-out',
+                'bg-background border-r border-border w-80',
+                showSidebar ? 'translate-x-0' : '-translate-x-full'
             )}>
                 <ChatSidebar
                     privateChats={privateChats}

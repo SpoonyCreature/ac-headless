@@ -3,17 +3,21 @@ import { getServerWixClient } from "../app/serverWixClient";
 import { members } from "@wix/members";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { GoogleLoginButton } from "./GoogleLoginButton";
+import { LogoutButton } from "./LogoutButton";
 import Image from 'next/image';
-import { Menu } from 'lucide-react';
-import MobileMenu from './MobileMenu';
 import './header.css';
+import { HeaderClient } from './HeaderClient';
 
 async function logout() {
     "use server";
+    // Add a small delay to make the loading state more noticeable
+    await new Promise(resolve => setTimeout(resolve, 500));
     cookies().delete("wixSession");
     revalidatePath("/");
+    redirect("/");
 }
 
 export async function Header() {
@@ -32,19 +36,11 @@ export async function Header() {
             <div className="container mx-auto px-4 py-3">
                 <nav className="flex items-center justify-between">
                     {/* Logo */}
-                    <Link href="/" className="relative z-10 text-lg xs:text-xl sm:text-2xl font-bold tracking-tighter hover:text-primary transition-all duration-200 ease-in-out whitespace-nowrap">
+                    <Link href="/" className="relative z-10 text-lg xs:text-xl sm:text-2xl font-bold tracking-tighter text-primary transition-all duration-200 ease-in-out whitespace-nowrap">
                         Apologetics Central
                     </Link>
 
-                    {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-8">
-                        <Link href="/" className="nav-link">Home</Link>
-                        <Link href="/blog" className="nav-link">Articles</Link>
-                        <Link href="/study" className="nav-link">Study</Link>
-                        <Link href="/about" className="nav-link">About</Link>
-                    </div>
-
-                    {/* Auth Section */}
+                    {/* Auth Section and Menu Button */}
                     <div className="flex items-center gap-2 sm:gap-4">
                         <Suspense fallback={<div className="h-10 w-32 animate-pulse bg-muted rounded-md" />}>
                             {member ? (
@@ -65,14 +61,7 @@ export async function Header() {
                                     <span className="hidden sm:inline text-sm font-medium">
                                         {member.profile?.nickname || member.profile?.slug || "Member"}
                                     </span>
-                                    <form action={logout} className="contents">
-                                        <button
-                                            type="submit"
-                                            className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                                        >
-                                            Logout
-                                        </button>
-                                    </form>
+                                    <LogoutButton action={logout} />
                                 </div>
                             ) : (
                                 <GoogleLoginButton
@@ -83,8 +72,8 @@ export async function Header() {
                             )}
                         </Suspense>
 
-                        {/* Mobile Menu */}
-                        <MobileMenu />
+                        {/* Menu Button */}
+                        <HeaderClient />
                     </div>
                 </nav>
             </div>
