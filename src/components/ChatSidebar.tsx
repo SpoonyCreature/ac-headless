@@ -78,18 +78,18 @@ export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId
             {/* Mobile Overlay */}
             {showSidebar && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm transition-opacity duration-300"
+                    className="fixed inset-0 bg-black/50 z-[45] lg:hidden backdrop-blur-sm transition-opacity duration-300"
                     onClick={onCloseSidebar}
                 />
             )}
 
             {/* Sidebar */}
             <div className={cn(
-                "fixed inset-y-0 left-0 z-50 w-80 lg:w-80 lg:relative",
-                "transform transition-transform duration-300 ease-in-out",
+                "fixed inset-y-0 left-0 z-[50] w-80 lg:w-80 lg:relative",
+                "transform transition-all duration-300 ease-in-out",
                 "bg-background border-r border-border",
-                "lg:opacity-100 lg:pointer-events-auto",
-                showSidebar ? "translate-x-0 opacity-100 pointer-events-auto" : "-translate-x-full opacity-0 pointer-events-none lg:translate-x-0"
+                "lg:opacity-100 lg:pointer-events-auto lg:translate-x-0",
+                showSidebar ? "translate-x-0 opacity-100 pointer-events-auto" : "-translate-x-full opacity-0 pointer-events-none"
             )}>
                 <div className="flex-1 overflow-y-auto p-4 space-y-6">
                     {privateChats.length > 0 && (

@@ -99,36 +99,36 @@ export function EnhancedBibleStudy({
     };
 
     return (
-        <div className="space-y-8 sm:space-y-12">
+        <div className="space-y-6 sm:space-y-8">
             {/* Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6">
                 {/* Study Overview Card */}
                 {explanation && (
                     <div className="md:col-span-2 relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/50 bg-card">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 blur-3xl opacity-50" />
-                        <div className="relative p-4 sm:p-6 space-y-4">
-                            <div className="flex items-center gap-3 text-primary">
-                                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                    <Info className="w-4 h-4" />
+                        <div className="relative p-3 sm:p-6 space-y-3 sm:space-y-4">
+                            <div className="flex items-center gap-2 sm:gap-3 text-primary">
+                                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                    <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 </div>
-                                <h2 className="text-lg font-medium">Study Overview</h2>
+                                <h2 className="text-base sm:text-lg font-medium">Study Overview</h2>
                             </div>
                             <div className="prose prose-sm max-w-none">
-                                <p className="text-muted-foreground leading-relaxed">{explanation}</p>
+                                <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">{explanation}</p>
                             </div>
-                            <div className="flex flex-wrap gap-2 sm:gap-3 pt-2">
-                                <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground bg-muted/50 px-2.5 sm:px-3 py-1.5 rounded-full">
-                                    <BookOpen className="w-3.5 h-3.5" />
+                            <div className="flex flex-wrap gap-2 sm:gap-3 pt-1 sm:pt-2">
+                                <div className="flex items-center gap-1 sm:gap-2 text-xs text-muted-foreground bg-muted/50 px-2.5 sm:px-3 py-1.5 rounded-full">
+                                    <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                     <span>{verses.length} verses</span>
                                 </div>
                                 {crossReferences && crossReferences.length > 0 && (
-                                    <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground bg-muted/50 px-2.5 sm:px-3 py-1.5 rounded-full">
-                                        <Network className="w-3.5 h-3.5" />
+                                    <div className="flex items-center gap-1 sm:gap-2 text-xs text-muted-foreground bg-muted/50 px-2.5 sm:px-3 py-1.5 rounded-full">
+                                        <Network className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                         <span>{crossReferences.length} cross-references</span>
                                     </div>
                                 )}
-                                <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground bg-muted/50 px-2.5 sm:px-3 py-1.5 rounded-full">
-                                    <Languages className="w-3.5 h-3.5" />
+                                <div className="flex items-center gap-1 sm:gap-2 text-xs text-muted-foreground bg-muted/50 px-2.5 sm:px-3 py-1.5 rounded-full">
+                                    <Languages className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                     <span>Original text available</span>
                                 </div>
                             </div>
@@ -139,35 +139,35 @@ export function EnhancedBibleStudy({
                 {/* Quick Guide Card */}
                 <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/50 bg-card">
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 blur-3xl opacity-50" />
-                    <div className="relative p-4 sm:p-6 space-y-4">
-                        <div className="flex items-center gap-3 text-primary">
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <Lightbulb className="w-4 h-4" />
+                    <div className="relative p-3 sm:p-6 space-y-3 sm:space-y-4">
+                        <div className="flex items-center gap-2 sm:gap-3 text-primary">
+                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Lightbulb className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             </div>
-                            <h2 className="text-lg font-medium">Quick Guide</h2>
+                            <h2 className="text-base sm:text-lg font-medium">Quick Guide</h2>
                         </div>
-                        <div className="grid gap-2 sm:gap-3">
-                            <div className="flex items-start gap-3 p-2 sm:p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
-                                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                    <BookOpen className="w-4 h-4" />
+                        <div className="grid gap-1.5 sm:gap-3">
+                            <div className="flex items-start gap-2 p-2 sm:p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
+                                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                    <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-medium mb-0.5">Read & Compare</h3>
                                     <p className="text-xs text-muted-foreground">View verses in English and original languages</p>
                                 </div>
                             </div>
-                            <div className="flex items-start gap-3 p-2 sm:p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
-                                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                    <MessageSquare className="w-4 h-4" />
+                            <div className="flex items-start gap-2 p-2 sm:p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
+                                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                    <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-medium mb-0.5">Study Deeper</h3>
                                     <p className="text-xs text-muted-foreground">Get AI-powered verse commentary</p>
                                 </div>
                             </div>
-                            <div className="flex items-start gap-3 p-2 sm:p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
-                                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                    <Network className="w-4 h-4" />
+                            <div className="flex items-start gap-2 p-2 sm:p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
+                                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                    <Network className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-medium mb-0.5">Connect Scripture</h3>
@@ -182,15 +182,15 @@ export function EnhancedBibleStudy({
             {/* Verse Timeline */}
             <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/50 bg-card">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 blur-3xl opacity-50" />
-                <div className="relative p-4 sm:p-6 space-y-4 sm:space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div className="flex items-center gap-3 text-primary">
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <Network className="w-4 h-4" />
+                <div className="relative p-3 sm:p-6 space-y-3 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3 text-primary">
+                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Network className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             </div>
-                            <h2 className="text-lg font-medium">Verse Timeline</h2>
+                            <h2 className="text-base sm:text-lg font-medium">Verse Timeline</h2>
                         </div>
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-muted-foreground">
                             <div className="flex items-center gap-1.5">
                                 <div className="w-2 h-2 rounded-full bg-amber-500" />
                                 <span>Old Testament</span>
@@ -224,13 +224,13 @@ export function EnhancedBibleStudy({
                                     className="group relative overflow-hidden rounded-lg sm:rounded-xl border border-border/50 bg-card hover:bg-muted/50 transition-all duration-300"
                                 >
                                     <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-transparent via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    <div className="p-3 sm:p-4 flex gap-3 sm:gap-4">
-                                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary/10 text-primary text-sm font-medium flex items-center justify-center">
+                                    <div className="p-2.5 sm:p-4 flex gap-2 sm:gap-4">
+                                        <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-primary/10 text-primary text-sm font-medium flex items-center justify-center">
                                             {index + 1}
 
                                         </div>
                                         <div className="flex-1 min-w-0 text-left">
-                                            <div className="flex items-center gap-2 mb-1 sm:mb-1.5">
+                                            <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-1.5">
                                                 <span className="font-medium text-sm">{verseRef}</span>
                                                 <div className={cn(
                                                     "w-1.5 h-1.5 rounded-full",
@@ -278,17 +278,17 @@ export function EnhancedBibleStudy({
                             )}
                         >
                             {/* Verse Header */}
-                            <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/50 gap-4">
-                                <div className="flex items-center gap-4">
+                            <div className="p-3 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/50 gap-3 sm:gap-4">
+                                <div className="flex items-center gap-3 sm:gap-4">
                                     <div className={cn(
-                                        "w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-colors shrink-0",
+                                        "w-8 h-8 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-colors shrink-0",
                                         hasCommentary ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                                     )}>
-                                        <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
+                                        <BookOpen className="w-4 h-4 sm:w-6 sm:h-6" />
                                     </div>
                                     <div>
                                         <h3 className="text-lg sm:text-xl font-medium text-foreground">{verseRef}</h3>
-                                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
                                             {verse.originalText && (
                                                 <span className="inline-flex items-center gap-1 text-xs text-primary/70">
                                                     <Languages className="w-3 h-3" />
@@ -310,36 +310,36 @@ export function EnhancedBibleStudy({
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1 sm:gap-2">
                                     {verse.originalText && (
                                         <button
                                             onClick={() => setShowOriginalText(prev => ({ ...prev, [index]: !prev[index] }))}
                                             className={cn(
-                                                "p-2 rounded-lg transition-colors",
+                                                "p-1.5 sm:p-2 rounded-lg transition-colors",
                                                 showOriginalText[index] ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-primary hover:bg-primary/5"
                                             )}
                                             title={`Toggle ${verse.originalText.language} text`}
                                         >
-                                            <Languages className="w-5 h-5" />
+                                            <Languages className="w-4 h-4 sm:w-5 sm:h-5" />
                                         </button>
                                     )}
                                     <button
                                         onClick={() => handleCopyVerse(verse)}
-                                        className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+                                        className="p-1.5 sm:p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
                                         title="Copy verse"
                                     >
-                                        <Copy className="w-5 h-5" />
+                                        <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Main Verse Content */}
-                            <div className="p-4 sm:p-6">
-                                <div className="relative rounded-xl bg-muted/30 p-4 sm:p-6">
+                            <div className="p-3 sm:p-6">
+                                <div className="relative rounded-xl bg-muted/30 p-3 sm:p-6">
                                     <FormattedVerseText verses={verse.verses} />
                                     {verse.originalText && showOriginalText[index] && (
-                                        <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-border/50">
-                                            <div className="flex items-center gap-2 mb-3 text-sm text-muted-foreground">
+                                        <div className="mt-3 sm:mt-6 pt-3 sm:pt-6 border-t border-border/50">
+                                            <div className="flex items-center gap-2 mb-2 sm:mb-3 text-sm text-muted-foreground">
                                                 <Languages className="w-4 h-4" />
                                                 <span>Original {verse.originalText.language} Text</span>
                                             </div>
@@ -362,12 +362,12 @@ export function EnhancedBibleStudy({
                                     )}
                                 </div>
 
-                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4">
+                                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
                                     {verse.originalText && (
                                         <button
                                             onClick={() => setShowOriginalText(prev => ({ ...prev, [index]: !prev[index] }))}
                                             className={cn(
-                                                "flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium transition-all text-sm",
+                                                "flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-all text-sm",
                                                 showOriginalText[index] ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-primary hover:bg-primary/5"
                                             )}
                                         >
@@ -379,7 +379,7 @@ export function EnhancedBibleStudy({
                                         href={`https://biblehub.com/${verse.reference.toLowerCase()}.htm`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                                        className="flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
                                     >
                                         <ExternalLink className="w-4 h-4" />
                                         Study Tools
@@ -388,22 +388,22 @@ export function EnhancedBibleStudy({
                             </div>
 
                             {/* Navigation for Additional Content */}
-                            <div className="px-4 sm:px-6">
-                                <div className="border-t border-border/50 -mx-4 sm:-mx-6" />
+                            <div className="px-3 sm:px-6">
+                                <div className="border-t border-border/50 -mx-3 sm:-mx-6" />
 
                                 {/* Desktop Tabs */}
-                                <div className="hidden sm:flex items-center gap-2 py-4">
+                                <div className="hidden sm:flex items-center gap-2 py-3 sm:py-4">
                                     <button
                                         onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'commentary' }))}
                                         className={cn(
-                                            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                                            "flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium transition-all",
                                             activeTab === 'commentary'
                                                 ? "bg-primary text-primary-foreground"
                                                 : "text-muted-foreground hover:text-primary hover:bg-primary/5"
                                         )}
                                     >
                                         <MessageSquare className="w-4 h-4" />
-                                        Commentary
+                                        <span className="hidden sm:inline">Commentary</span>
                                         {hasCommentary && (
                                             <span className="w-2 h-2 rounded-full bg-primary-foreground" />
                                         )}
@@ -412,14 +412,14 @@ export function EnhancedBibleStudy({
                                     <button
                                         onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'references' }))}
                                         className={cn(
-                                            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                                            "flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium transition-all",
                                             activeTab === 'references'
                                                 ? "bg-primary text-primary-foreground"
                                                 : "text-muted-foreground hover:text-primary hover:bg-primary/5"
                                         )}
                                     >
                                         <Network className="w-4 h-4" />
-                                        Cross References
+                                        <span className="hidden sm:inline">Cross References</span>
                                         {verseCrossRefs.length > 0 && (
                                             <span className="min-w-[1.25rem] h-5 flex items-center justify-center rounded-full bg-primary-foreground/20 text-primary-foreground text-xs px-1">
                                                 {verseCrossRefs.length}
@@ -429,11 +429,11 @@ export function EnhancedBibleStudy({
                                 </div>
 
                                 {/* Mobile Action Menu */}
-                                <div className="sm:hidden flex flex-col bg-muted/30 rounded-lg overflow-hidden py-1 my-4">
+                                <div className="sm:hidden flex flex-col bg-muted/30 rounded-lg overflow-hidden py-1 my-3 sm:my-4">
                                     <button
                                         onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'commentary' }))}
                                         className={cn(
-                                            "flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-all",
+                                            "flex items-center justify-between px-4 py-2 text-sm font-medium transition-all",
                                             activeTab === 'commentary'
                                                 ? "bg-primary text-primary-foreground"
                                                 : "text-muted-foreground hover:bg-muted/50"
@@ -454,7 +454,7 @@ export function EnhancedBibleStudy({
                                     <button
                                         onClick={() => setActiveVerseTab(prev => ({ ...prev, [index]: 'references' }))}
                                         className={cn(
-                                            "flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-all border-t border-border/10",
+                                            "flex items-center justify-between px-4 py-2 text-sm font-medium transition-all border-t border-border/10",
                                             activeTab === 'references'
                                                 ? "bg-primary text-primary-foreground"
                                                 : "text-muted-foreground hover:bg-muted/50"
@@ -479,7 +479,7 @@ export function EnhancedBibleStudy({
                             {/* Additional Content */}
                             {(activeTab === 'commentary' || activeTab === 'references') && (
                                 <div className="border-t border-border/50">
-                                    <div className="p-4 sm:p-6">
+                                    <div className="p-3 sm:p-6">
                                         {activeTab === 'commentary' && (
                                             <div className="space-y-4">
                                                 {hasCommentary ? (
@@ -523,23 +523,23 @@ export function EnhancedBibleStudy({
                                                         <button
                                                             onClick={() => handleGenerateCommentary(verseRef)}
                                                             disabled={isGenerating}
-                                                            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                                                            className="flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
                                                         >
                                                             <RefreshCw className={cn("w-4 h-4", isGenerating && "animate-spin")} />
                                                             Regenerate Commentary
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <div className="text-center py-6">
-                                                        <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-4" />
+                                                    <div className="text-center py-4 sm:py-6">
+                                                        <MessageSquare className="w-8 h-8 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
                                                         <h3 className="text-base sm:text-lg font-medium mb-2">No Commentary Yet</h3>
-                                                        <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
+                                                        <p className="text-sm text-muted-foreground mb-3 sm:mb-4 max-w-md mx-auto">
                                                             Generate AI-powered commentary to explore deeper insights into this verse.
                                                         </p>
                                                         <button
                                                             onClick={() => handleGenerateCommentary(verseRef)}
                                                             disabled={isGenerating}
-                                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
+                                                            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
                                                         >
                                                             {isGenerating ? (
                                                                 <>
@@ -563,7 +563,7 @@ export function EnhancedBibleStudy({
                                                 {verseCrossRefs.length > 0 ? (
                                                     <>
                                                         {/* Timeline Section */}
-                                                        <div className="bg-muted/30 rounded-xl p-4 sm:p-6 space-y-4">
+                                                        <div className="bg-muted/30 rounded-xl p-3 sm:p-6 space-y-3 sm:space-y-4">
                                                             <h5 className="text-sm font-medium text-primary/70">Biblical Timeline</h5>
                                                             <div className="max-w-3xl mx-auto overflow-x-auto">
                                                                 <VerseTimeline
@@ -606,23 +606,23 @@ export function EnhancedBibleStudy({
                                                         <button
                                                             onClick={() => handleGenerateCrossRefs(verse)}
                                                             disabled={generatingCrossRefs === verseRef}
-                                                            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                                                            className="flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
                                                         >
                                                             <RefreshCw className={cn("w-4 h-4", generatingCrossRefs === verseRef && "animate-spin")} />
                                                             Find More References
                                                         </button>
                                                     </>
                                                 ) : (
-                                                    <div className="text-center py-6">
-                                                        <Network className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-4" />
+                                                    <div className="text-center py-4 sm:py-6">
+                                                        <Network className="w-8 h-8 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
                                                         <h3 className="text-base sm:text-lg font-medium mb-2">No Cross References Yet</h3>
-                                                        <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
+                                                        <p className="text-sm text-muted-foreground mb-3 sm:mb-4 max-w-md mx-auto">
                                                             Find connections between this verse and other parts of Scripture.
                                                         </p>
                                                         <button
                                                             onClick={() => handleGenerateCrossRefs(verse)}
                                                             disabled={generatingCrossRefs === verseRef}
-                                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
+                                                            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
                                                         >
                                                             {generatingCrossRefs === verseRef ? (
                                                                 <>

@@ -239,70 +239,67 @@ export default function ChatPage() {
 
     return (
         <main className={cn(
-            "flex min-h-screen bg-gradient-to-b from-background to-background/95",
+            "flex h-[calc(100vh-4rem)] bg-gradient-to-b from-background to-background/95",
             "transition-opacity duration-300",
             isTransitioning ? "opacity-50" : "opacity-100"
         )}>
             {/* Mobile Sidebar Toggle */}
             <button
                 onClick={() => setShowSidebar(!showSidebar)}
-                className="lg:hidden fixed right-4 bottom-24 z-50 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+                className="lg:hidden fixed right-4 bottom-32 z-100 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
             >
-                <History className="w-5 h-5" />
+                <History className="w-6 h-6" />
             </button>
 
-            {/* Sidebar */}
-            <ChatSidebar
-                privateChats={privateChats}
-                publicChats={publicChats}
-                currentUserId={currentUserId}
-                isAuthenticated={isAuthenticated}
-                isLoading={isInitialLoad}
-                showSidebar={showSidebar}
-                onCloseSidebar={() => setShowSidebar(false)}
-            />
+            {/* Chat Layout */}
+            <div className="flex-1 flex">
+                {/* Sidebar */}
+                <ChatSidebar
+                    privateChats={privateChats}
+                    publicChats={publicChats}
+                    currentUserId={currentUserId}
+                    isLoading={isInitialLoad}
+                    isAuthenticated={isAuthenticated}
+                    showSidebar={showSidebar}
+                    onCloseSidebar={() => setShowSidebar(false)}
+                />
 
-            {/* Main Chat Area */}
-            <div className="flex-1 flex flex-col h-[100dvh] relative">
-                {/* Messages Container */}
-                <div className="flex-1 overflow-y-auto pb-36">
-                    <div className="max-w-3xl mx-auto ">
-                        {messages.map((message, index) => (
-                            <ChatMessage
-                                key={message._id}
-                                message={message}
-                                isLastMessage={index === messages.length - 1}
-                            />
-                        ))}
-                        {isLoading && <LoadingMessage />}
-                        <div ref={messagesEndRef} />
+                {/* Chat Area */}
+                <div className="flex-1 flex flex-col">
+                    {/* Messages Container */}
+                    <div className="flex-1 overflow-y-auto pb-[88px]">
+                        <div className="max-w-3xl mx-auto">
+                            {messages.map((message) => (
+                                <ChatMessage
+                                    key={message._id}
+                                    message={message}
+                                />
+                            ))}
+                            {isLoading && <LoadingMessage />}
+                            <div ref={messagesEndRef} />
+                        </div>
                     </div>
-                </div>
 
-                {/* Fixed Chat Input Container */}
-                <div className="fixed bottom-0 left-0 right-0 lg:left-80 bg-background/95 border-t border-border/50">
-                    <div className="max-w-3xl mx-auto p-4">
-                        <ChatInput
-                            onSend={handleSend}
-                            disabled={isLoading}
-                            isAuthenticated={isAuthenticated}
-                        />
+                    {/* Chat Input */}
+                    <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border bg-background/80 backdrop-blur-lg">
+                        <div className="max-w-3xl mx-auto p-4">
+                            <ChatInput
+                                onSend={handleSend}
+                                disabled={isLoading}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
 
             <style jsx global>{`
-                html {
-                    height: -webkit-fill-available;
-                }
-                body {
-                    height: 100vh;
-                    height: -webkit-fill-available;
-                    overflow: hidden;
+                :root {
+                    --viewport-height: 100vh;
                 }
                 @supports (-webkit-touch-callout: none) {
-                    .h-screen {
-                        height: -webkit-fill-available;
+                    :root {
+                        --viewport-height: -webkit-fill-available;
                     }
                 }
             `}</style>
