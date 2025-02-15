@@ -39,8 +39,8 @@ export async function Header() {
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-8">
                         <Link href="/" className="nav-link">Home</Link>
-                        <Link href="/blog" className="nav-link">Blog</Link>
-                        <Link href="/ai" className="nav-link">AI</Link>
+                        <Link href="/blog" className="nav-link">Articles</Link>
+                        <Link href="/study" className="nav-link">Study</Link>
                         <Link href="/about" className="nav-link">About</Link>
                     </div>
 

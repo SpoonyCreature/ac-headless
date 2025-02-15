@@ -63,7 +63,7 @@ export function BibleStudySidebar({ studies = [], currentStudyId, currentUserId,
                             {initialStudies.map((study) => (
                                 <Link
                                     key={study._id}
-                                    href={`/ai/bible-study/${study._id}`}
+                                    href={`/study/bible-study/${study._id}`}
                                     className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors ${study._id === currentStudyId ? 'bg-muted' : ''
                                         }`}
                                 >
@@ -88,7 +88,7 @@ export function BibleStudySidebar({ studies = [], currentStudyId, currentUserId,
                                     {showMore && remainingStudies.map((study) => (
                                         <Link
                                             key={study._id}
-                                            href={`/ai/bible-study/${study._id}`}
+                                            href={`/study/bible-study/${study._id}`}
                                             className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors ${study._id === currentStudyId ? 'bg-muted' : ''
                                                 }`}
                                         >

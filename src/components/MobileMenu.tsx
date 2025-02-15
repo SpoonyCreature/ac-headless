@@ -44,8 +44,8 @@ export default function MobileMenu() {
                     </button>
                     <div className="flex flex-col space-y-6 mt-8">
                         <Link href="/" className="mobile-nav-link" onClick={toggleMenu}>Home</Link>
-                        <Link href="/blog" className="mobile-nav-link" onClick={toggleMenu}>Blog</Link>
-                        <Link href="/ai" className="mobile-nav-link" onClick={toggleMenu}>AI</Link>
+                        <Link href="/blog" className="mobile-nav-link" onClick={toggleMenu}>Articles</Link>
+                        <Link href="/study" className="mobile-nav-link" onClick={toggleMenu}>Study</Link>
                         <Link href="/about" className="mobile-nav-link" onClick={toggleMenu}>About</Link>
                     </div>
                 </div>

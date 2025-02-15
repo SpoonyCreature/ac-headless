@@ -72,7 +72,7 @@ export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId
                             {initialPrivateChats.map((chat) => (
                                 <Link
                                     key={chat._id}
-                                    href={`/ai/chat/${chat._id}`}
+                                    href={`/study/chat/${chat._id}`}
                                     className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors ${chat._id === currentChatId ? 'bg-muted' : ''}`}
                                 >
                                     <MessageSquare className="w-4 h-4 shrink-0 mt-0.5" />
@@ -92,7 +92,7 @@ export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId
                                     {showMorePrivate && remainingPrivateChats.map((chat) => (
                                         <Link
                                             key={chat._id}
-                                            href={`/ai/chat/${chat._id}`}
+                                            href={`/study/chat/${chat._id}`}
                                             className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors ${chat._id === currentChatId ? 'bg-muted' : ''}`}
                                         >
                                             <MessageSquare className="w-4 h-4 shrink-0 mt-0.5" />
@@ -127,7 +127,7 @@ export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId
                             {initialPublicChats.map((chat) => (
                                 <Link
                                     key={chat._id}
-                                    href={`/ai/chat/${chat._id}`}
+                                    href={`/study/chat/${chat._id}`}
                                     className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors ${chat._id === currentChatId ? 'bg-muted' : ''}`}
                                 >
                                     <MessageSquare className="w-4 h-4 shrink-0 mt-0.5" />
@@ -147,7 +147,7 @@ export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId
                                     {showMorePublic && remainingPublicChats.map((chat) => (
                                         <Link
                                             key={chat._id}
-                                            href={`/ai/chat/${chat._id}`}
+                                            href={`/study/chat/${chat._id}`}
                                             className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors ${chat._id === currentChatId ? 'bg-muted' : ''}`}
                                         >
                                             <MessageSquare className="w-4 h-4 shrink-0 mt-0.5" />

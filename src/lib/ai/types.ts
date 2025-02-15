@@ -3,13 +3,6 @@ export interface Message {
     content: string | PDFContent;
 }
 
-export interface PDFContent {
-    fileData: {
-        fileUri: string;
-        mimeType: string;
-    };
-}
-
 export interface JsonSchemaFormat {
     type: "json_schema";
     json_schema: {
@@ -34,6 +27,14 @@ export interface CompletionOptions {
     response_format?: 'text' | JsonSchemaFormat;
     store?: boolean;
     stop?: string[];
+    tools?: Array<{
+        retrieval?: {
+            vertex_ai_search?: {
+                datastore: string;
+            };
+            disableAttribution?: boolean;
+        };
+    }>;
 }
 
 export interface PromptTemplate {

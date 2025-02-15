@@ -90,8 +90,8 @@ export function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/ai" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 group">
-                                    Christian AI Q&A
+                                <Link href="/study" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 group">
+                                    Study Resources
                                     <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                                 </Link>
                             </li>

@@ -28,7 +28,7 @@ const EXAMPLE_QUERIES = [
 // Add categories for better organization
 const FEATURES = [
     { icon: Search, label: 'Search Topics & Verses' },
-    { icon: Bot, label: 'AI-Powered Analysis' },
+    { icon: Book, label: 'In-Depth Analysis' },
     { icon: Save, label: 'Save & Organize Studies' },
 ] as const;
 
@@ -147,7 +147,7 @@ export default function BibleStudyPage() {
             }
 
             const data = await response.json();
-            router.push(`/ai/bible-study/${data.studyId}`);
+            router.push(`/study/bible-study/${data.studyId}`);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to create Bible study');
         } finally {
@@ -197,9 +197,9 @@ export default function BibleStudyPage() {
                                     <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
                                     <Book className="w-12 h-12 md:w-16 md:h-16 text-primary relative" />
                                 </div>
-                                <h1 className="font-serif text-3xl md:text-6xl mb-4 md:mb-6">AI-Powered Bible Study</h1>
+                                <h1 className="font-serif text-3xl md:text-6xl mb-4 md:mb-6">Interactive Bible Study</h1>
                                 <p className="text-lg md:text-xl text-muted-foreground mb-8 md:mb-12 max-w-2xl mx-auto">
-                                    Experience deeper biblical understanding with AI-guided analysis
+                                    Explore Scripture deeply with guided analysis and cross-references
                                 </p>
                                 <div className="flex flex-col items-center gap-4 md:gap-6">
                                     <div className="flex flex-col items-center gap-2 text-sm">
@@ -296,7 +296,7 @@ export default function BibleStudyPage() {
                                             <h3 className="font-medium text-lg mb-2">{feature.label}</h3>
                                             <p className="text-muted-foreground text-sm">
                                                 {feature.label === 'Search Topics & Verses' && 'Search any Bible topic or verse reference for instant insights.'}
-                                                {feature.label === 'AI-Powered Analysis' && 'Get deep analysis and cross-references powered by AI.'}
+                                                {feature.label === 'In-Depth Analysis' && 'Get deep analysis and cross-references powered by AI.'}
                                                 {feature.label === 'Save & Organize Studies' && 'Create and organize your personal Bible study library.'}
                                             </p>
                                         </div>
