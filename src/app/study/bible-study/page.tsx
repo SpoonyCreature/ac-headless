@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot, Book, Search, Save, History, ChevronRight, BookOpen, MessageSquare, Globe, Loader2 } from 'lucide-react';
+import { Bot, BookMarked, Search, Save, History, ChevronRight, BookOpen, MessageSquare, Globe, Loader2 } from 'lucide-react';
 import { BibleStudyResults } from '@/src/components/BibleStudyResults';
 import { BibleStudySidebar } from '@/src/components/BibleStudySidebar';
 import { useRouter } from 'next/navigation';
@@ -194,7 +194,7 @@ export default function BibleStudyPage() {
                         <div className="container mx-auto px-4">
                             <div className="max-w-4xl mx-auto text-center">
                                 <div className="relative inline-block mb-6 md:mb-8">
-                                    <BookOpen className="w-12 h-12 md:w-16 md:h-16 text-primary" />
+                                    <BookMarked className="w-12 h-12 md:w-16 md:h-16 text-primary" />
                                 </div>
                                 <h1 className="font-serif text-3xl md:text-6xl mb-4 md:mb-6">Interactive Bible Study</h1>
                                 <p className="text-lg md:text-xl text-muted-foreground mb-8 md:mb-12 max-w-2xl mx-auto">
