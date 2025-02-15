@@ -90,6 +90,8 @@ export function ChatInput({ onSend, disabled, isAuthenticated }: ChatInputProps)
                         rows={1}
                         style={{
                             lineHeight: '20px',
+                            WebkitUserSelect: 'text',
+                            WebkitTouchCallout: 'none',
                         }}
                     />
                     <button

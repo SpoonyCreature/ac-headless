@@ -28,7 +28,13 @@ export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId
 
     if (isLoading) {
         return (
-            <div className="w-80 border-r border-border bg-background flex flex-col h-full">
+            <div className={cn(
+                "fixed inset-y-0 left-0 z-50 w-80 lg:w-80 lg:relative",
+                "transform transition-transform duration-300 ease-in-out",
+                "bg-background border-r border-border",
+                "lg:opacity-100 lg:pointer-events-auto",
+                showSidebar ? "translate-x-0 opacity-100 pointer-events-auto" : "-translate-x-full opacity-0 pointer-events-none lg:translate-x-0"
+            )}>
                 <div className="flex-1 overflow-y-auto p-4 space-y-6">
                     <div>
                         <h3 className="text-sm font-medium text-muted-foreground mb-2 px-3">Your Chats</h3>
@@ -82,7 +88,8 @@ export function ChatSidebar({ privateChats = [], publicChats = [], currentChatId
                 "fixed inset-y-0 left-0 z-50 w-80 lg:w-80 lg:relative",
                 "transform transition-transform duration-300 ease-in-out",
                 "bg-background border-r border-border",
-                showSidebar ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+                "lg:opacity-100 lg:pointer-events-auto",
+                showSidebar ? "translate-x-0 opacity-100 pointer-events-auto" : "-translate-x-full opacity-0 pointer-events-none lg:translate-x-0"
             )}>
                 <div className="flex-1 overflow-y-auto p-4 space-y-6">
                     {privateChats.length > 0 && (
