@@ -1,7 +1,8 @@
 import { Book, Lock, Globe, ChevronDown } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { TransitionLink } from './TransitionLink';
+import { cn } from '@/src/lib/utils';
 
 interface BibleStudy {
     _id: string;
@@ -61,11 +62,13 @@ export function BibleStudySidebar({ studies = [], currentStudyId, currentUserId,
                         <h3 className="text-sm font-medium text-muted-foreground mb-2 px-3">Your Studies</h3>
                         <div className="space-y-1">
                             {initialStudies.map((study) => (
-                                <Link
+                                <TransitionLink
                                     key={study._id}
                                     href={`/study/bible-study/${study._id}`}
-                                    className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors ${study._id === currentStudyId ? 'bg-muted' : ''
-                                        }`}
+                                    className={cn(
+                                        'flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-muted',
+                                        study._id === currentStudyId && 'bg-muted'
+                                    )}
                                 >
                                     <Book className="w-4 h-4 shrink-0 mt-0.5" />
                                     <div className="flex-1 min-w-0">
@@ -81,16 +84,18 @@ export function BibleStudySidebar({ studies = [], currentStudyId, currentUserId,
                                             {formatDistanceToNow(new Date(study._createdDate))} ago
                                         </p>
                                     </div>
-                                </Link>
+                                </TransitionLink>
                             ))}
                             {remainingStudies.length > 0 && (
                                 <>
                                     {showMore && remainingStudies.map((study) => (
-                                        <Link
+                                        <TransitionLink
                                             key={study._id}
                                             href={`/study/bible-study/${study._id}`}
-                                            className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors ${study._id === currentStudyId ? 'bg-muted' : ''
-                                                }`}
+                                            className={cn(
+                                                'flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-muted',
+                                                study._id === currentStudyId && 'bg-muted'
+                                            )}
                                         >
                                             <Book className="w-4 h-4 shrink-0 mt-0.5" />
                                             <div className="flex-1 min-w-0">
@@ -106,7 +111,7 @@ export function BibleStudySidebar({ studies = [], currentStudyId, currentUserId,
                                                     {formatDistanceToNow(new Date(study._createdDate))} ago
                                                 </p>
                                             </div>
-                                        </Link>
+                                        </TransitionLink>
                                     ))}
                                     <button
                                         onClick={() => setShowMore(!showMore)}

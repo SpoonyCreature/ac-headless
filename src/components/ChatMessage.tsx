@@ -9,6 +9,7 @@ import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface ChatMessageProps {
     message: ChatMessageType;
+    isLastMessage?: boolean;
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
