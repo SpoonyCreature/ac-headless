@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot, Book, Search, Save, History, ChevronRight } from 'lucide-react';
+import { Bot, Book, Search, Save, History, ChevronRight, BookOpen, MessageSquare, Globe, Loader2 } from 'lucide-react';
 import { BibleStudyResults } from '@/src/components/BibleStudyResults';
 import { BibleStudySidebar } from '@/src/components/BibleStudySidebar';
 import { useRouter } from 'next/navigation';
@@ -27,9 +27,9 @@ const EXAMPLE_QUERIES = [
 
 // Add categories for better organization
 const FEATURES = [
-    { icon: Search, label: 'Search Topics & Verses' },
-    { icon: Book, label: 'In-Depth Analysis' },
-    { icon: Save, label: 'Save & Organize Studies' },
+    { icon: BookOpen, label: 'Search Topics & Verses' },
+    { icon: MessageSquare, label: 'In-Depth Analysis' },
+    { icon: Globe, label: 'Save & Organize Studies' },
 ] as const;
 
 export default function BibleStudyPage() {
@@ -190,12 +190,11 @@ export default function BibleStudyPage() {
             <main className="flex-1 min-h-screen">
                 {/* Hero Section - Only show when there's no search */}
                 {!query && !results && (
-                    <div className="bg-gradient-to-b from-primary/5 to-transparent pt-8 md:pt-24 pb-8 md:pb-16">
+                    <div className="pt-8 md:pt-24 pb-8 md:pb-16">
                         <div className="container mx-auto px-4">
                             <div className="max-w-4xl mx-auto text-center">
                                 <div className="relative inline-block mb-6 md:mb-8">
-                                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-                                    <Book className="w-12 h-12 md:w-16 md:h-16 text-primary relative" />
+                                    <BookOpen className="w-12 h-12 md:w-16 md:h-16 text-primary" />
                                 </div>
                                 <h1 className="font-serif text-3xl md:text-6xl mb-4 md:mb-6">Interactive Bible Study</h1>
                                 <p className="text-lg md:text-xl text-muted-foreground mb-8 md:mb-12 max-w-2xl mx-auto">
@@ -205,7 +204,7 @@ export default function BibleStudyPage() {
                                     <div className="flex flex-col items-center gap-2 text-sm">
                                         <span className="text-muted-foreground">Try searching for topics or verses like:</span>
                                         <div className="flex items-center gap-2">
-                                            <span className="font-medium text-primary animate-pulse">{EXAMPLE_QUERIES[currentExampleIndex]}</span>
+                                            <span className="font-medium text-primary">{EXAMPLE_QUERIES[currentExampleIndex]}</span>
                                             <span className="text-muted-foreground text-xs">({currentExampleIndex + 1}/{EXAMPLE_QUERIES.length})</span>
                                         </div>
                                     </div>
@@ -224,8 +223,8 @@ export default function BibleStudyPage() {
                         <div className="max-w-2xl mx-auto">
                             {/* Search Form */}
                             <div className={cn(
-                                "bg-background rounded-xl md:rounded-2xl transition-all duration-300",
-                                !query && !results ? "border border-border shadow-lg p-4 md:p-8" : ""
+                                "bg-background rounded-lg transition-all duration-300",
+                                !query && !results ? "border border-border shadow-sm p-4 md:p-6" : ""
                             )}>
                                 <form onSubmit={handleSearch} className="space-y-4">
                                     <div className="flex flex-col md:flex-row gap-3 md:gap-4">
@@ -244,18 +243,18 @@ export default function BibleStudyPage() {
                                         <button
                                             type="submit"
                                             disabled={isLoading || !query.trim()}
-                                            className="h-12 px-6 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium whitespace-nowrap"
+                                            className="h-12 px-6 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium whitespace-nowrap flex items-center gap-2"
                                         >
                                             {isLoading ? (
-                                                <span className="flex items-center gap-2">
-                                                    <Bot className="w-5 h-5 animate-spin" />
-                                                    Analyzing...
-                                                </span>
+                                                <>
+                                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                                    Searching...
+                                                </>
                                             ) : (
-                                                <span className="flex items-center gap-2">
-                                                    <Bot className="w-5 h-5" />
-                                                    Preview Study
-                                                </span>
+                                                <>
+                                                    <Search className="w-5 h-5" />
+                                                    Search
+                                                </>
                                             )}
                                         </button>
                                     </div>
