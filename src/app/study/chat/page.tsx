@@ -274,12 +274,14 @@ export default function ChatPage() {
                 </div>
 
                 {/* Mobile Sidebar Toggle */}
-                <button
-                    onClick={() => setShowSidebar(!showSidebar)}
-                    className="fixed lg:hidden bottom-32 right-4 p-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
-                >
-                    <History className="h-4 w-4" />
-                </button>
+                {isAuthenticated && (
+                    <button
+                        onClick={() => setShowSidebar(!showSidebar)}
+                        className="fixed lg:hidden bottom-32 right-4 p-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
+                    >
+                        <History className="h-4 w-4" />
+                    </button>
+                )}
 
                 {/* Input Area - Fixed at Bottom */}
                 <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border/5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50">
