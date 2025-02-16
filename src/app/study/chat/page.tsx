@@ -239,56 +239,56 @@ export default function ChatPage() {
 
     return (
         <main className={cn(
-            "flex h-[calc(100vh-4rem)] bg-gradient-to-b from-background to-background/95",
+            "flex min-h-[calc(100vh-4rem)] bg-gradient-to-b from-background to-background/95",
             "transition-opacity duration-300",
             isTransitioning ? "opacity-50" : "opacity-100"
         )}>
-            {/* Mobile Sidebar Toggle */}
-            <button
-                onClick={() => setShowSidebar(!showSidebar)}
-                className="lg:hidden fixed right-4 bottom-32 z-100 p-3 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors"
-            >
-                <History className="w-6 h-6" />
-            </button>
+            {/* Sidebar */}
+            <ChatSidebar
+                privateChats={privateChats}
+                publicChats={publicChats}
+                currentChatId={threadId}
+                currentUserId={currentUserId}
+                isLoading={isInitialLoad}
+                isAuthenticated={isAuthenticated}
+                showSidebar={showSidebar}
+                onCloseSidebar={() => setShowSidebar(false)}
+            />
 
-            {/* Chat Layout */}
-            <div className="flex-1 flex">
-                {/* Sidebar */}
-                <ChatSidebar
-                    privateChats={privateChats}
-                    publicChats={publicChats}
-                    currentUserId={currentUserId}
-                    isLoading={isInitialLoad}
-                    isAuthenticated={isAuthenticated}
-                    showSidebar={showSidebar}
-                    onCloseSidebar={() => setShowSidebar(false)}
-                />
+            {/* Main Chat Area - No Nested Scrolling */}
+            <div className="flex-1 flex flex-col">
 
-                {/* Chat Area */}
-                <div className="flex-1 flex flex-col">
-                    {/* Messages Container */}
-                    <div className="flex-1 overflow-y-auto pb-[88px]">
-                        <div className="max-w-3xl mx-auto">
-                            {messages.map((message) => (
-                                <ChatMessage
-                                    key={message._id}
-                                    message={message}
-                                />
-                            ))}
-                            {isLoading && <LoadingMessage />}
-                            <div ref={messagesEndRef} />
-                        </div>
-                    </div>
-
-                    {/* Chat Input */}
-                    <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border bg-background/80 backdrop-blur-lg">
-                        <div className="max-w-3xl mx-auto p-4">
-                            <ChatInput
-                                onSend={handleSend}
-                                disabled={isLoading}
-                                isAuthenticated={isAuthenticated}
+                {/* Messages Container */}
+                <div className="flex-1">
+                    <div className="max-w-3xl mx-auto">
+                        {messages.map((message, index) => (
+                            <ChatMessage
+                                key={message._id}
+                                message={message}
+                                isLastMessage={index === messages.length - 1}
                             />
-                        </div>
+                        ))}
+                        {isLoading && <LoadingMessage />}
+                        <div ref={messagesEndRef} />
+                    </div>
+                </div>
+
+                {/* Mobile Sidebar Toggle */}
+                <button
+                    onClick={() => setShowSidebar(!showSidebar)}
+                    className="fixed lg:hidden bottom-32 right-4 p-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
+                >
+                    <History className="h-4 w-4" />
+                </button>
+
+                {/* Input Area - Fixed at Bottom */}
+                <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border/5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50">
+                    <div className="max-w-3xl mx-auto p-4">
+                        <ChatInput
+                            onSend={handleSend}
+                            disabled={isLoading}
+                            isAuthenticated={isAuthenticated}
+                        />
                     </div>
                 </div>
             </div>
