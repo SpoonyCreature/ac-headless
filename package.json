@@ -20,6 +20,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "@wix/bookings": "^1.0.127",
     "@wix/comments": "^1.0.89",
+    "@wix/crm": "^1.0.172",
     "@wix/data": "^1.0.2",
     "@wix/ecom": "^1.0.164",
     "@wix/events": "^1.0.159",

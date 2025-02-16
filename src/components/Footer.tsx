@@ -4,23 +4,51 @@ import { Facebook, Mail, Youtube, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
+interface ErrorDetails {
+    applicationError?: {
+        code: string;
+        description: string;
+    };
+}
+
 export function Footer() {
     const [email, setEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [errorDetails, setErrorDetails] = useState<ErrorDetails | null>(null);
 
     const handleSubscribe = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            // TODO: Implement newsletter subscription
+            const response = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                setErrorMessage(data.error);
+                setErrorDetails(data.details);
+                throw new Error(data.error);
+            }
+
             setSubscribeStatus('success');
             setEmail('');
-        } catch (error) {
+        } catch (error: any) {
+            console.error('Subscription error:', error);
             setSubscribeStatus('error');
         } finally {
             setIsSubmitting(false);
-            setTimeout(() => setSubscribeStatus('idle'), 3000);
+            setTimeout(() => {
+                setSubscribeStatus('idle');
+                setErrorMessage('');
+                setErrorDetails(null);
+            }, 3000);
         }
     };
 
@@ -80,7 +108,7 @@ export function Footer() {
                                         <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                         </svg>
-                                        You&apos;re in! Check your inbox
+                                        You&apos;re in! You will be included in newsletter
                                     </p>
                                 )}
                                 {subscribeStatus === 'error' && (
@@ -88,7 +116,9 @@ export function Footer() {
                                         <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                                         </svg>
-                                        Oops! Please try again
+                                        {['DUPLICATE_CONTACT_EXISTS', 'CONTACT_ID_ALREADY_EXISTS'].includes(errorDetails?.applicationError?.code || '')
+                                            ? "You're already subscribed!"
+                                            : "Oops! Please try again later..."}
                                     </p>
                                 )}
                             </form>
