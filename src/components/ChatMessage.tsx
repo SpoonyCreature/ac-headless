@@ -167,7 +167,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
     return (
         <div className={cn(
-            "group relative flex gap-3 py-4 flex-col",
+            "group relative flex gap-3 py-4 px-4 flex-col",
             "animate-in slide-in-from-bottom-2 duration-300 ease-out",
             isUser ? "bg-muted/30" : "bg-background",
             "border-b border-border/5"
