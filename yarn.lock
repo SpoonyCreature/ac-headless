@@ -1597,6 +1597,80 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wix/crm@npm:^1.0.172":
+  version: 1.0.172
+  resolution: "@wix/crm@npm:1.0.172"
+  dependencies:
+    "@wix/crm_attachments": 1.0.28
+    "@wix/crm_contacts": 1.0.72
+    "@wix/crm_extended-fields": 1.0.52
+    "@wix/crm_labels": 1.0.52
+    "@wix/crm_submitted-contact": 1.0.46
+    "@wix/crm_tasks": 1.0.54
+  checksum: 2f626d8058b23e56743b2544e7cdba45e7bb330d6276dc948955cf8b010e85cb628e86de589f0c5e4eab59bd1956104b74969c0b3047e5690607b4340975a3d7
+  languageName: node
+  linkType: hard
+
+"@wix/crm_attachments@npm:1.0.28":
+  version: 1.0.28
+  resolution: "@wix/crm_attachments@npm:1.0.28"
+  dependencies:
+    "@wix/sdk-runtime": ^0.3.22
+    "@wix/sdk-types": ^1.12.4
+  checksum: 7432b168ae985652e26746bcb2f9090cfadc5f7f37beefa10eae90e9f73020f0133004027e420ed90dc14ad72e82e8069a38abf33ffe644b8fc5200b9bce91e6
+  languageName: node
+  linkType: hard
+
+"@wix/crm_contacts@npm:1.0.72":
+  version: 1.0.72
+  resolution: "@wix/crm_contacts@npm:1.0.72"
+  dependencies:
+    "@wix/sdk-runtime": ^0.3.22
+    "@wix/sdk-types": ^1.12.4
+  checksum: 66a6bcd89e3439a626b43ac4f568e6a365aeddeb3b8c03cec94c076b9730cb9e43bef5bb8d7cabea1da594553af094410654979d3be260646f6c5cfee4ccc95f
+  languageName: node
+  linkType: hard
+
+"@wix/crm_extended-fields@npm:1.0.52":
+  version: 1.0.52
+  resolution: "@wix/crm_extended-fields@npm:1.0.52"
+  dependencies:
+    "@wix/sdk-runtime": ^0.3.22
+    "@wix/sdk-types": ^1.12.4
+  checksum: 73a2206bf8cf5ff3bb8816eacc45b74dc8482272373f1201ca76471c28964a93cf4898188fea7a0c131208c4ea2fe2504ce70943920e3c7b8ea39ecfe7e70f9e
+  languageName: node
+  linkType: hard
+
+"@wix/crm_labels@npm:1.0.52":
+  version: 1.0.52
+  resolution: "@wix/crm_labels@npm:1.0.52"
+  dependencies:
+    "@wix/sdk-runtime": ^0.3.22
+    "@wix/sdk-types": ^1.12.4
+  checksum: e3e36cc9d101e41746522169209d17b833e72ab9daf6f394064c527584e6646a593d0c870bc4057b79e5517c9ecad96cab18a36728fa3323ddc37fcc67b5c2ef
+  languageName: node
+  linkType: hard
+
+"@wix/crm_submitted-contact@npm:1.0.46":
+  version: 1.0.46
+  resolution: "@wix/crm_submitted-contact@npm:1.0.46"
+  dependencies:
+    "@wix/sdk-runtime": ^0.3.22
+    "@wix/sdk-types": ^1.12.4
+  checksum: 392cd0f849c0481fe5309e7822fa465f44c49e9c2e46d32fca613c22be76b9bef2fe35da512197bdecb9ce4bf272c64ab988a2e337f4f316b22bad3e23fefadd
+  languageName: node
+  linkType: hard
+
+"@wix/crm_tasks@npm:1.0.54":
+  version: 1.0.54
+  resolution: "@wix/crm_tasks@npm:1.0.54"
+  dependencies:
+    "@wix/sdk-runtime": ^0.3.22
+    "@wix/sdk-types": ^1.12.4
+  checksum: 4b7625390024379e0bd24db5acc71761e385e45fb67f270139809689989d98e67ee23174bd3a7ad02884526dee85c4354a7fca657b0f4a9e8ddb17d7d2e00e07
+  languageName: node
+  linkType: hard
+
 "@wix/data@npm:^1.0.2":
   version: 1.0.189
   resolution: "@wix/data@npm:1.0.189"
@@ -11796,6 +11870,7 @@ __metadata:
     "@types/node": ^22.13.1
     "@wix/bookings": ^1.0.127
     "@wix/comments": ^1.0.89
+    "@wix/crm": ^1.0.172
     "@wix/data": ^1.0.2
     "@wix/ecom": ^1.0.164
     "@wix/events": ^1.0.159

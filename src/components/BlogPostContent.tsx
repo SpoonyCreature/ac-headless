@@ -74,79 +74,160 @@ interface Book {
     displayPrice?: string;
 }
 
+interface ErrorDetails {
+    applicationError?: {
+        code: string;
+        description: string;
+    };
+}
 
-const Sidebar = ({ books }: { books: Book[] }) => (
-    <aside className="space-y-8">
-        {/* Recommended Books */}
-        {books.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                <div className="p-6">
-                    <div className="mb-4">
-                        <h3 className="font-serif text-xl font-bold text-gray-900 mb-2">Recommended Reading</h3>
-                        <p className="text-sm text-gray-600">Support our ministry by exploring these carefully selected books</p>
-                    </div>
-                    <div className="space-y-6">
-                        {books.slice(0, 3).map((book, index) => (
-                            <div key={index} className="group relative bg-gray-50 p-4 rounded-lg">
-                                <div className="flex gap-4">
-                                    <div className="w-20 h-28 relative rounded-lg overflow-hidden shadow-sm flex-shrink-0">
-                                        <WixMediaImage
-                                            media={book.image}
-                                            width={80}
-                                            height={112}
-                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                            objectFit="cover"
-                                        />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-medium text-gray-900 mb-1 truncate">
-                                            {book.title}
-                                        </h4>
-                                        {book.displayPrice && (
-                                            <div className="text-sm text-gray-600 mb-3">
-                                                Support us: {book.displayPrice}
-                                            </div>
-                                        )}
-                                        <a
-                                            href={book.link}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center justify-center w-full px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors"
-                                        >
-                                            Purchase & Support
-                                            <svg className="w-4 h-4 ml-2 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                            </svg>
-                                        </a>
+const Sidebar = ({ books }: { books: Book[] }) => {
+    const [email, setEmail] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [errorDetails, setErrorDetails] = useState<ErrorDetails | null>(null);
+
+    const handleSubscribe = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        try {
+            const response = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                setErrorMessage(data.error);
+                setErrorDetails(data.details);
+                throw new Error(data.error);
+            }
+
+            setSubscribeStatus('success');
+            setEmail('');
+        } catch (error: any) {
+            console.error('Subscription error:', error);
+            setSubscribeStatus('error');
+        } finally {
+            setIsSubmitting(false);
+            setTimeout(() => {
+                setSubscribeStatus('idle');
+                setErrorMessage('');
+                setErrorDetails(null);
+            }, 3000);
+        }
+    };
+
+    return (
+        <aside className="space-y-8">
+            {/* Recommended Books */}
+            {books.length > 0 && (
+                <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div className="p-6">
+                        <div className="mb-4">
+                            <h3 className="font-serif text-xl font-bold text-gray-900 mb-2">Recommended Reading</h3>
+                            <p className="text-sm text-gray-600">Support our ministry by exploring these carefully selected books</p>
+                        </div>
+                        <div className="space-y-6">
+                            {books.slice(0, 3).map((book, index) => (
+                                <div key={index} className="group relative bg-gray-50 p-4 rounded-lg">
+                                    <div className="flex gap-4">
+                                        <div className="w-20 h-28 relative rounded-lg overflow-hidden shadow-sm flex-shrink-0">
+                                            <WixMediaImage
+                                                media={book.image}
+                                                width={80}
+                                                height={112}
+                                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                                objectFit="cover"
+                                            />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-medium text-gray-900 mb-1 truncate">
+                                                {book.title}
+                                            </h4>
+                                            {book.displayPrice && (
+                                                <div className="text-sm text-gray-600 mb-3">
+                                                    Support us: {book.displayPrice}
+                                                </div>
+                                            )}
+                                            <a
+                                                href={book.link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center justify-center w-full px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors"
+                                            >
+                                                Purchase & Support
+                                                <svg className="w-4 h-4 ml-2 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                </svg>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="mt-6 pt-6 border-t border-gray-100">
-                        <p className="text-sm text-gray-500 mb-4 text-center">Your purchase helps us create more content and resources</p>
+                            ))}
+                        </div>
+                        <div className="mt-6 pt-6 border-t border-gray-100">
+                            <p className="text-sm text-gray-500 mb-4 text-center">Your purchase helps us create more content and resources</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )}
+            )}
 
-        {/* Newsletter */}
-        <div className="bg-gray-900 rounded-lg p-6 text-white">
-            <h3 className="font-serif text-lg font-semibold mb-3">Stay Updated</h3>
-            <p className="text-gray-300 text-sm mb-4">Get the latest insights delivered to your inbox.</p>
-            <form className="space-y-3">
-                <input
-                    type="email"
-                    placeholder="Your email"
-                    className="w-full px-4 py-2 text-sm bg-white/10 border border-white/20 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Subscribe
-                </button>
-            </form>
-        </div>
-    </aside>
-);
+            {/* Newsletter */}
+            <div className="bg-gray-900 rounded-lg p-6 text-white">
+                <h3 className="font-serif text-lg font-semibold mb-3">Stay Updated</h3>
+                <p className="text-gray-300 text-sm mb-4">Get the latest insights delivered to your inbox.</p>
+                <form onSubmit={handleSubscribe} className="space-y-3">
+                    <input
+                        type="email"
+                        placeholder="Your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-4 py-2 text-sm bg-white/10 border border-white/20 rounded-lg 
+                                 placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                        disabled={isSubmitting}
+                    />
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg 
+                                 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? (
+                            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin mx-auto" />
+                        ) : (
+                            'Subscribe'
+                        )}
+                    </button>
+                </form>
+                {subscribeStatus === 'success' && (
+                    <p className="mt-3 text-sm text-emerald-300 flex items-center justify-center gap-2">
+                        <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        You&apos;re in! You will be included in newsletter.
+                    </p>
+                )}
+                {subscribeStatus === 'error' && (
+                    <p className="mt-3 text-sm text-red-300 flex items-center justify-center gap-2">
+                        <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        {['DUPLICATE_CONTACT_EXISTS', 'CONTACT_ID_ALREADY_EXISTS'].includes(errorDetails?.applicationError?.code || '')
+                            ? "You're already subscribed!"
+                            : "Oops! Please try again later..."}
+                    </p>
+                )}
+            </div>
+        </aside>
+    );
+};
 
 export function BlogPostContent({ blog, books = [] }: { blog: BlogPost; books: Book[] }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);

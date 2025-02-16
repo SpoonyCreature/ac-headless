@@ -4,6 +4,7 @@ import { WIX_SESSION_COOKIE_NAME } from "./../constants/constants";
 import { members } from "@wix/members";
 import { items } from "@wix/data";
 import { comments } from "@wix/comments";
+import { contacts } from "@wix/crm";
 
 export function getServerWixClient() {
     const wixSessionCookie = cookies().get(WIX_SESSION_COOKIE_NAME);
@@ -20,6 +21,7 @@ export function getServerWixClient() {
             members,
             items,
             comments,
+            contacts,
         },
     });
 }
