@@ -265,7 +265,7 @@ export default function ChatPage() {
                 <div className="flex-1 flex flex-col">
 
                     {/* Messages Container */}
-                    <div className="flex-1">
+                    <div className="flex-1 pb-40">
                         <div className="max-w-3xl mx-auto">
                             {messages.map((message, index) => (
                                 <ChatMessage

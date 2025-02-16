@@ -8,13 +8,15 @@ import {
     Info
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { SidebarSkeleton } from './Skeletons';
 
 interface SidebarProps {
     isOpen: boolean;
     onClose: () => void;
+    isLoading?: boolean;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, isLoading = false }: SidebarProps) {
     const [isStudyOpen, setIsStudyOpen] = useState(false);
 
     // Update body overflow when isOpen changes
@@ -24,6 +26,22 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             document.body.style.overflow = 'auto';
         };
     }, [isOpen]);
+
+    if (isLoading) {
+        return (
+            <>
+                {/* Backdrop */}
+                <div
+                    className={cn(
+                        "fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity z-40",
+                        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                    )}
+                    onClick={onClose}
+                />
+                <SidebarSkeleton />
+            </>
+        );
+    }
 
     return (
         <>

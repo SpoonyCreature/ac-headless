@@ -138,3 +138,61 @@ export function ChatSkeleton() {
         </div>
     );
 }
+
+export function SidebarSkeleton() {
+    return (
+        <div className="w-80 border-r border-border/50 bg-background/95 backdrop-blur-sm flex flex-col h-full shadow-[8px_0_32px_-12px_rgba(0,0,0,0.12)] dark:shadow-[8px_0_32px_-12px_rgba(0,0,0,0.3)]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* First Section */}
+                <div>
+                    <div className="text-sm font-medium text-muted-foreground/80 mb-3 px-3 flex items-center gap-2">
+                        <div className="p-1 rounded-md bg-muted/50">
+                            <div className="w-3.5 h-3.5 bg-muted-foreground/10 rounded animate-pulse" />
+                        </div>
+                        <div className="h-4 bg-muted-foreground/10 rounded w-24 animate-pulse" />
+                    </div>
+                    <div className="space-y-1.5">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="px-3.5 py-3 rounded-xl">
+                                <div className="flex items-start gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center flex-none">
+                                        <div className="w-4 h-4 bg-muted-foreground/10 rounded animate-pulse" />
+                                    </div>
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-4 bg-muted-foreground/10 rounded w-3/4 animate-pulse" />
+                                        <div className="h-3 bg-muted-foreground/10 rounded w-1/4 animate-pulse" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Second Section */}
+                <div>
+                    <div className="text-sm font-medium text-muted-foreground/80 mb-3 px-3 flex items-center gap-2">
+                        <div className="p-1 rounded-md bg-muted/50">
+                            <div className="w-3.5 h-3.5 bg-muted-foreground/10 rounded animate-pulse" />
+                        </div>
+                        <div className="h-4 bg-muted-foreground/10 rounded w-28 animate-pulse" />
+                    </div>
+                    <div className="space-y-1.5">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="px-3.5 py-3 rounded-xl">
+                                <div className="flex items-start gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center flex-none">
+                                        <div className="w-4 h-4 bg-muted-foreground/10 rounded animate-pulse" />
+                                    </div>
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-4 bg-muted-foreground/10 rounded w-3/4 animate-pulse" />
+                                        <div className="h-3 bg-muted-foreground/10 rounded w-1/4 animate-pulse" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
