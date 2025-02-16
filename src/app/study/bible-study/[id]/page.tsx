@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Bot, BookMarked, Globe, Lock, ChevronLeft, Share2, Plus, ArrowLeft } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Bot, BookMarked, Globe, Lock, ChevronLeft, Share2, Plus, ArrowLeft, Link2, Twitter, Facebook, Check } from 'lucide-react';
 import Link from 'next/link';
 import { EnhancedBibleStudy } from '@/src/components/EnhancedBibleStudy';
 import { BibleStudy } from '@/src/types/bible';
@@ -17,8 +17,22 @@ export default function BibleStudyDetailPage({
     const [study, setStudy] = useState<BibleStudy | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showShareMenu, setShowShareMenu] = useState(false);
     const [showShareTooltip, setShowShareTooltip] = useState(false);
+    const [shareTooltipText, setShareTooltipText] = useState('');
     const { isTransitioning, navigateWithTransition } = usePageTransition();
+    const shareMenuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
+                setShowShareMenu(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const fetchStudy = async () => {
@@ -267,9 +281,28 @@ export default function BibleStudyDetailPage({
     };
 
     const handleShare = () => {
-        navigator.clipboard.writeText(window.location.href);
+        setShowShareMenu(!showShareMenu);
+    };
+
+    const handleCopyLink = async () => {
+        await navigator.clipboard.writeText(window.location.href);
+        setShareTooltipText('Copied to clipboard!');
         setShowShareTooltip(true);
         setTimeout(() => setShowShareTooltip(false), 2000);
+        setShowShareMenu(false);
+    };
+
+    const handleShareTwitter = () => {
+        const text = study ? `Check out this Bible study: ${study.query || 'Untitled Study'}` : 'Check out this Bible study';
+        const url = window.location.href;
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        setShowShareMenu(false);
+    };
+
+    const handleShareFacebook = () => {
+        const url = window.location.href;
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+        setShowShareMenu(false);
     };
 
     if (isLoading) {
@@ -330,59 +363,106 @@ export default function BibleStudyDetailPage({
             isTransitioning ? "opacity-50" : "opacity-100"
         )}>
             <div className="flex-1">
-                {/* Header */}
-                <div className="p-3 sm:p-4 border-t border-border border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
+                {/* Header Card */}
+                <div className="sticky top-0 z-10 p-3 sm:p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                     <div className="max-w-4xl mx-auto">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
-                            <div className="flex items-center gap-2 sm:gap-4">
-                                <button
-                                    onClick={() => navigateWithTransition('/study/bible-study')}
-                                    className="p-1.5 sm:p-2 hover:bg-muted rounded-lg transition-colors"
-                                >
-                                    <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                                </button>
-                                <div className="flex flex-col sm:block">
-                                    <h1 className="font-medium text-sm sm:text-base">
-                                        {study.query || 'Untitled Study'}
-                                    </h1>
-                                    <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground">
-                                        <span className="flex items-center gap-1">
-                                            {study.public ? (
-                                                <>
-                                                    <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                                                    Public study
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Lock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                                                    Private study
-                                                </>
+                        <div className="relative bg-card text-card-foreground rounded-2xl border shadow-sm">
+                            {/* Top Section */}
+                            <div className="p-4 sm:p-6 pb-3 sm:pb-4">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <button
+                                            onClick={() => navigateWithTransition('/study/bible-study')}
+                                            className="flex-none p-2 -ml-2 hover:bg-muted rounded-full transition-colors"
+                                        >
+                                            <ArrowLeft className="w-5 h-5" />
+                                        </button>
+                                        <div className="min-w-0">
+                                            <h1 className="font-semibold text-base sm:text-lg truncate">
+                                                {study.query || 'Untitled Study'}
+                                            </h1>
+                                            <p className="text-sm text-muted-foreground mt-0.5">
+                                                {study.public ? 'Public Bible study' : 'Private Bible study'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 flex-none">
+                                        <div className="relative" ref={shareMenuRef}>
+                                            <button
+                                                onClick={handleShare}
+                                                className="p-2.5 hover:bg-muted rounded-full transition-colors relative"
+                                            >
+                                                <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                                            </button>
+                                            {showShareMenu && (
+                                                <div className="absolute right-0 mt-2 w-72 bg-popover border border-border rounded-2xl shadow-lg overflow-hidden z-[60]">
+                                                    <div className="px-4 py-3 border-b border-border bg-muted/50">
+                                                        <h3 className="font-medium">Share this study</h3>
+                                                        <p className="text-xs text-muted-foreground mt-0.5">Choose how you want to share this Bible study</p>
+                                                    </div>
+                                                    <div className="p-2">
+                                                        <button
+                                                            onClick={handleCopyLink}
+                                                            className="w-full px-3 py-2.5 text-left rounded-xl hover:bg-muted transition-colors flex items-center gap-3 group"
+                                                        >
+                                                            <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                                                                <Link2 className="w-4 h-4" />
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-medium">Copy link</div>
+                                                                <div className="text-xs text-muted-foreground">Share via URL</div>
+                                                            </div>
+                                                        </button>
+                                                        <button
+                                                            onClick={handleShareTwitter}
+                                                            className="w-full px-3 py-2.5 text-left rounded-xl hover:bg-muted transition-colors flex items-center gap-3 group mt-1"
+                                                        >
+                                                            <div className="p-2 rounded-lg bg-sky-500/10 text-sky-500 group-hover:bg-sky-500 group-hover:text-white transition-colors">
+                                                                <Twitter className="w-4 h-4" />
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-medium">Twitter</div>
+                                                                <div className="text-xs text-muted-foreground">Share on Twitter</div>
+                                                            </div>
+                                                        </button>
+                                                        <button
+                                                            onClick={handleShareFacebook}
+                                                            className="w-full px-3 py-2.5 text-left rounded-xl hover:bg-muted transition-colors flex items-center gap-3 group mt-1"
+                                                        >
+                                                            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                                                <Facebook className="w-4 h-4" />
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-medium">Facebook</div>
+                                                                <div className="text-xs text-muted-foreground">Share on Facebook</div>
+                                                            </div>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             )}
-                                        </span>
-                                        <span>•</span>
-                                        <time>{study._createdDate ? formatDistanceToNow(new Date(study._createdDate)) : 'Recently'} ago</time>
+                                            {showShareTooltip && (
+                                                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-popover border border-border text-popover-foreground text-xs rounded-xl shadow-lg whitespace-nowrap flex items-center gap-2 z-[60]">
+                                                    <div className="p-1 rounded-full bg-green-500/10">
+                                                        <Check className="w-3 h-3 text-green-500" />
+                                                    </div>
+                                                    {shareTooltipText}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <Link
+                                            href="/study/bible-study"
+                                            className="inline-flex items-center gap-2 px-3.5 h-10 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-xs sm:text-sm font-medium"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            <span className="hidden sm:inline">New Study</span>
+                                            <span className="sm:hidden">New</span>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1 sm:gap-2">
-                                <button
-                                    onClick={handleShare}
-                                    className="p-1.5 sm:p-2 hover:bg-muted rounded-lg transition-colors relative group"
-                                >
-                                    <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    {showShareTooltip && (
-                                        <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs bg-background border border-border rounded shadow-lg whitespace-nowrap">
-                                            Copied to clipboard!
-                                        </span>
-                                    )}
-                                </button>
-                                <Link
-                                    href="/study/bible-study"
-                                    className="inline-flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-xs sm:text-sm font-medium"
-                                >
-                                    <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-                                    <span className="hidden sm:inline">New Study</span>
-                                </Link>
+                            {/* Bottom Section - Metadata */}
+                            <div className="px-4 sm:px-6 py-3 bg-muted/50 border-t flex items-center gap-3 text-sm text-muted-foreground">
+                                <time>{study._createdDate ? formatDistanceToNow(new Date(study._createdDate)) : 'Recently'} ago</time>
                             </div>
                         </div>
                     </div>
