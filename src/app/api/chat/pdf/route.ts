@@ -4,7 +4,7 @@ import { ChatMessage, Source, GroundingSupport } from '@/src/types/chat';
 
 const DATASTORE_PATH_APOLOGETICS_CENTRAL = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/apologetics-central-site_1739189009605";
 const DATASTORE_PATH_PDFS = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/apologetics-central-books_1739215369130_gcs_store";
-
+const DATASTORE_PATH_RELIABLE_WEBSITES = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/reliable-websites-all_1739889376488";
 interface GroundingChunk {
     retrievedContext: {
         uri: string;
@@ -68,12 +68,6 @@ export async function POST(request: Request) {
                     retrieval: {
                         vertex_ai_search: {
                             datastore: DATASTORE_PATH_APOLOGETICS_CENTRAL
-                        }
-                    }
-                }, {
-                    retrieval: {
-                        vertex_ai_search: {
-                            datastore: DATASTORE_PATH_PDFS
                         }
                     }
                 }]

@@ -362,10 +362,10 @@ export default function BibleStudyDetailPage({
             "transition-opacity duration-300",
             isTransitioning ? "opacity-50" : "opacity-100"
         )}>
-            <div className="flex-1">
+            <div className="flex-1 container px-4 py-4 mx-auto">
                 {/* Header Card */}
-                <div className="sticky top-0 z-10 p-3 sm:p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                    <div className="max-w-4xl mx-auto">
+                <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <div className="max-w-4xl mx-auto sm:px-4">
                         <div className="relative bg-card text-card-foreground rounded-2xl border shadow-sm">
                             {/* Top Section */}
                             <div className="p-4 sm:p-6 pb-3 sm:pb-4">

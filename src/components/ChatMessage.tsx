@@ -25,33 +25,6 @@ export function ChatMessage({ message }: ChatMessageProps) {
         }
     }, []);
 
-    // Reference button component
-    const ReferenceButton = useCallback(({ refNumber }: { refNumber: number }) => (
-        <Tooltip.Provider>
-            <Tooltip.Root delayDuration={300}>
-                <Tooltip.Trigger asChild>
-                    <button
-                        onClick={() => handleReferenceClick(`ref${refNumber}`)}
-                        className="relative -top-1 inline-flex h-3.5 min-w-[1.5rem] items-center justify-center
-                                 rounded-full px-1 text-[10px] font-medium transition-colors
-                                 bg-primary/10 text-primary hover:bg-primary/20 ml-0.5"
-                    >
-                        {refNumber}
-                    </button>
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                    <Tooltip.Content
-                        className="z-50 max-w-[300px] rounded-md bg-popover px-3 py-2 text-sm text-popover-foreground shadow-md"
-                        side="top"
-                        sideOffset={5}
-                    >
-                        {message.sources?.find(s => s.id === `ref${refNumber}`)?.title}
-                        <Tooltip.Arrow className="fill-popover" />
-                    </Tooltip.Content>
-                </Tooltip.Portal>
-            </Tooltip.Root>
-        </Tooltip.Provider>
-    ), [handleReferenceClick, message.sources]);
 
     // Function to render message content with references
     const renderContent = () => {

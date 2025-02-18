@@ -134,11 +134,7 @@ export default function BibleStudyPage() {
     };
 
     return (
-        <div className={cn(
-            "flex min-h-screen bg-[url('/paper-texture.png')] bg-repeat",
-            "transition-opacity duration-300",
-            isTransitioning ? "opacity-50" : "opacity-100"
-        )}>
+        <div className="flex justify-center">
             {/* Mobile Sidebar Toggle */}
             <button
                 onClick={() => setShowSidebar(!showSidebar)}
@@ -169,7 +165,7 @@ export default function BibleStudyPage() {
             )}
 
             {/* Main Content */}
-            <main className="flex-1 min-h-screen">
+            <main className="flex-1 min-h-screen mx-auto">
                 <div className="container mx-auto px-4 py-8 md:py-16">
                     <div className="max-w-4xl mx-auto">
                         {/* Hero Section */}
@@ -289,7 +285,9 @@ export default function BibleStudyPage() {
                                 ))}
                             </div>
                         )}
+
                     </div>
+
                 </div>
             </main>
         </div>
