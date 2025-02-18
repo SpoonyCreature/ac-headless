@@ -48,6 +48,14 @@ export default function ChatPage() {
     const [showSidebar, setShowSidebar] = useState(false);
     const { isTransitioning } = usePageTransition();
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
     useEffect(() => {
         const init = async () => {
             await fetchCurrentUser();

@@ -23,6 +23,16 @@ export default function ChatViewPage({ params }: { params: { id: string } }) {
     const router = useRouter();
     const shareMenuRef = useRef<HTMLDivElement>(null);
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        if (currentChat?.thread) {
+            scrollToBottom();
+        }
+    }, [currentChat?.thread]);
+
     useEffect(() => {
         fetchCurrentUser();
     }, []);
