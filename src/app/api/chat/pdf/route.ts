@@ -67,7 +67,7 @@ export async function POST(request: Request) {
                 tools: [{
                     retrieval: {
                         vertex_ai_search: {
-                            datastore: DATASTORE_PATH_APOLOGETICS_CENTRAL
+                            datastore: DATASTORE_PATH_RELIABLE_WEBSITES
                         }
                     }
                 }]
