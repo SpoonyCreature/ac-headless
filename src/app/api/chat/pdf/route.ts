@@ -3,6 +3,7 @@ import { Message, completion } from '@/src/lib/ai';
 import { ChatMessage, Source, GroundingSupport } from '@/src/types/chat';
 
 const DATASTORE_PATH_APOLOGETICS_CENTRAL = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/apologetics-central-site_1739189009605";
+const DATASTORE_PATH_PDFS = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/apologetics-central-books_1739215369130_gcs_store";
 
 interface GroundingChunk {
     retrievedContext: {
@@ -11,21 +12,6 @@ interface GroundingChunk {
         text: string;
     };
 }
-
-interface GroundingMetadata {
-    groundingChunks: GroundingChunk[];
-}
-
-interface StructuredResponse {
-    text: string;
-    sources: Array<{
-        id: string;
-        title: string;
-        uri: string;
-        text: string;
-    }>;
-}
-
 interface CompletionResponse {
     text: string;
     sources?: Source[];
@@ -57,30 +43,14 @@ export async function POST(request: Request) {
                         You are bold, yet conversational and friendly... sometimes you you even ask the user questions back.
                         You always provide a straight answer to the question, and don't beat around the bush, in a friendly way.
                         After you've given the answer, you support your answer with airtight reasoning.
+                        The answers you give will be approved of by the theologians on the Reformation Wall.
                     </personality>
                     Ground your responses in the provided context from the knowledge base. The knowledge base (groundingChunks) should be seen as your own knowledge.
                     The sources that you might see is not provided by the sources, but by your own mind.
 
-                    Format your response in markdown with these elements:
-                    - Use ## for main sections
-                    - Use ### for subsections when needed
-                    - Use **bold** for key theological terms and crucial observations
-                    - Use *italics* for Greek/Hebrew terms (include both transliteration and original script)
-                    - Use > blockquotes for quotations of verses / prior commentaries
-                    - Use - bullet points for lists and applications
-                    - Keep paragraphs short and focused
-                    - Use line breaks between sections
+                    Plreae respond in simple markdown, concisely, in paragraph form, like you would type a message.
                     
-                    <formatting>
-                        Provide your insights in markdown format with the following sections:
-                        <output-format>
-                            ## {{section title}}
-                            {{A concise explanation of the verse's immediate meaning and context.}}
-
-                            .... add more sections here ....
-                            
-                        </output-format>
-                    <formatting>
+            
 
                     IMPORTANT: Always use the retrieval tool to ground your responses in the knowledge base. This is crucial for maintaining consistency and accuracy in your responses.
                 `
@@ -98,6 +68,12 @@ export async function POST(request: Request) {
                     retrieval: {
                         vertex_ai_search: {
                             datastore: DATASTORE_PATH_APOLOGETICS_CENTRAL
+                        }
+                    }
+                }, {
+                    retrieval: {
+                        vertex_ai_search: {
+                            datastore: DATASTORE_PATH_PDFS
                         }
                     }
                 }]

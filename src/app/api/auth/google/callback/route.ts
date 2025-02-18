@@ -5,6 +5,8 @@ import { google } from 'googleapis';
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 // Helper function to get or create Wix member
 async function getOrCreateWixMember(email: string, profile: { name: string; picture: string }) {
     const wixAdminClient = createClient({

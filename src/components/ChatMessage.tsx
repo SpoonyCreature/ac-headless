@@ -1,11 +1,11 @@
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
 import { ChatMessage as ChatMessageType } from '@/src/types/chat';
 import { User, Bot, ExternalLink, Quote } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
-import React from 'react';
+import React, { useCallback } from 'react';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
 interface ChatMessageProps {
     message: ChatMessageType;
@@ -15,72 +15,128 @@ interface ChatMessageProps {
 export function ChatMessage({ message }: ChatMessageProps) {
     const isUser = message.role === 'user';
 
-    // Custom components for markdown rendering
-    const markdownComponents = {
-        // Block-level components
-        p: ({ children, ...props }) => (
-            <p className="mb-4 last:mb-0 leading-7" {...props}>{children}</p>
-        ),
-        h1: ({ children, ...props }) => (
-            <h1 className="text-2xl font-bold mt-6 first:mt-0 mb-4" {...props}>{children}</h1>
-        ),
-        h2: ({ children, ...props }) => (
-            <h2 className="text-xl font-semibold mt-5 first:mt-0 mb-3" {...props}>{children}</h2>
-        ),
-        h3: ({ children, ...props }) => (
-            <h3 className="text-lg font-medium mt-4 first:mt-0 mb-2" {...props}>{children}</h3>
-        ),
-        ul: ({ children, ...props }) => (
-            <ul className="list-disc pl-6 mb-4 last:mb-0" {...props}>{children}</ul>
-        ),
-        ol: ({ children, ...props }) => (
-            <ol className="list-decimal pl-6 mb-4 last:mb-0" {...props}>{children}</ol>
-        ),
-        li: ({ children, ...props }) => (
-            <li className="mb-1 last:mb-0" {...props}>{children}</li>
-        ),
-        blockquote: ({ children, ...props }) => (
-            <blockquote className="border-l-2 border-primary/20 pl-4 italic my-4" {...props}>{children}</blockquote>
-        ),
-        // Inline components
-        strong: ({ children, ...props }) => (
-            <strong className="font-semibold" {...props}>{children}</strong>
-        ),
-        em: ({ children, ...props }) => (
-            <em className="italic" {...props}>{children}</em>
-        ),
-        code: ({ children, ...props }) => (
-            <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props}>{children}</code>
-        ),
-        pre: ({ children, ...props }) => (
-            <pre className="bg-muted p-4 rounded-lg overflow-x-auto mb-4 last:mb-0" {...props}>{children}</pre>
-        ),
-        a: ({ children, href, ...props }) => (
-            <a
-                href={href}
-                className="text-primary hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
-                {...props}
-            >
-                {children}
-            </a>
-        ),
-    };
+    // Function to handle reference clicks
+    const handleReferenceClick = useCallback((refId: string) => {
+        const element = document.getElementById(`source-${refId}`);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+            element.classList.add('highlight');
+            setTimeout(() => element.classList.remove('highlight'), 2000);
+        }
+    }, []);
 
-    // Function to render the main message content
-    const renderContent = (text: string) => (
-        <div className="text-sm text-foreground">
-            <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeRaw]}
-                components={markdownComponents}
-                className="markdown-content"
-            >
-                {text}
-            </ReactMarkdown>
-        </div>
-    );
+    // Reference button component
+    const ReferenceButton = useCallback(({ refNumber }: { refNumber: number }) => (
+        <Tooltip.Provider>
+            <Tooltip.Root delayDuration={300}>
+                <Tooltip.Trigger asChild>
+                    <button
+                        onClick={() => handleReferenceClick(`ref${refNumber}`)}
+                        className="relative -top-1 inline-flex h-3.5 min-w-[1.5rem] items-center justify-center
+                                 rounded-full px-1 text-[10px] font-medium transition-colors
+                                 bg-primary/10 text-primary hover:bg-primary/20 ml-0.5"
+                    >
+                        {refNumber}
+                    </button>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                    <Tooltip.Content
+                        className="z-50 max-w-[300px] rounded-md bg-popover px-3 py-2 text-sm text-popover-foreground shadow-md"
+                        side="top"
+                        sideOffset={5}
+                    >
+                        {message.sources?.find(s => s.id === `ref${refNumber}`)?.title}
+                        <Tooltip.Arrow className="fill-popover" />
+                    </Tooltip.Content>
+                </Tooltip.Portal>
+            </Tooltip.Root>
+        </Tooltip.Provider>
+    ), [handleReferenceClick, message.sources]);
+
+    // Function to render message content with references
+    const renderContent = () => {
+        if (!message.text) return null;
+        if (!message.groundingSupports || !message.sources) {
+            return (
+                <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-0 prose-p:leading-7 prose-li:my-0 prose-ul:my-4">
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeRaw]}
+                        components={{
+                            p: ({ children }) => <p className="whitespace-pre-wrap mb-4 last:mb-0">{children}</p>,
+                            ul: ({ children }) => <ul className="my-4">{children}</ul>,
+                            li: ({ children }) => <li className="my-1">{children}</li>,
+                            sup: ({ children }) => <sup className="text-primary font-bold text-[0.8em] relative top-[-0.4em] ml-[0.15em] bg-primary/10 px-1 rounded-sm">{children}</sup>
+                        }}
+                    >
+                        {message.text}
+                    </ReactMarkdown>
+                </div>
+            );
+        }
+
+        // Create segments array to store all pieces of text and their references
+        const segments: { text: string; refs?: number[] }[] = [];
+        let currentPosition = 0;
+        const text = message.text;
+
+        // Sort supports by start index to process them in order
+        const sortedSupports = [...message.groundingSupports].sort((a, b) =>
+            a.segment.startIndex - b.segment.startIndex
+        );
+
+        // Process each support
+        sortedSupports.forEach(support => {
+            const { startIndex, endIndex, text: supportText } = support.segment;
+
+            // Add text before the current support if any
+            if (startIndex > currentPosition) {
+                segments.push({
+                    text: text.slice(currentPosition, startIndex)
+                });
+            }
+
+            // Add the supported text with its references
+            segments.push({
+                text: supportText,
+                refs: support.groundingChunkIndices.map(i => i + 1)
+            });
+
+            currentPosition = endIndex;
+        });
+
+        // Add any remaining text after the last support
+        if (currentPosition < text.length) {
+            segments.push({
+                text: text.slice(currentPosition)
+            });
+        }
+
+        // Generate markdown content with references
+        const markdownContent = segments.map(segment => {
+            if (segment.refs) {
+                return `${segment.text}<sup>[${segment.refs.join(',')}]</sup>`;
+            }
+            return segment.text;
+        }).join('');
+
+        return (
+            <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-0 prose-p:leading-7 prose-li:my-0 prose-ul:my-4">
+                <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw]}
+                    components={{
+                        p: ({ children }) => <p className="whitespace-pre-wrap mb-4 last:mb-0">{children}</p>,
+                        ul: ({ children }) => <ul className="my-4">{children}</ul>,
+                        li: ({ children }) => <li className="my-1">{children}</li>,
+                        sup: ({ children }) => <sup className="text-primary font-bold text-[0.8em] relative top-[-0.4em] ml-[0.15em] bg-primary/10 px-1 rounded-sm">{children}</sup>
+                    }}
+                >
+                    {markdownContent}
+                </ReactMarkdown>
+            </div>
+        );
+    };
 
     // Function to render references section
     const renderReferences = () => {
@@ -90,41 +146,47 @@ export function ChatMessage({ message }: ChatMessageProps) {
             <div className="mt-4 pl-9">
                 <div className="text-sm font-medium text-muted-foreground mb-2">Sources:</div>
                 <div className="space-y-2">
-                    {message.sources.map((source, index) => (
-                        <div
-                            key={source.id}
-                            className={cn(
-                                "group relative text-sm bg-muted/30 p-3 rounded-md",
-                                "hover:bg-muted/40 transition-colors"
-                            )}
-                        >
-                            <div className="flex items-start gap-3">
-                                <div className="flex-shrink-0 mt-1">
-                                    <Quote className="h-4 w-4 text-primary/60" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-primary font-mono text-xs px-1.5 py-0.5 rounded bg-primary/10">
-                                            [{index + 1}]
-                                        </span>
-                                        <span className="font-medium">{source.title}</span>
+                    {message.sources.map((source) => {
+                        // Extract the reference number from the source ID (e.g., "ref1" -> 1)
+                        const refNumber = parseInt(source.id.replace('ref', ''));
+
+                        return (
+                            <div
+                                key={source.id}
+                                id={`source-${source.id}`}
+                                className={cn(
+                                    "group relative text-sm bg-muted/30 p-3 rounded-md",
+                                    "hover:bg-muted/40 transition-colors"
+                                )}
+                            >
+                                <div className="flex items-start gap-3">
+                                    <div className="flex-shrink-0 mt-1">
+                                        <Quote className="h-4 w-4 text-primary/60" />
                                     </div>
-                                    <p className="text-muted-foreground line-clamp-2">{source.text}</p>
-                                    {source.uri && (
-                                        <a
-                                            href={source.uri}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="mt-2 text-primary hover:text-primary/80 inline-flex items-center gap-1 text-xs"
-                                        >
-                                            <ExternalLink className="h-3 w-3" />
-                                            <span>View Source</span>
-                                        </a>
-                                    )}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-primary font-mono text-xs px-1.5 py-0.5 rounded bg-primary/10">
+                                                [{refNumber}]
+                                            </span>
+                                            <span className="font-medium">{source.title}</span>
+                                        </div>
+                                        <p className="text-muted-foreground line-clamp-2">{source.text}</p>
+                                        {source.uri && (
+                                            <a
+                                                href={source.uri}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="mt-2 text-primary hover:text-primary/80 inline-flex items-center gap-1 text-xs"
+                                            >
+                                                <ExternalLink className="h-3 w-3" />
+                                                <span>View Source</span>
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         );
@@ -166,8 +228,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
                     </div>
 
                     {/* Message Text */}
-                    <div className="message-content">
-                        {renderContent(message.text)}
+                    <div className="message-content text-sm text-foreground">
+                        {renderContent()}
                     </div>
                 </div>
             </div>

@@ -17,9 +17,7 @@ const nextConfig = {
         return config;
     },
     experimental: {
-        serverActions: {
-            bodySizeLimit: '2mb'
-        }
+        serverActions: true
     },
     typescript: {
         ignoreBuildErrors: true,
