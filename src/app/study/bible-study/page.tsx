@@ -24,13 +24,6 @@ const EXAMPLE_QUERIES = [
     "Wisdom from Proverbs",
 ];
 
-// Add categories for better organization
-const FEATURES = [
-    { icon: BookOpen, label: 'Search Topics & Verses' },
-    { icon: MessageSquare, label: 'In-Depth Analysis' },
-    { icon: Globe, label: 'Save & Organize Studies' },
-] as const;
-
 export default function BibleStudyPage() {
     const [query, setQuery] = useState('');
     const [translation, setTranslation] = useState<Translation>('web');
@@ -168,18 +161,49 @@ export default function BibleStudyPage() {
             <main className="flex-1 min-h-screen mx-auto">
                 <div className="container mx-auto px-4 py-8 md:py-16">
                     <div className="max-w-4xl mx-auto">
-                        {/* Hero Section */}
-                        <div className="text-center mb-12">
+                        {/* Hero Section - Simplified and more focused */}
+                        <div className="text-center mb-8">
                             <div className="relative inline-block mb-6">
                                 <BookMarked className="w-12 h-12 md:w-16 md:h-16 text-primary" />
                             </div>
-                            <h1 className="font-serif text-3xl md:text-6xl mb-4">Interactive Bible Study</h1>
-                            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                                Explore Scripture deeply with AI-powered insights and cross-references
+                            <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">
+                                Unlock the Bible
+                            </h1>
+                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                                Search any topic or verse to start your guided Bible study journey
                             </p>
                         </div>
 
-                        {/* Search Section */}
+                        {/* Quick Start Cards - Visual guides for common actions */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                            <button
+                                onClick={() => setQuery("What does the Bible say about love?")}
+                                className="p-6 text-left rounded-xl border border-border bg-background hover:border-primary/50 hover:shadow-md transition-all group"
+                            >
+                                <div className="flex items-center gap-3 mb-2">
+                                    <Search className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                                    <h3 className="font-medium">Explore Topics</h3>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    Search for themes like "love", "faith", or "wisdom"
+                                </p>
+                            </button>
+
+                            <button
+                                onClick={() => setQuery("John 3:16")}
+                                className="p-6 text-left rounded-xl border border-border bg-background hover:border-primary/50 hover:shadow-md transition-all group"
+                            >
+                                <div className="flex items-center gap-3 mb-2">
+                                    <BookOpen className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                                    <h3 className="font-medium">Study Verses</h3>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    Enter specific verses like "John 3:16" or "Psalm 23"
+                                </p>
+                            </button>
+                        </div>
+
+                        {/* Enhanced Search Section */}
                         <div className="bg-background rounded-xl border border-border shadow-sm p-6 md:p-8 mb-8">
                             <form onSubmit={handleSearch} className="space-y-6">
                                 <div className="flex flex-col md:flex-row gap-3 md:gap-4">
@@ -191,7 +215,7 @@ export default function BibleStudyPage() {
                                             type="text"
                                             value={query}
                                             onChange={(e) => setQuery(e.target.value)}
-                                            placeholder="Enter a topic (e.g., 'faith') or verse (e.g., 'John 3:16')"
+                                            placeholder={EXAMPLE_QUERIES[currentExampleIndex]}
                                             className="w-full h-12 px-4 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 pl-10"
                                             disabled={isSearching || isCreatingStudy}
                                         />
@@ -209,85 +233,64 @@ export default function BibleStudyPage() {
                                         ) : isCreatingStudy ? (
                                             <>
                                                 <Loader2 className="w-5 h-5 animate-spin" />
-                                                <span>Creating Bible Study...</span>
+                                                <span>Creating Study...</span>
                                             </>
                                         ) : (
                                             <>
-                                                <Search className="w-5 h-5" />
-                                                <span>Generate Bible Study</span>
+                                                <Bot className="w-5 h-5" />
+                                                <span>Start Study</span>
                                             </>
                                         )}
                                     </button>
                                 </div>
 
-                                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                    <span>Translation:</span>
-                                    <select
-                                        value={translation}
-                                        onChange={(e) => setTranslation(e.target.value as Translation)}
-                                        className="bg-transparent focus:outline-none focus:ring-0 text-foreground"
-                                        disabled={isSearching || isCreatingStudy}
-                                    >
-                                        {TRANSLATIONS.map((t) => (
-                                            <option key={t.id} value={t.id}>
-                                                {t.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="flex flex-col items-center gap-2 text-sm">
-                                    <span className="text-muted-foreground">Try searching for topics or verses like:</span>
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-medium text-primary">{EXAMPLE_QUERIES[currentExampleIndex]}</span>
-                                        <span className="text-muted-foreground text-xs">({currentExampleIndex + 1}/{EXAMPLE_QUERIES.length})</span>
+                                <div className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-3 text-muted-foreground">
+                                        <span>Translation:</span>
+                                        <select
+                                            value={translation}
+                                            onChange={(e) => setTranslation(e.target.value as Translation)}
+                                            className="bg-transparent focus:outline-none focus:ring-0 text-foreground"
+                                            disabled={isSearching || isCreatingStudy}
+                                        >
+                                            {TRANSLATIONS.map((t) => (
+                                                <option key={t.id} value={t.id}>
+                                                    {t.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
+
+                                    {error && (
+                                        <p className="text-destructive text-sm">{error}</p>
+                                    )}
                                 </div>
                             </form>
                         </div>
 
-                        {/* Loading States */}
-                        {(isSearching || isCreatingStudy) && (
-                            <div className="text-center space-y-4 py-12">
-                                <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
-                                <p className="text-lg text-muted-foreground">
-                                    {isSearching ? (
-                                        "Searching for relevant Bible verses..."
-                                    ) : (
-                                        "Creating your Bible study..."
-                                    )}
-                                </p>
+                        {/* Recent Studies Section - Only show if user has studies */}
+                        {studies.length > 0 && (
+                            <div className="rounded-xl border border-border p-6">
+                                <h2 className="text-xl font-medium mb-4">Recent Studies</h2>
+                                <div className="space-y-3">
+                                    {studies.slice(0, 3).map((study: any) => (
+                                        <button
+                                            key={study._id}
+                                            onClick={() => navigateWithTransition(`/study/bible-study/${study._id}`)}
+                                            className="w-full p-4 rounded-lg border border-border hover:border-primary/50 transition-all text-left group"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <h3 className="font-medium group-hover:text-primary transition-colors">{study.query}</h3>
+                                                <span className="text-sm text-muted-foreground">
+                                                    {new Date(study.createdAt).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         )}
-
-                        {/* Error Display */}
-                        {error && (
-                            <div className="text-center py-8">
-                                <p className="text-red-500">{error}</p>
-                            </div>
-                        )}
-
-                        {/* Features Grid */}
-                        {!isSearching && !isCreatingStudy && (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
-                                {FEATURES.map((feature) => (
-                                    <div key={feature.label} className="bg-gradient-to-b from-primary/5 to-transparent rounded-xl p-6">
-                                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                                            <feature.icon className="w-6 h-6 text-primary" />
-                                        </div>
-                                        <h3 className="font-medium text-lg mb-2">{feature.label}</h3>
-                                        <p className="text-muted-foreground text-sm">
-                                            {feature.label === 'Search Topics & Verses' && 'Search any Bible topic or verse reference for instant insights.'}
-                                            {feature.label === 'In-Depth Analysis' && 'Get deep analysis and cross-references powered by AI.'}
-                                            {feature.label === 'Save & Organize Studies' && 'Create and organize your personal Bible study library.'}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
                     </div>
-
                 </div>
             </main>
         </div>
