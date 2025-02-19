@@ -185,7 +185,7 @@ export default function BibleStudyPage() {
                                     <h3 className="font-medium">Explore Topics</h3>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                    Search for themes like "love", "faith", or "wisdom"
+                                    Search for themes like &quot;love&quot;, &quot;faith&quot;, or &quot;wisdom&quot;
                                 </p>
                             </button>
 
@@ -198,7 +198,7 @@ export default function BibleStudyPage() {
                                     <h3 className="font-medium">Study Verses</h3>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                    Enter specific verses like "John 3:16" or "Psalm 23"
+                                    Enter specific verses like &quot;John 3:16&quot; or &quot;Psalm 23&quot;
                                 </p>
                             </button>
                         </div>
