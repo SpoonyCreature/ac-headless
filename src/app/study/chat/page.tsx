@@ -234,6 +234,7 @@ export default function ChatPage() {
                 groundingSupports: data.groundingSupports,
                 public: data.public
             } satisfies Message;
+
             setMessages(prev => [...prev, aiMessage]);
 
             // Refresh chat lists

@@ -1,13 +1,23 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Bot, BookMarked, Globe, Lock, ChevronLeft, Share2, Plus, ArrowLeft, Link2, Twitter, Facebook, Check } from 'lucide-react';
+import { Bot, BookMarked, Globe, Lock, ChevronLeft, Share2, Plus, ArrowLeft, Link2, Twitter, Facebook, Check, EyeOff, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { EnhancedBibleStudy } from '@/src/components/EnhancedBibleStudy';
 import { BibleStudy } from '@/src/types/bible';
 import { cn } from '@/src/lib/utils';
 import { usePageTransition } from '@/src/hooks/usePageTransition';
 import { formatDistanceToNow } from 'date-fns';
+
+interface CommentaryResponse {
+    markdown: string;
+}
+
+interface Commentary {
+    verseRef: string;
+    commentary: CommentaryResponse;
+    timestamp: number;
+}
 
 export default function BibleStudyDetailPage({
     params
@@ -20,6 +30,8 @@ export default function BibleStudyDetailPage({
     const [showShareMenu, setShowShareMenu] = useState(false);
     const [showShareTooltip, setShowShareTooltip] = useState(false);
     const [shareTooltipText, setShareTooltipText] = useState('');
+    const [isOwner, setIsOwner] = useState(false);
+    const [isUpdatingPublic, setIsUpdatingPublic] = useState(false);
     const { isTransitioning, navigateWithTransition } = usePageTransition();
     const shareMenuRef = useRef<HTMLDivElement>(null);
 
@@ -37,11 +49,25 @@ export default function BibleStudyDetailPage({
     useEffect(() => {
         const fetchStudy = async () => {
             try {
-                const response = await fetch(`/api/bible-study/${params.id}`);
-                if (!response.ok) {
+                const [studyResponse, authResponse] = await Promise.all([
+                    fetch(`/api/bible-study/${params.id}`),
+                    fetch('/api/auth/me')
+                ]);
+
+                if (!studyResponse.ok) {
                     throw new Error('Failed to fetch study');
                 }
-                const data = await response.json();
+
+                const data = await studyResponse.json();
+                const authData = await authResponse.json();
+
+                // Check if user is owner
+                setIsOwner(authData.user?._id === data.study._owner);
+
+                // Check if user has access
+                if (!data.study.public && authData.user?._id !== data.study._owner) {
+                    throw new Error('This study is private');
+                }
 
                 // Check if we need to fetch original verses
                 if (!data.study.originalVerses || data.study.originalVerses.length === 0) {
@@ -134,7 +160,7 @@ export default function BibleStudyDetailPage({
         fetchStudy();
     }, [params.id]);
 
-    const handleGenerateCommentary = async (verseRef: string, previousCommentaries: any[]) => {
+    const handleGenerateCommentary = async (verseRef: string, previousCommentaries: Commentary[]): Promise<CommentaryResponse> => {
         try {
             const verse = study?.verses.find(v => `${v.reference}` === verseRef);
             if (!verse || !verse.verses) throw new Error('Verse not found or invalid');
@@ -305,6 +331,33 @@ export default function BibleStudyDetailPage({
         setShowShareMenu(false);
     };
 
+    const handleTogglePublic = async () => {
+        if (!study || !isOwner || isUpdatingPublic) return;
+
+        setIsUpdatingPublic(true);
+        try {
+            const response = await fetch(`/api/bible-study/${params.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    public: !study.public
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update study visibility');
+            }
+
+            setStudy(prev => prev ? { ...prev, public: !prev.public } : null);
+        } catch (err) {
+            console.error('Error updating study visibility:', err);
+        } finally {
+            setIsUpdatingPublic(false);
+        }
+    };
+
     if (isLoading) {
         return (
             <div className={cn(
@@ -331,7 +384,7 @@ export default function BibleStudyDetailPage({
         );
     }
 
-    if (error || !study) {
+    if (error) {
         return (
             <div className={cn(
                 "flex min-h-screen bg-gradient-to-b from-background to-background/95 items-center justify-center",
@@ -339,11 +392,15 @@ export default function BibleStudyDetailPage({
                 isTransitioning ? "opacity-50" : "opacity-100"
             )}>
                 <div className="text-center space-y-4">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
-                        <BookMarked className="w-6 h-6 text-primary" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-destructive/10 mb-4">
+                        <EyeOff className="w-6 h-6 text-destructive" />
                     </div>
-                    <h2 className="text-xl font-medium">Study not found</h2>
-                    <p className="text-muted-foreground">This Bible study may have been deleted or is not accessible.</p>
+                    <h2 className="text-xl font-medium">{error}</h2>
+                    <p className="text-muted-foreground">
+                        {error === 'This study is private'
+                            ? "This Bible study is private and can only be viewed by its owner."
+                            : "This Bible study may have been deleted or is not accessible."}
+                    </p>
                     <Link
                         href="/study/bible-study"
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium"
@@ -355,6 +412,8 @@ export default function BibleStudyDetailPage({
             </div>
         );
     }
+
+    if (!study) return null;
 
     return (
         <div className={cn(
@@ -387,10 +446,60 @@ export default function BibleStudyDetailPage({
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2 flex-none">
+                                        {isOwner && (
+                                            <div className="relative">
+                                                <button
+                                                    onClick={handleTogglePublic}
+                                                    disabled={isUpdatingPublic}
+                                                    className={cn(
+                                                        "group inline-flex items-center gap-2 px-3.5 h-10 rounded-full transition-all text-sm",
+                                                        "hover:shadow-md active:shadow-sm",
+                                                        study.public
+                                                            ? "bg-primary/10 text-primary hover:bg-primary/15"
+                                                            : "bg-muted/50 text-muted-foreground hover:bg-muted/80",
+                                                        isUpdatingPublic && "opacity-50 cursor-not-allowed"
+                                                    )}
+                                                >
+                                                    <span className={cn(
+                                                        "w-2 h-2 rounded-full transition-colors",
+                                                        study.public ? "bg-primary" : "bg-muted-foreground"
+                                                    )} />
+                                                    {study.public ? (
+                                                        <>
+                                                            <Globe className="w-4 h-4" />
+                                                            <span className="hidden sm:inline">Public</span>
+                                                            <span className="hidden sm:inline text-xs text-muted-foreground">• Anyone can view</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Lock className="w-4 h-4" />
+                                                            <span className="hidden sm:inline">Private</span>
+                                                            <span className="hidden sm:inline text-xs text-muted-foreground">• Only you can view</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                                {isUpdatingPublic && (
+                                                    <div className="absolute left-1/2 -translate-x-1/2 -bottom-8 bg-popover border border-border rounded-lg px-2.5 py-1.5 text-xs whitespace-nowrap shadow-md">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Loader2 className="w-3 h-3 animate-spin" />
+                                                            <span>Updating visibility...</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Share Menu */}
                                         <div className="relative" ref={shareMenuRef}>
                                             <button
                                                 onClick={handleShare}
-                                                className="p-2.5 hover:bg-muted rounded-full transition-colors relative"
+                                                className={cn(
+                                                    "p-2.5 rounded-full transition-colors relative",
+                                                    "hover:shadow-md active:shadow-sm",
+                                                    study.public
+                                                        ? "bg-primary/10 text-primary hover:bg-primary/15"
+                                                        : "bg-muted/50 text-muted-foreground hover:bg-muted/80"
+                                                )}
                                             >
                                                 <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                             </button>
@@ -476,9 +585,9 @@ export default function BibleStudyDetailPage({
                             crossReferences={study.crossReferences}
                             explanation={study.explanation}
                             query={study.query}
-                            onGenerateCommentary={handleGenerateCommentary}
-                            onSaveCommentary={handleSaveCommentary}
-                            onGenerateCrossReferenceMap={handleGenerateCrossReferenceMap}
+                            onGenerateCommentary={isOwner ? handleGenerateCommentary : undefined}
+                            onSaveCommentary={isOwner ? handleSaveCommentary : undefined}
+                            onGenerateCrossReferenceMap={isOwner ? handleGenerateCrossReferenceMap : undefined}
                             initialCommentaries={study.commentaries || []}
                         />
                     </div>

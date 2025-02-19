@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Bot, BookMarked, Search, History, BookOpen, MessageSquare, Globe, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bot, History, Loader2, Clock, Globe, BookOpen } from 'lucide-react';
 import { BibleStudySidebar } from '@/src/components/BibleStudySidebar';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/src/lib/utils';
 import { usePageTransition } from '@/src/hooks/usePageTransition';
+import { formatDistanceToNow } from 'date-fns';
 
 const TRANSLATIONS = [
     { id: 'web', name: 'World English Bible' },
@@ -28,10 +29,12 @@ export default function BibleStudyPage() {
     const [query, setQuery] = useState('');
     const [translation, setTranslation] = useState<Translation>('web');
     const [isLoadingStudies, setIsLoadingStudies] = useState(true);
+    const [isLoadingPublicStudies, setIsLoadingPublicStudies] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-    const [studies, setStudies] = useState<any[]>([]);
+    const [userStudies, setUserStudies] = useState<any[]>([]);
+    const [publicStudies, setPublicStudies] = useState<any[]>([]);
     const [showSidebar, setShowSidebar] = useState(false);
     const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
     const [isSearching, setIsSearching] = useState(false);
@@ -43,16 +46,24 @@ export default function BibleStudyPage() {
     useEffect(() => {
         const init = async () => {
             setIsLoadingStudies(true);
+            setIsLoadingPublicStudies(true);
             try {
                 const response = await fetch('/api/auth/me');
                 const data = await response.json();
                 setIsAuthenticated(!!data.user);
                 setCurrentUserId(data.user?._id || null);
 
+                // Fetch public studies
+                const publicStudiesResponse = await fetch('/api/bible-study?public=true&limit=3');
+                const publicStudiesData = await publicStudiesResponse.json();
+                setPublicStudies(publicStudiesData.studies || []);
+                setIsLoadingPublicStudies(false);
+
+                // If authenticated, fetch user's studies
                 if (data.user) {
-                    const studiesResponse = await fetch('/api/bible-study');
-                    const studiesData = await studiesResponse.json();
-                    setStudies(studiesData.studies || []);
+                    const userStudiesResponse = await fetch('/api/bible-study');
+                    const userStudiesData = await userStudiesResponse.json();
+                    setUserStudies(userStudiesData.studies || []);
                 }
             } catch (error) {
                 console.error('Error during initialization:', error);
@@ -96,7 +107,6 @@ export default function BibleStudyPage() {
 
             const data = await response.json();
 
-            // Automatically create the Bible study
             setIsCreatingStudy(true);
             const createResponse = await fetch('/api/bible-study', {
                 method: 'POST',
@@ -143,7 +153,7 @@ export default function BibleStudyPage() {
                 showSidebar ? 'translate-x-0' : '-translate-x-full'
             )}>
                 <BibleStudySidebar
-                    studies={studies}
+                    studies={userStudies}
                     currentUserId={currentUserId || undefined}
                     isLoading={isLoadingStudies}
                 />
@@ -160,97 +170,35 @@ export default function BibleStudyPage() {
             {/* Main Content */}
             <main className="flex-1 min-h-screen mx-auto">
                 <div className="container mx-auto px-4 py-8 md:py-16">
-                    <div className="max-w-4xl mx-auto">
-                        {/* Hero Section - Simplified and more focused */}
-                        <div className="text-center mb-8">
-                            <div className="relative inline-block mb-6">
-                                <BookMarked className="w-12 h-12 md:w-16 md:h-16 text-primary" />
-                            </div>
-                            <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">
-                                Unlock the Bible
+                    <div className="max-w-2xl mx-auto space-y-8">
+                        {/* Hero Section */}
+                        <div className="text-center">
+                            <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+                                Bible Study Assistant
                             </h1>
-                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                                Search any topic or verse to start your guided Bible study journey
+                            <p className="text-lg text-muted-foreground">
+                                Enter any topic, verse, or question to begin
                             </p>
                         </div>
 
-                        {/* Quick Start Cards - Visual guides for common actions */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                            <button
-                                onClick={() => setQuery("What does the Bible say about love?")}
-                                className="p-6 text-left rounded-xl border border-border bg-background hover:border-primary/50 hover:shadow-md transition-all group"
-                            >
-                                <div className="flex items-center gap-3 mb-2">
-                                    <Search className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-                                    <h3 className="font-medium">Explore Topics</h3>
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                    Search for themes like &quot;love&quot;, &quot;faith&quot;, or &quot;wisdom&quot;
-                                </p>
-                            </button>
+                        {/* Search Section */}
+                        <div className="bg-card rounded-xl border border-border shadow-sm p-6">
+                            <form onSubmit={handleSearch} className="space-y-4">
+                                <div className="flex flex-col gap-4">
+                                    <input
+                                        type="text"
+                                        value={query}
+                                        onChange={(e) => setQuery(e.target.value)}
+                                        placeholder="Example: What does the Bible say about love? or John 3:16"
+                                        className="w-full h-12 px-4 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                        disabled={isSearching || isCreatingStudy}
+                                    />
 
-                            <button
-                                onClick={() => setQuery("John 3:16")}
-                                className="p-6 text-left rounded-xl border border-border bg-background hover:border-primary/50 hover:shadow-md transition-all group"
-                            >
-                                <div className="flex items-center gap-3 mb-2">
-                                    <BookOpen className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-                                    <h3 className="font-medium">Study Verses</h3>
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                    Enter specific verses like &quot;John 3:16&quot; or &quot;Psalm 23&quot;
-                                </p>
-                            </button>
-                        </div>
-
-                        {/* Enhanced Search Section */}
-                        <div className="bg-background rounded-xl border border-border shadow-sm p-6 md:p-8 mb-8">
-                            <form onSubmit={handleSearch} className="space-y-6">
-                                <div className="flex flex-col md:flex-row gap-3 md:gap-4">
-                                    <div className="relative flex-1">
-                                        <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                                            <Search className="w-5 h-5 text-muted-foreground" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            value={query}
-                                            onChange={(e) => setQuery(e.target.value)}
-                                            placeholder={EXAMPLE_QUERIES[currentExampleIndex]}
-                                            className="w-full h-12 px-4 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 pl-10"
-                                            disabled={isSearching || isCreatingStudy}
-                                        />
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        disabled={isSearching || isCreatingStudy || !query.trim()}
-                                        className="h-12 px-6 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium whitespace-nowrap flex items-center justify-center gap-2"
-                                    >
-                                        {isSearching ? (
-                                            <>
-                                                <Loader2 className="w-5 h-5 animate-spin" />
-                                                <span>Searching...</span>
-                                            </>
-                                        ) : isCreatingStudy ? (
-                                            <>
-                                                <Loader2 className="w-5 h-5 animate-spin" />
-                                                <span>Creating Study...</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Bot className="w-5 h-5" />
-                                                <span>Start Study</span>
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-
-                                <div className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-3 text-muted-foreground">
-                                        <span>Translation:</span>
+                                    <div className="flex gap-2">
                                         <select
                                             value={translation}
                                             onChange={(e) => setTranslation(e.target.value as Translation)}
-                                            className="bg-transparent focus:outline-none focus:ring-0 text-foreground"
+                                            className="h-12 px-3 rounded-lg border border-border bg-background text-sm"
                                             disabled={isSearching || isCreatingStudy}
                                         >
                                             {TRANSLATIONS.map((t) => (
@@ -259,31 +207,59 @@ export default function BibleStudyPage() {
                                                 </option>
                                             ))}
                                         </select>
-                                    </div>
 
-                                    {error && (
-                                        <p className="text-destructive text-sm">{error}</p>
-                                    )}
+                                        <button
+                                            type="submit"
+                                            disabled={isSearching || isCreatingStudy || !query.trim()}
+                                            className="flex-1 h-12 px-6 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
+                                        >
+                                            {isSearching || isCreatingStudy ? (
+                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                            ) : (
+                                                <Bot className="w-5 h-5" />
+                                            )}
+                                            <span>Start Study</span>
+                                        </button>
+                                    </div>
                                 </div>
+
+                                {error && (
+                                    <div className="text-red-500 text-sm mt-2">
+                                        {error}
+                                    </div>
+                                )}
                             </form>
                         </div>
 
-                        {/* Recent Studies Section - Only show if user has studies */}
-                        {studies.length > 0 && (
-                            <div className="rounded-xl border border-border p-6">
-                                <h2 className="text-xl font-medium mb-4">Recent Studies</h2>
-                                <div className="space-y-3">
-                                    {studies.slice(0, 3).map((study: any) => (
+                        {/* Recent Public Studies */}
+                        {!isLoadingPublicStudies && publicStudies.length > 0 && (
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-lg font-medium text-muted-foreground">
+                                    <Globe className="w-5 h-5" />
+                                    <h2>Recent Public Studies</h2>
+                                </div>
+                                <div className="grid gap-4">
+                                    {publicStudies.map((study) => (
                                         <button
                                             key={study._id}
                                             onClick={() => navigateWithTransition(`/study/bible-study/${study._id}`)}
-                                            className="w-full p-4 rounded-lg border border-border hover:border-primary/50 transition-all text-left group"
+                                            className="w-full p-4 rounded-lg bg-card border border-border hover:border-primary/50 hover:shadow-md transition-all text-left group"
                                         >
-                                            <div className="flex items-center justify-between">
-                                                <h3 className="font-medium group-hover:text-primary transition-colors">{study.query}</h3>
-                                                <span className="text-sm text-muted-foreground">
-                                                    {new Date(study.createdAt).toLocaleDateString()}
-                                                </span>
+                                            <h3 className="font-medium group-hover:text-primary transition-colors line-clamp-1">
+                                                {study.query}
+                                            </h3>
+                                            {study.explanation && (
+                                                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                                                    {study.explanation}
+                                                </p>
+                                            )}
+                                            <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                                                <time>{study._createdDate ? formatDistanceToNow(new Date(study._createdDate)) : 'Recently'} ago</time>
+                                                <span>•</span>
+                                                <div className="flex items-center gap-1">
+                                                    <BookOpen className="w-3.5 h-3.5" />
+                                                    <span>{study.verses?.length || 0} verses</span>
+                                                </div>
                                             </div>
                                         </button>
                                     ))}
