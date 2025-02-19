@@ -39,6 +39,7 @@ export default function ChatPage() {
     const [publicChats, setPublicChats] = useState<ChatType[]>([]);
     const [currentUserId, setCurrentUserId] = useState<string>();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [threadId, setThreadId] = useState<string | undefined>(undefined);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -127,6 +128,8 @@ export default function ChatPage() {
                 stack: error instanceof Error ? error.stack : undefined
             });
             setIsAuthenticated(false);
+        } finally {
+            setIsAuthLoading(false);
         }
     };
 
@@ -300,11 +303,17 @@ export default function ChatPage() {
                     {/* Input Area - Fixed at Bottom */}
                     <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border/5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50">
                         <div className="max-w-3xl mx-auto p-4">
-                            <ChatInput
-                                onSend={handleSend}
-                                disabled={isLoading}
-                                isAuthenticated={isAuthenticated}
-                            />
+                            {isAuthLoading ? (
+                                <div className="rounded-2xl bg-muted/50 border border-border/50 p-6 backdrop-blur-sm">
+                                    <div className="h-8 bg-muted animate-pulse rounded-lg w-48 mx-auto" />
+                                </div>
+                            ) : (
+                                <ChatInput
+                                    onSend={handleSend}
+                                    disabled={isLoading}
+                                    isAuthenticated={isAuthenticated}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
