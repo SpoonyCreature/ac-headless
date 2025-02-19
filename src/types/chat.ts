@@ -22,6 +22,7 @@ export interface ChatMessage {
     role: 'user' | 'Agent';
     text: string;
     time: string;
+    datetime?: string;
     sources?: Source[];
     groundingSupports?: GroundingSupport[];
     public?: boolean;
