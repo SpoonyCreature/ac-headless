@@ -1,5 +1,4 @@
 import { VertexAI, SchemaType } from '@google-cloud/vertexai';
-import type { Tool } from '@google-cloud/vertexai/build/src/types/content';
 import { AIProvider } from './base';
 import { CompletionOptions, Message, JsonSchemaFormat } from './types';
 import { Source } from '@/src/types/chat';
@@ -10,10 +9,6 @@ interface GroundingChunk {
         title: string;
         content: string;  // Gemini actually returns content, not text
     };
-}
-
-interface GroundingMetadata {
-    groundingChunks: GroundingChunk[];
 }
 
 interface GroundingSupport {
@@ -38,7 +33,7 @@ export class GeminiProvider extends AIProvider {
     private project: string;
     private location: string;
 
-    constructor(projectId: string, location: string = 'us-central1', modelName: string = 'gemini-pro') {
+    constructor(projectId: string, location: string = 'us-central1', modelName: string = 'gemini-1.5-flash-001') {
         super('not-needed'); // API key not needed for Vertex AI as it uses GCP auth
         this.project = projectId;
         this.location = location;

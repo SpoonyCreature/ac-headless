@@ -8,6 +8,8 @@ const oauth2Client = new google.auth.OAuth2(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/google/callback`
 );
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;

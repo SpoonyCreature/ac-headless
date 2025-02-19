@@ -13,11 +13,10 @@ import { HeaderClient } from './HeaderClient';
 
 async function logout() {
     "use server";
-    // Add a small delay to make the loading state more noticeable
+    // Add a small delay to ensure smooth transition
     await new Promise(resolve => setTimeout(resolve, 500));
     cookies().delete("wixSession");
     revalidatePath("/");
-    redirect("/");
 }
 
 export async function Header() {

@@ -23,6 +23,16 @@ export default function ChatViewPage({ params }: { params: { id: string } }) {
     const router = useRouter();
     const shareMenuRef = useRef<HTMLDivElement>(null);
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        if (currentChat?.thread) {
+            scrollToBottom();
+        }
+    }, [currentChat?.thread]);
+
     useEffect(() => {
         fetchCurrentUser();
     }, []);
@@ -161,10 +171,10 @@ export default function ChatViewPage({ params }: { params: { id: string } }) {
             "transition-opacity duration-300",
             isTransitioning ? "opacity-50" : "opacity-100"
         )}>
-            <div className="flex-1">
+            <div className="flex-1 container px-4 py-4 mx-auto">
                 {/* Header Card */}
-                <div className="sticky top-0 z-10 p-3 sm:p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                    <div className="max-w-4xl mx-auto">
+                <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <div className="max-w-4xl mx-auto sm:px-4">
                         <div className="relative bg-card text-card-foreground rounded-2xl border shadow-sm">
                             {/* Top Section */}
                             <div className="p-4 sm:p-6 pb-3 sm:pb-4">
@@ -268,8 +278,8 @@ export default function ChatViewPage({ params }: { params: { id: string } }) {
                 </div>
 
                 {/* Chat Messages */}
-                <div className="flex-1 overflow-y-auto py-8">
-                    <div className="max-w-4xl mx-auto px-4">
+                <div className="flex-1 overflow-y-auto py-4 sm:py-8">
+                    <div className="max-w-4xl mx-auto sm:px-4">
                         {currentChat.thread.map((message) => (
                             <ChatMessage
                                 key={message._id}
