@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bot, Loader2, Clock, Globe, BookOpen, Search, Sparkles, Filter, Star, Users, BarChart, ChevronRight, PlusCircle, Lightbulb, BookMarked } from 'lucide-react';
+import { Bot, Loader2, Clock, Globe, BookOpen, Search, Sparkles, Filter, Star, Users, BarChart, ChevronRight, PlusCircle, Lightbulb, BookMarked, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/src/lib/utils';
 import { usePageTransition } from '@/src/hooks/usePageTransition';
 import { formatDistanceToNow } from 'date-fns';
+import { BIBLE_STRUCTURE } from '@/src/lib/bible';
 
 const TRANSLATIONS = [
     { id: 'web', name: 'World English Bible' },
@@ -47,11 +48,16 @@ export default function BibleStudyPage() {
     const [activeTab, setActiveTab] = useState<TabType>('create');
     const [currentPage, setCurrentPage] = useState(1);
     const studiesPerPage = 6;
+    const [userContext, setUserContext] = useState<any>(null);
+    const [isLoadingContext, setIsLoadingContext] = useState(false);
+    const [coverage, setCoverage] = useState(0);
+    const [showAuthModal, setShowAuthModal] = useState(false);
 
-    // Update the useEffect to fetch user studies
+    // Update the useEffect to fetch user studies and context
     useEffect(() => {
         const init = async () => {
             setIsLoadingStudies(true);
+            setIsLoadingContext(true);
             try {
                 const response = await fetch('/api/auth/me');
                 const data = await response.json();
@@ -62,17 +68,26 @@ export default function BibleStudyPage() {
                 const publicStudiesData = await publicStudiesResponse.json();
                 setPublicStudies(publicStudiesData.studies || []);
 
-                // If authenticated, fetch user's studies
+                // If authenticated, fetch user's studies and context
                 if (data.user) {
-                    const userStudiesResponse = await fetch('/api/bible-study');
+                    const [userStudiesResponse, userContextResponse] = await Promise.all([
+                        fetch('/api/bible-study'),
+                        fetch('/api/user-context')
+                    ]);
+
                     const userStudiesData = await userStudiesResponse.json();
                     setUserStudies(userStudiesData.studies || []);
+
+                    const contextData = await userContextResponse.json();
+                    setUserContext(contextData.userContext);
+                    setCoverage(contextData.coverage);
                 }
             } catch (error) {
                 console.error('Error during initialization:', error);
                 setIsAuthenticated(false);
             } finally {
                 setIsLoadingStudies(false);
+                setIsLoadingContext(false);
             }
         };
         init();
@@ -81,6 +96,11 @@ export default function BibleStudyPage() {
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!query.trim()) return;
+
+        if (!isAuthenticated) {
+            setShowAuthModal(true);
+            return;
+        }
 
         setIsSearching(true);
         setError(null);
@@ -126,70 +146,80 @@ export default function BibleStudyPage() {
         <div className="min-h-screen bg-[url('/paper-texture.png')] bg-repeat">
             {/* Hero Header */}
             <div className="relative">
-                <div className="absolute inset-0 bg-[url('/bs.webp')] bg-cover bg-center">
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/40" />
+                <div className="absolute inset-0 bg-[url('/bs.jpeg')] bg-cover bg-center">
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/50 backdrop-blur-[2px]" />
+                    {/* Add animated particles effect */}
+                    <div className="absolute inset-0 opacity-30">
+                        <div className="absolute w-1/3 h-1/3 bg-primary/20 rounded-full blur-3xl animate-pulse top-1/4 left-1/4 mix-blend-overlay" />
+                        <div className="absolute w-1/4 h-1/4 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-300 top-1/3 right-1/3 mix-blend-overlay" />
+                        <div className="absolute w-1/3 h-1/3 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-500 bottom-1/4 right-1/4 mix-blend-overlay" />
+                    </div>
                 </div>
-                <div className="relative container mx-auto px-4 sm:px-6 pt-20 pb-24 sm:pt-32 sm:pb-32">
-                    <div className="max-w-[640px] mx-auto text-center">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/80 mb-6 text-sm">
+                <div className="relative container mx-auto px-4 sm:px-6 pt-24 pb-28 sm:pt-36 sm:pb-40">
+                    <div className="max-w-[720px] mx-auto text-center">
+                        <div
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/90 mb-8 text-sm shadow-xl transform hover:scale-105 transition-all"
+                        >
                             <Bot className="w-4 h-4" />
-                            <span>Cutting Technology & Resources</span>
+                            <span className="relative">
+                                <span className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 blur"></span>
+                                <span className="relative">Cutting Edge AI & Biblical Scholarship</span>
+                            </span>
                         </div>
 
-                        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-white mb-6 tracking-tight">
-                            The World’s Most Advanced Bible Study Platform
+                        <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-white mb-8 tracking-tight leading-[1.15] font-medium">
+                            <span className="inline-block transform hover:scale-105 transition-transform duration-300">The World's Most</span>{' '}
+                            <span className="relative inline-block">
+                                <span className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-purple-500/30 blur"></span>
+                                <span className="relative">Advanced</span>
+                            </span>{' '}
+                            <span className="inline-block transform hover:scale-105 transition-transform duration-300">Bible Study Platform</span>
                         </h1>
 
-                        <p className="text-white/80 max-w-lg mx-auto text-base sm:text-lg leading-relaxed">
-                            Get instant insights, cross-references, and in-depth analysis for any verse, topic, or character from Scripture.
+                        <p className="text-white/90 max-w-2xl mx-auto text-lg sm:text-xl leading-relaxed font-light">
+                            Experience Scripture like never before with instant AI-powered insights,
+                            cross-references, and in-depth analysis for any verse, topic, or character.
                         </p>
                     </div>
                 </div>
 
-                {/* Decorative Elements */}
-                <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/20 blur-[100px] -mb-32" />
+                {/* Enhanced decorative elements */}
+                <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-t from-primary/30 via-purple-500/20 to-transparent blur-[100px] -mb-40 opacity-50" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/30 blur-[100px] -mb-32" />
             </div>
 
             <main className="container mx-auto px-4 sm:px-6 -mt-8 relative z-10">
                 {/* Tabs in white card that overlaps the hero */}
                 <div className="max-w-3xl mx-auto">
-                    <div className="bg-white/95 backdrop-blur-md shadow-xl rounded-2xl p-1 mb-8">
-                        <div className="border-b border-border/50">
+                    <div className="bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl p-1.5 mb-8 border border-white/40">
+                        <div className="border-b border-border/30">
                             <div className="flex -mb-px justify-center sm:justify-start">
-                                <button
-                                    onClick={() => setActiveTab('create')}
-                                    className={cn(
-                                        "px-4 sm:px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
-                                        activeTab === 'create'
-                                            ? "border-primary text-primary"
-                                            : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                                    )}
-                                >
-                                    Create Study
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('studies')}
-                                    className={cn(
-                                        "px-4 sm:px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
-                                        activeTab === 'studies'
-                                            ? "border-primary text-primary"
-                                            : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                                    )}
-                                >
-                                    My Studies
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('insights')}
-                                    className={cn(
-                                        "px-4 sm:px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
-                                        activeTab === 'insights'
-                                            ? "border-primary text-primary"
-                                            : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                                    )}
-                                >
-                                    Insights
-                                </button>
+                                {[
+                                    { id: 'create', label: 'Create Study', icon: PlusCircle },
+                                    { id: 'studies', label: 'My Studies', icon: BookMarked },
+                                    { id: 'insights', label: 'Insights', icon: BarChart }
+                                ].map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => isAuthenticated ? setActiveTab(tab.id as TabType) : setShowAuthModal(true)}
+                                        className={cn(
+                                            "px-5 sm:px-7 py-4 text-sm font-medium border-b-2 transition-all flex items-center gap-2 relative group",
+                                            activeTab === tab.id
+                                                ? "border-primary text-primary"
+                                                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                                        )}
+                                    >
+                                        <tab.icon className={cn(
+                                            "w-4 h-4 transition-transform group-hover:scale-110",
+                                            activeTab === tab.id ? "text-primary" : "text-muted-foreground"
+                                        )} />
+                                        <span>{tab.label}</span>
+                                        {activeTab === tab.id && (
+                                            <span className="absolute inset-x-0 -bottom-px h-px bg-primary blur-sm" />
+                                        )}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -199,66 +229,85 @@ export default function BibleStudyPage() {
                         {activeTab === 'create' && (
                             <div className="space-y-8">
                                 {/* Bible Study Creation Card */}
-                                <div className="bg-white/95 backdrop-blur-md border-2 border-primary/10 rounded-2xl shadow-xl overflow-hidden">
+                                <div className="bg-white/95 backdrop-blur-xl border border-border/20 rounded-3xl shadow-2xl overflow-hidden relative group">
+                                    {/* Replace animated gradient border with subtle hover effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
                                     {/* Primary Input Section */}
-                                    <div className="p-6 sm:p-8 bg-gradient-to-b from-primary/[0.03] to-transparent">
-                                        <form onSubmit={handleSearch} className="space-y-5">
-                                            <div className="space-y-2">
-                                                <label htmlFor="query" className="text-base font-medium text-foreground">
+                                    <div className="relative p-8 sm:p-10 bg-gradient-to-b from-slate-50/50 to-transparent">
+                                        <form onSubmit={handleSearch} className="space-y-6">
+                                            <div className="space-y-3">
+                                                <label htmlFor="query" className="text-lg font-medium text-foreground inline-flex items-center gap-2">
+                                                    <Search className="w-5 h-5 text-primary" />
                                                     What would you like to study?
                                                 </label>
                                                 <div className="relative">
-                                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
                                                     <input
                                                         id="query"
                                                         type="text"
                                                         value={query}
                                                         onChange={(e) => setQuery(e.target.value)}
-                                                        placeholder="e.g., John 3:16, God's love, Kin"
-                                                        className="w-full h-[52px] pl-11 pr-4 rounded-2xl bg-zinc-100/80 placeholder:text-muted-foreground/50 text-[15px] focus:outline-none focus:ring-0 border-0"
+                                                        placeholder="e.g., John 3:16, God's love, Kingdom of Heaven"
+                                                        className="w-full h-[60px] px-6 rounded-xl bg-white shadow-lg placeholder:text-muted-foreground/50 text-[15px] focus:outline-none focus:ring-2 focus:ring-primary/20 border border-border/5 transition-shadow hover:shadow-xl"
                                                         disabled={isSearching || isCreatingStudy}
                                                     />
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                                                <div className="order-1 sm:order-2 relative">
-                                                    <select
-                                                        value={translation}
-                                                        onChange={(e) => setTranslation(e.target.value as Translation)}
-                                                        className="w-full sm:w-[200px] h-[52px] px-4 pr-10 rounded-2xl bg-zinc-100/80 text-[15px] appearance-none focus:outline-none focus:ring-0 border-0 cursor-pointer"
-                                                        disabled={isSearching || isCreatingStudy}
-                                                    >
-                                                        {TRANSLATIONS.map((t) => (
-                                                            <option key={t.id} value={t.id}>{t.name}</option>
-                                                        ))}
-                                                    </select>
-                                                    <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 rotate-90 pointer-events-none" />
-                                                </div>
-
+                                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                                                 <button
                                                     type="submit"
                                                     disabled={isSearching || isCreatingStudy || !query.trim()}
-                                                    className="order-2 sm:order-1 flex-1 h-[52px] rounded-2xl bg-zinc-100/80 text-zinc-900 font-medium flex items-center justify-center gap-2 text-[15px] disabled:opacity-50 hover:bg-zinc-200/80 active:bg-zinc-300/80"
+                                                    className={cn(
+                                                        "order-2 sm:order-1 flex-1 h-[52px] rounded-xl font-medium flex items-center justify-center gap-3 text-[15px] transition-all relative group overflow-hidden shadow-lg hover:shadow-xl",
+                                                        isAuthenticated
+                                                            ? "bg-primary text-white disabled:opacity-50"
+                                                            : "bg-primary text-white disabled:opacity-50"
+                                                    )}
                                                 >
+                                                    <span className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                     {isSearching || isCreatingStudy ? (
                                                         <>
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                            <Loader2 className="w-5 h-5 animate-spin" />
                                                             <span>
                                                                 {isSearching ? 'Searching...' : 'Creating study...'}
                                                             </span>
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <Bot className="w-4 h-4" />
-                                                            <span>Generate Study</span>
+                                                            {isAuthenticated ? (
+                                                                <>
+                                                                    <Bot className="w-5 h-5" />
+                                                                    <span>Generate Study</span>
+                                                                    <Sparkles className="w-4 h-4 opacity-50" />
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <Lock className="w-5 h-5" />
+                                                                    <span>Sign in to Generate Study</span>
+                                                                </>
+                                                            )}
                                                         </>
                                                     )}
                                                 </button>
+
+                                                <div className="order-1 sm:order-2 relative">
+                                                    <select
+                                                        value={translation}
+                                                        onChange={(e) => setTranslation(e.target.value as Translation)}
+                                                        className="w-full sm:w-[240px] h-[52px] px-4 pr-10 rounded-xl bg-white text-[15px] appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 border border-border/5 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+                                                        disabled={isSearching || isCreatingStudy}
+                                                    >
+                                                        {TRANSLATIONS.map((t) => (
+                                                            <option key={t.id} value={t.id}>{t.name}</option>
+                                                        ))}
+                                                    </select>
+                                                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 rotate-90 pointer-events-none" />
+                                                </div>
                                             </div>
 
                                             {error && (
-                                                <div className="p-4 rounded-xl bg-red-50/80 backdrop-blur-sm border border-red-200 text-red-600 text-sm">
+                                                <div className="p-4 rounded-xl bg-red-50/90 backdrop-blur-sm border border-red-200 text-red-600 text-sm">
                                                     {error}
                                                 </div>
                                             )}
@@ -267,12 +316,14 @@ export default function BibleStudyPage() {
 
                                     {/* Secondary Content - Quick Ideas */}
                                     <div className="border-t border-border/40">
-                                        <div className="px-6 sm:px-8 py-6 text-muted-foreground">
-                                            <div className="flex items-center gap-2 mb-4">
-                                                <Lightbulb className="w-4 h-4" />
-                                                <h3 className="text-sm font-medium">Quick Ideas & Examples</h3>
+                                        <div className="px-8 sm:px-10 py-8 text-muted-foreground">
+                                            <div className="flex items-center gap-2 mb-6">
+                                                <div className="p-2 rounded-lg bg-primary/10">
+                                                    <Lightbulb className="w-4 h-4 text-primary" />
+                                                </div>
+                                                <h3 className="text-base font-medium text-foreground">Quick Ideas & Examples</h3>
                                             </div>
-                                            <div className="space-y-4">
+                                            <div className="space-y-6">
                                                 <div>
                                                     <div className="flex flex-wrap gap-2">
                                                         {[
@@ -286,32 +337,43 @@ export default function BibleStudyPage() {
                                                             <button
                                                                 key={idea}
                                                                 onClick={() => setQuery(idea)}
-                                                                className="px-3 py-1.5 rounded-lg bg-primary/5 hover:bg-primary/10 text-sm transition-colors"
+                                                                className="px-4 py-2 rounded-xl bg-primary/5 hover:bg-primary/10 text-sm transition-all hover:shadow-md relative group overflow-hidden"
                                                             >
-                                                                {idea}
+                                                                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
+                                                                <span className="relative">{idea}</span>
                                                             </button>
                                                         ))}
                                                     </div>
                                                 </div>
 
-                                                <div className="grid sm:grid-cols-2 gap-3">
+                                                <div className="grid sm:grid-cols-2 gap-4">
                                                     {[
                                                         {
                                                             text: "What does Philippians 4:6-7 teach about anxiety and peace?",
-                                                            description: "Deep dive into specific verses"
+                                                            description: "Deep dive into specific verses",
+                                                            icon: BookOpen
                                                         },
                                                         {
                                                             text: "Compare Jesus's parables about the Kingdom of Heaven",
-                                                            description: "Thematic analysis"
+                                                            description: "Thematic analysis",
+                                                            icon: Filter
                                                         }
                                                     ].map((prompt) => (
                                                         <button
                                                             key={prompt.text}
                                                             onClick={() => setQuery(prompt.text)}
-                                                            className="p-3 rounded-lg border border-border/40 hover:border-primary/30 hover:bg-primary/[0.02] text-left group transition-all"
+                                                            className="p-4 rounded-xl border border-border/40 hover:border-primary/30 hover:bg-primary/[0.02] text-left group transition-all hover:shadow-lg relative overflow-hidden"
                                                         >
-                                                            <p className="text-sm group-hover:text-primary transition-colors line-clamp-2">{prompt.text}</p>
-                                                            <p className="text-xs mt-1 opacity-60">{prompt.description}</p>
+                                                            <span className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                                                            <div className="relative flex gap-3">
+                                                                <div className="shrink-0 p-2 rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
+                                                                    <prompt.icon className="w-4 h-4 text-primary transition-transform group-hover:scale-110" />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-2">{prompt.text}</p>
+                                                                    <p className="text-xs mt-1.5 text-muted-foreground/70">{prompt.description}</p>
+                                                                </div>
+                                                            </div>
                                                         </button>
                                                     ))}
                                                 </div>
@@ -320,20 +382,44 @@ export default function BibleStudyPage() {
                                     </div>
                                 </div>
 
-                                {/* Pro Tips Section - More subtle */}
-                                <div className="bg-white/80 backdrop-blur-sm border border-border/40 rounded-xl p-5 shadow-md">
-                                    <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2 mb-4">
-                                        <Sparkles className="w-4 h-4" />
-                                        Pro Tips
-                                    </h3>
-                                    <div className="grid sm:grid-cols-2 gap-4 text-sm text-muted-foreground">
-                                        <div className="space-y-3">
-                                            <p>• Be specific with your questions</p>
-                                            <p>• Include multiple verses for comparison</p>
-                                        </div>
-                                        <div className="space-y-3">
-                                            <p>• Ask about historical context</p>
-                                            <p>• Request practical applications</p>
+                                {/* Pro Tips Section - More sophisticated */}
+                                <div className="bg-white/90 backdrop-blur-xl border border-border/40 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                                    <div className="relative">
+                                        <h3 className="text-base font-medium text-foreground flex items-center gap-2 mb-6">
+                                            <div className="p-2 rounded-lg bg-primary/10">
+                                                <Sparkles className="w-4 h-4 text-primary" />
+                                            </div>
+                                            Pro Tips
+                                        </h3>
+                                        <div className="grid sm:grid-cols-2 gap-6">
+                                            {[
+                                                {
+                                                    tips: [
+                                                        "Be specific with your questions",
+                                                        "Include multiple verses for comparison"
+                                                    ],
+                                                    icon: Filter
+                                                },
+                                                {
+                                                    tips: [
+                                                        "Ask about historical context",
+                                                        "Request practical applications"
+                                                    ],
+                                                    icon: Globe
+                                                }
+                                            ].map((section, idx) => (
+                                                <div key={idx} className="space-y-3">
+                                                    {section.tips.map((tip, tipIdx) => (
+                                                        <div key={tipIdx} className="flex items-start gap-3">
+                                                            <div className="shrink-0 p-1.5 rounded-lg bg-primary/10 mt-0.5">
+                                                                <section.icon className="w-3 h-3 text-primary" />
+                                                            </div>
+                                                            <p className="text-sm text-muted-foreground">{tip}</p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
@@ -422,95 +508,211 @@ export default function BibleStudyPage() {
                             <div className="space-y-8">
                                 <h2 className="font-serif text-2xl sm:text-3xl">Study Insights</h2>
 
-                                <div className="grid sm:grid-cols-3 gap-4">
-                                    {[
-                                        { title: "Bible Coverage", value: "23%", description: "of the Bible studied", icon: BookOpen },
-                                        { title: "Study Streak", value: "4", description: "days in a row", icon: Sparkles },
-                                        { title: "Total Studies", value: userStudies.length.toString(), description: "studies completed", icon: Star },
-                                    ].map((stat) => (
-                                        <div key={stat.title} className="group relative p-6 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm transition-all">
-                                            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            <div className="relative">
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <div className="p-2 rounded-lg bg-primary/10">
-                                                        <stat.icon className="w-4 h-4 text-primary" />
-                                                    </div>
-                                                    <h3 className="text-sm font-medium text-muted-foreground font-serif">{stat.title}</h3>
-                                                </div>
-                                                <div className="flex items-baseline gap-2">
-                                                    <span className="text-2xl font-bold font-serif">{stat.value}</span>
-                                                    <span className="text-sm text-muted-foreground font-serif">{stat.description}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="grid sm:grid-cols-2 gap-4">
-                                    {/* Reading Progress */}
-                                    <div className="group relative p-6 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm space-y-6">
-                                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        <div className="relative">
-                                            <div className="flex items-center gap-2 mb-6">
-                                                <div className="p-2 rounded-lg bg-primary/10">
-                                                    <BookOpen className="w-4 h-4 text-primary" />
-                                                </div>
-                                                <h3 className="font-serif text-lg">Reading Progress</h3>
-                                            </div>
-                                            <div className="space-y-4">
-                                                <div>
-                                                    <div className="flex justify-between text-sm mb-2">
-                                                        <span className="text-muted-foreground font-serif">Old Testament</span>
-                                                        <span className="font-medium font-serif">35%</span>
-                                                    </div>
-                                                    <div className="h-2 rounded-full bg-muted overflow-hidden">
-                                                        <div className="h-full w-[35%] bg-primary rounded-full" />
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div className="flex justify-between text-sm mb-2">
-                                                        <span className="text-muted-foreground font-serif">New Testament</span>
-                                                        <span className="font-medium font-serif">45%</span>
-                                                    </div>
-                                                    <div className="h-2 rounded-full bg-muted overflow-hidden">
-                                                        <div className="h-full w-[45%] bg-primary rounded-full" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                {isLoadingContext ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
                                     </div>
+                                ) : (
+                                    <>
+                                        <div className="grid sm:grid-cols-3 gap-4">
+                                            {[
+                                                {
+                                                    title: "Bible Coverage",
+                                                    value: `${Math.round(coverage)}%`,
+                                                    description: "of the Bible studied",
+                                                    icon: BookOpen
+                                                },
+                                                {
+                                                    title: "Study Streak",
+                                                    value: userContext?.studyStreak || "0",
+                                                    description: "days in a row",
+                                                    icon: Sparkles
+                                                },
+                                                {
+                                                    title: "Total Studies",
+                                                    value: userStudies.length.toString(),
+                                                    description: "studies completed",
+                                                    icon: Star
+                                                },
+                                            ].map((stat) => (
+                                                <div key={stat.title} className="group relative p-6 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm transition-all">
+                                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                    <div className="relative">
+                                                        <div className="flex items-center gap-2 mb-3">
+                                                            <div className="p-2 rounded-lg bg-primary/10">
+                                                                <stat.icon className="w-4 h-4 text-primary" />
+                                                            </div>
+                                                            <h3 className="text-sm font-medium text-muted-foreground font-serif">{stat.title}</h3>
+                                                        </div>
+                                                        <div className="flex items-baseline gap-2">
+                                                            <span className="text-2xl font-bold font-serif">{stat.value}</span>
+                                                            <span className="text-sm text-muted-foreground font-serif">{stat.description}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
 
-                                    {/* Study Focus */}
-                                    <div className="group relative p-6 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm">
-                                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        <div className="relative">
-                                            <div className="flex items-center gap-2 mb-6">
-                                                <div className="p-2 rounded-lg bg-primary/10">
-                                                    <Filter className="w-4 h-4 text-primary" />
+                                        <div className="grid sm:grid-cols-2 gap-4">
+                                            {/* Reading Progress */}
+                                            <div className="group relative p-6 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm space-y-6">
+                                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                <div className="relative">
+                                                    <div className="flex items-center gap-2 mb-6">
+                                                        <div className="p-2 rounded-lg bg-primary/10">
+                                                            <BookOpen className="w-4 h-4 text-primary" />
+                                                        </div>
+                                                        <h3 className="font-serif text-lg">Reading Progress</h3>
+                                                    </div>
+                                                    <div className="space-y-4">
+                                                        <div>
+                                                            <div className="flex justify-between text-sm mb-2">
+                                                                <span className="text-muted-foreground font-serif">Old Testament</span>
+                                                                <span className="font-medium font-serif">
+                                                                    {Math.round(userContext?.bibleCoverage
+                                                                        ?.filter((b: any) => b.book !== 'Matthew' &&
+                                                                            !b.book.startsWith('1') && !b.book.startsWith('2') &&
+                                                                            !b.book.startsWith('3'))
+                                                                        ?.reduce((acc: number, book: any) =>
+                                                                            acc + (book.chaptersRead.length / BIBLE_STRUCTURE[book.book as keyof typeof BIBLE_STRUCTURE].chapters), 0) * 100 / 39 || 0
+                                                                    )}%
+                                                                </span>
+                                                            </div>
+                                                            <div className="h-2 rounded-full bg-muted overflow-hidden">
+                                                                <div
+                                                                    className="h-full bg-primary rounded-full"
+                                                                    style={{
+                                                                        width: `${Math.round(userContext?.bibleCoverage
+                                                                            ?.filter((b: any) => b.book !== 'Matthew' &&
+                                                                                !b.book.startsWith('1') && !b.book.startsWith('2') &&
+                                                                                !b.book.startsWith('3'))
+                                                                            ?.reduce((acc: number, book: any) =>
+                                                                                acc + (book.chaptersRead.length / BIBLE_STRUCTURE[book.book as keyof typeof BIBLE_STRUCTURE].chapters), 0) * 100 / 39 || 0
+                                                                        )}%`
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex justify-between text-sm mb-2">
+                                                                <span className="text-muted-foreground font-serif">New Testament</span>
+                                                                <span className="font-medium font-serif">
+                                                                    {Math.round(userContext?.bibleCoverage
+                                                                        ?.filter((b: any) => b.book === 'Matthew' ||
+                                                                            b.book.startsWith('1') || b.book.startsWith('2') ||
+                                                                            b.book.startsWith('3'))
+                                                                        ?.reduce((acc: number, book: any) =>
+                                                                            acc + (book.chaptersRead.length / BIBLE_STRUCTURE[book.book as keyof typeof BIBLE_STRUCTURE].chapters), 0) * 100 / 27 || 0
+                                                                    )}%
+                                                                </span>
+                                                            </div>
+                                                            <div className="h-2 rounded-full bg-muted overflow-hidden">
+                                                                <div
+                                                                    className="h-full bg-primary rounded-full"
+                                                                    style={{
+                                                                        width: `${Math.round(userContext?.bibleCoverage
+                                                                            ?.filter((b: any) => b.book === 'Matthew' ||
+                                                                                b.book.startsWith('1') || b.book.startsWith('2') ||
+                                                                                b.book.startsWith('3'))
+                                                                            ?.reduce((acc: number, book: any) =>
+                                                                                acc + (book.chaptersRead.length / BIBLE_STRUCTURE[book.book as keyof typeof BIBLE_STRUCTURE].chapters), 0) * 100 / 27 || 0
+                                                                        )}%`
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <h3 className="font-serif text-lg">Recent Focus</h3>
                                             </div>
-                                            <div className="space-y-4">
-                                                <p className="text-sm text-muted-foreground font-serif">Most studied themes:</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {["Wisdom", "Love", "Faith", "Prayer"].map((theme) => (
-                                                        <span key={theme} className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-serif">
-                                                            {theme}
-                                                        </span>
-                                                    ))}
+
+                                            {/* Study Focus */}
+                                            <div className="group relative p-6 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm">
+                                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                <div className="relative">
+                                                    <div className="flex items-center gap-2 mb-6">
+                                                        <div className="p-2 rounded-lg bg-primary/10">
+                                                            <Filter className="w-4 h-4 text-primary" />
+                                                        </div>
+                                                        <h3 className="font-serif text-lg">Recent Focus</h3>
+                                                    </div>
+                                                    <div className="space-y-4">
+                                                        <p className="text-sm text-muted-foreground font-serif">Most studied themes:</p>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {(userContext?.favoriteTopics || ["Wisdom", "Love", "Faith", "Prayer"]).slice(0, 6).map((theme: string) => (
+                                                                <span key={theme} className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-serif capitalize">
+                                                                    {theme}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                        {userContext?.notes?.length > 0 && (
+                                                            <div className="mt-6">
+                                                                <p className="text-sm text-muted-foreground font-serif mb-3">Recent Notes:</p>
+                                                                <div className="space-y-2">
+                                                                    {userContext.notes.slice(-2).map((note: any, index: number) => (
+                                                                        <div key={index} className="text-sm bg-muted/50 rounded-lg p-3">
+                                                                            <p className="text-muted-foreground font-serif line-clamp-2">{note.content}</p>
+                                                                            <p className="text-xs text-muted-foreground/70 mt-1">
+                                                                                {formatDistanceToNow(new Date(note.timestamp), { addSuffix: true })}
+                                                                            </p>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        <p className="text-sm text-muted-foreground font-serif mt-4">
+                                                            Suggestion: Consider exploring {
+                                                                userContext?.bibleCoverage?.length === 0
+                                                                    ? "the Gospels"
+                                                                    : userContext?.bibleCoverage?.some((b: any) => b.book === "Psalms")
+                                                                        ? "Prophetic books"
+                                                                        : "Psalms"
+                                                            } next
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <p className="text-sm text-muted-foreground font-serif">
-                                                    Suggestion: Consider exploring Prophetic books next
-                                                </p>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>
                 </div>
             </main>
+
+            {/* Auth Modal */}
+            {showAuthModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4">
+                        <div className="text-center">
+                            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+                                <Lock className="w-6 h-6 text-primary" />
+                            </div>
+                            <h2 className="text-xl font-medium mb-2">Sign in to Continue</h2>
+                            <p className="text-muted-foreground text-sm">
+                                Create an account to generate personalized Bible studies and track your progress.
+                            </p>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <button
+                                onClick={() => {
+                                    setShowAuthModal(false);
+                                    // TODO: Implement sign in logic
+                                }}
+                                className="w-full h-11 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition-colors"
+                            >
+                                Sign in
+                            </button>
+                            <button
+                                onClick={() => setShowAuthModal(false)}
+                                className="w-full h-11 rounded-lg bg-zinc-100 text-zinc-900 font-medium hover:bg-zinc-200 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 } 

@@ -145,7 +145,7 @@ export function isNewTestament(bookName: string): boolean {
 }
 
 // Book order and chapter counts for position calculation
-const BIBLE_STRUCTURE = {
+export const BIBLE_STRUCTURE = {
     Genesis: { position: 1, chapters: 50 },
     Exodus: { position: 2, chapters: 40 },
     Leviticus: { position: 3, chapters: 27 },
