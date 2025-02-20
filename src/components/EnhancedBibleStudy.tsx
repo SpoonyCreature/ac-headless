@@ -570,7 +570,6 @@ export function EnhancedBibleStudy({
                                                     <>
                                                         {/* Timeline Section */}
                                                         <div className="bg-muted/30 rounded-xl p-3 sm:p-6 space-y-3 sm:space-y-4">
-                                                            <h5 className="text-sm font-medium text-primary/70">Biblical Timeline</h5>
                                                             <div className="max-w-3xl mx-auto overflow-x-auto">
                                                                 <VerseTimeline
                                                                     sourceReference={verseRef}
