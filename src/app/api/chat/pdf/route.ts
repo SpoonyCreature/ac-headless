@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { Message, completion } from '@/src/lib/ai';
 import { ChatMessage, Source, GroundingSupport } from '@/src/types/chat';
 import { getServerWixClient } from '@/src/app/serverWixClient';
+import { generateChatNote, shouldGenerateNoteForChat } from '@/src/lib/user-notes';
 
 const DATASTORE_PATH_APOLOGETICS_CENTRAL = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/apologetics-central-site_1739189009605";
 const DATASTORE_PATH_PDFS = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/apologetics-central-books_1739215369130_gcs_store";
@@ -91,32 +92,6 @@ export async function POST(request: Request) {
             hour12: false
         });
 
-        let responseMessage: ChatMessage;
-
-        // Handle the response
-        if (typeof response === 'object' && 'text' in response) {
-            const completionResponse = response as CompletionResponse;
-            responseMessage = {
-                _id: `msg-${Date.now()}`,
-                role: 'Agent',
-                text: completionResponse.text,
-                sources: completionResponse.sources,
-                groundingSupports: completionResponse.groundingSupports,
-                time: formattedTime,
-                datetime: now.toISOString()
-            };
-        } else if (typeof response === 'string') {
-            responseMessage = {
-                _id: `msg-${Date.now()}`,
-                role: 'Agent',
-                text: response,
-                time: formattedTime,
-                datetime: now.toISOString()
-            };
-        } else {
-            throw new Error('Invalid response format from completion');
-        }
-
         // Create the user's message in the DB format
         const userMessage = {
             _id: `msg-${Date.now()}-user`,
@@ -126,13 +101,37 @@ export async function POST(request: Request) {
             datetime: now.toISOString()
         };
 
+        // Create the AI response message
+        const responseMessage = typeof response === 'object' && 'text' in response
+            ? {
+                _id: `msg-${Date.now()}`,
+                role: 'Agent',
+                text: (response as CompletionResponse).text,
+                sources: (response as CompletionResponse).sources,
+                groundingSupports: (response as CompletionResponse).groundingSupports,
+                time: formattedTime,
+                datetime: now.toISOString()
+            }
+            : {
+                _id: `msg-${Date.now()}`,
+                role: 'Agent',
+                text: response as string,
+                time: formattedTime,
+                datetime: now.toISOString()
+            };
+
+        const completionResponse = typeof response === 'object' && 'text' in response
+            ? response as CompletionResponse
+            : { text: response as string };
+
         // Save the chat if user is authenticated
         if (wixClient.auth.loggedIn()) {
             try {
                 let savedThreadId = threadId;
+                let updatedThread;
 
+                // If we have a threadId, try to update existing thread
                 if (threadId) {
-                    // Update existing thread
                     const { items } = await wixClient.items
                         .query('gptthread')
                         .eq('_id', threadId)
@@ -140,24 +139,44 @@ export async function POST(request: Request) {
 
                     if (items.length > 0) {
                         const existingThread = items[0];
+                        updatedThread = [...(existingThread.thread || []), userMessage, responseMessage];
+
                         await wixClient.items.update('gptthread', {
                             _id: existingThread._id,
                             question: existingThread.question,
                             personality: existingThread.personality || "REFORMED",
-                            thread: [...(existingThread.thread || []), userMessage, responseMessage]
+                            thread: updatedThread
                         });
                     } else {
-                        console.log('Thread not found:', threadId);
+                        console.error('Thread not found:', threadId);
+                        // If thread not found, create a new one
+                        savedThreadId = null;
                     }
-                } else {
-                    // Create new thread
+                }
+
+                // If no threadId or thread not found, create a new thread
+                if (!savedThreadId) {
+                    updatedThread = [userMessage, responseMessage];
                     const result = await wixClient.items.insert('gptthread', {
                         question: messages[messages.length - 1].content.substring(0, 100) + '...',
-                        thread: [userMessage, responseMessage],
+                        thread: updatedThread,
                         public: false,
                         personality: "REFORMED"
                     });
                     savedThreadId = result._id;
+                }
+
+                // Generate note if needed
+                if (shouldGenerateNoteForChat(updatedThread.length)) {
+                    try {
+                        await generateChatNote(
+                            updatedThread,
+                            completionResponse.sources
+                        );
+                    } catch (error) {
+                        console.error('Failed to generate chat note:', error);
+                        // Continue even if note generation fails
+                    }
                 }
 
                 // Return the response with threadId

@@ -191,7 +191,8 @@ export default function ChatPage() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    messages: messagesToSend
+                    messages: messagesToSend,
+                    threadId
                 }),
             });
 

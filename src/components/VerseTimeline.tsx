@@ -46,7 +46,7 @@ const TIMELINE_MARKERS = [
     { book: 'Esther', chapters: 10, label: 'Est', category: 'historical' },
     // Poetic Books
     { book: 'Job', chapters: 42, label: 'Job', category: 'poetic' },
-    { book: 'Psalms', chapters: 150, label: 'Ps', category: 'poetic' },
+    { book: 'Psalm', chapters: 150, label: 'Ps', category: 'poetic' },
     { book: 'Proverbs', chapters: 31, label: 'Prov', category: 'poetic' },
     { book: 'Ecclesiastes', chapters: 12, label: 'Eccl', category: 'poetic' },
     { book: 'Song of Solomon', chapters: 8, label: 'Song', category: 'poetic' },

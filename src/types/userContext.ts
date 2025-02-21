@@ -1,7 +1,7 @@
 export interface UserContextNote {
     timestamp: string;
     content: string;
-    type: 'user' | 'llm' | 'system';
+    type: string;
     tags?: string[];
 }
 

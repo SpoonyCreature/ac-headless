@@ -86,7 +86,8 @@ export async function POST(request: NextRequest) {
 
         // Step 1: Get cross references using GPT with JSON schema
         const crossRefPrompt = `
-            Analyze the provided Bible verse and generate relevant cross references.
+            Analyze the provided Bible verse and generate relevant list of cross references for the user to explore.
+            You can try to be quite comprehensive, but don't include every verse in the bible lol.
             For each cross reference, provide:
             1. The exact verse reference (can include verse ranges, e.g. "Colossians 1:16-19" or "Genesis 1:1,3")
             2. How it connects to the original verse

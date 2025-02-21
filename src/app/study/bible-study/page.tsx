@@ -32,7 +32,7 @@ const formatDate = (dateString: string | undefined | null) => {
     }
 };
 
-type TabType = 'create' | 'studies' | 'insights';
+type TabType = 'create' | 'studies';
 
 export default function BibleStudyPage() {
     const [query, setQuery] = useState('');
@@ -143,188 +143,149 @@ export default function BibleStudyPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[url('/paper-texture.png')] bg-repeat">
-            {/* Hero Header */}
-            <div className="relative">
-                <div className="absolute inset-0 bg-[url('/bs.jpeg')] bg-cover bg-center">
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/50 backdrop-blur-[2px]" />
-                    {/* Add animated particles effect */}
-                    <div className="absolute inset-0 opacity-30">
-                        <div className="absolute w-1/3 h-1/3 bg-primary/20 rounded-full blur-3xl animate-pulse top-1/4 left-1/4 mix-blend-overlay" />
-                        <div className="absolute w-1/4 h-1/4 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-300 top-1/3 right-1/3 mix-blend-overlay" />
-                        <div className="absolute w-1/3 h-1/3 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-500 bottom-1/4 right-1/4 mix-blend-overlay" />
-                    </div>
-                </div>
-                <div className="relative container mx-auto px-4 sm:px-6 pt-24 pb-28 sm:pt-36 sm:pb-40">
-                    <div className="max-w-[720px] mx-auto text-center">
-                        <div
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/90 mb-8 text-sm shadow-xl transform hover:scale-105 transition-all"
-                        >
-                            <Bot className="w-4 h-4" />
-                            <span className="relative">
-                                <span className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 blur"></span>
-                                <span className="relative">Cutting Edge AI & Biblical Scholarship</span>
-                            </span>
-                        </div>
-
-                        <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-white mb-8 tracking-tight leading-[1.15] font-medium">
-                            <span className="inline-block transform hover:scale-105 transition-transform duration-300">The World's Most</span>{' '}
-                            <span className="relative inline-block">
-                                <span className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-purple-500/30 blur"></span>
-                                <span className="relative">Advanced</span>
-                            </span>{' '}
-                            <span className="inline-block transform hover:scale-105 transition-transform duration-300">Bible Study Platform</span>
-                        </h1>
-
-                        <p className="text-white/90 max-w-2xl mx-auto text-lg sm:text-xl leading-relaxed font-light">
-                            Experience Scripture like never before with instant AI-powered insights,
-                            cross-references, and in-depth analysis for any verse, topic, or character.
+        <div className="min-h-screen bg-repeat">
+            {/* Simple functional header */}
+            <section className="bg-[#0A1A3B] py-12">
+                <div className="container mx-auto px-4">
+                    <div className="max-w-[720px] mx-auto">
+                        <h1 className="font-serif text-2xl sm:text-3xl text-white mb-3">Bible Study</h1>
+                        <p className="text-white/90 text-lg">
+                            Study Scripture with verse analysis, cross-references, and commentary
                         </p>
                     </div>
                 </div>
-
-                {/* Enhanced decorative elements */}
-                <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-t from-primary/30 via-purple-500/20 to-transparent blur-[100px] -mb-40 opacity-50" />
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/30 blur-[100px] -mb-32" />
-            </div>
+            </section>
 
             <main className="container mx-auto px-4 sm:px-6 -mt-8 relative z-10">
-                {/* Tabs in white card that overlaps the hero */}
+                {/* Tabs with better mobile treatment */}
                 <div className="max-w-3xl mx-auto">
-                    <div className="bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl p-1.5 mb-8 border border-white/40">
-                        <div className="border-b border-border/30">
-                            <div className="flex -mb-px justify-center sm:justify-start">
-                                {[
-                                    { id: 'create', label: 'Create Study', icon: PlusCircle },
-                                    { id: 'studies', label: 'My Studies', icon: BookMarked },
-                                    { id: 'insights', label: 'Insights', icon: BarChart }
-                                ].map(tab => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => isAuthenticated ? setActiveTab(tab.id as TabType) : setShowAuthModal(true)}
-                                        className={cn(
-                                            "px-5 sm:px-7 py-4 text-sm font-medium border-b-2 transition-all flex items-center gap-2 relative group",
-                                            activeTab === tab.id
-                                                ? "border-primary text-primary"
-                                                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                                        )}
-                                    >
-                                        <tab.icon className={cn(
-                                            "w-4 h-4 transition-transform group-hover:scale-110",
-                                            activeTab === tab.id ? "text-primary" : "text-muted-foreground"
-                                        )} />
-                                        <span>{tab.label}</span>
-                                        {activeTab === tab.id && (
-                                            <span className="absolute inset-x-0 -bottom-px h-px bg-primary blur-sm" />
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                    <div className="bg-white shadow-xl rounded-2xl p-1.5 mb-8">
+                        <nav className="flex items-center justify-between border-b border-border/30">
+                            {[
+                                { id: 'create', label: 'Create Study', icon: PlusCircle },
+                                { id: 'studies', label: 'My Studies', icon: BookMarked }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => isAuthenticated ? setActiveTab(tab.id as TabType) : setShowAuthModal(true)}
+                                    className={cn(
+                                        "flex-1 px-4 py-3 text-sm font-medium transition-all flex items-center justify-center gap-2 relative",
+                                        activeTab === tab.id
+                                            ? "text-primary border-b-2 border-primary -mb-[2px]"
+                                            : "text-muted-foreground/70 hover:text-foreground"
+                                    )}
+                                >
+                                    <tab.icon className={cn(
+                                        "w-4 h-4",
+                                        activeTab === tab.id ? "text-primary" : "text-muted-foreground/70"
+                                    )} />
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </nav>
                     </div>
 
                     {/* Tab Content */}
                     <div className="max-w-3xl mx-auto">
                         {activeTab === 'create' && (
-                            <div className="space-y-8">
+                            <div className="space-y-6">
                                 {/* Bible Study Creation Card */}
-                                <div className="bg-white/95 backdrop-blur-xl border border-border/20 rounded-3xl shadow-2xl overflow-hidden relative group">
-                                    {/* Replace animated gradient border with subtle hover effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
+                                <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
                                     {/* Primary Input Section */}
-                                    <div className="relative p-8 sm:p-10 bg-gradient-to-b from-slate-50/50 to-transparent">
-                                        <form onSubmit={handleSearch} className="space-y-6">
-                                            <div className="space-y-3">
-                                                <label htmlFor="query" className="text-lg font-medium text-foreground inline-flex items-center gap-2">
-                                                    <Search className="w-5 h-5 text-primary" />
-                                                    What would you like to study?
-                                                </label>
-                                                <div className="relative">
-                                                    <input
-                                                        id="query"
-                                                        type="text"
-                                                        value={query}
-                                                        onChange={(e) => setQuery(e.target.value)}
-                                                        placeholder="e.g., John 3:16, God's love, Kingdom of Heaven"
-                                                        className="w-full h-[60px] px-6 rounded-xl bg-white shadow-lg placeholder:text-muted-foreground/50 text-[15px] focus:outline-none focus:ring-2 focus:ring-primary/20 border border-border/5 transition-shadow hover:shadow-xl"
-                                                        disabled={isSearching || isCreatingStudy}
-                                                    />
+                                    <div className="p-8">
+                                        <form onSubmit={handleSearch} className="space-y-8">
+                                            <div className="space-y-6">
+                                                <div className="space-y-4">
+                                                    <label htmlFor="query" className="text-lg font-medium text-foreground flex items-center gap-2.5">
+                                                        <Search className="w-5 h-5 text-primary" />
+                                                        What would you like to study?
+                                                    </label>
+                                                    <div className="space-y-3">
+                                                        <div className="relative">
+                                                            <input
+                                                                id="query"
+                                                                type="text"
+                                                                value={query}
+                                                                onChange={(e) => setQuery(e.target.value)}
+                                                                placeholder="Enter a verse (John 3:16), topic (God's love), or question"
+                                                                className="w-full h-14 sm:h-16 px-4 sm:px-6 pr-[90px] rounded-xl bg-white 
+                                                                    text-base placeholder:text-muted-foreground/50
+                                                                    border-2 border-border/20 hover:border-primary/30
+                                                                    focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary
+                                                                    transition-all duration-200"
+                                                                disabled={isSearching || isCreatingStudy}
+                                                            />
+                                                            <div className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2">
+                                                                <div className="px-2 py-1 rounded-md bg-slate-100 text-xs font-medium text-muted-foreground/70">
+                                                                    Enter ↵
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-3">
+                                                            <select
+                                                                value={translation}
+                                                                onChange={(e) => setTranslation(e.target.value as Translation)}
+                                                                className="flex-1 h-12 px-4 rounded-lg bg-white text-base appearance-none 
+                                                                    focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary
+                                                                    border-2 border-border/20 hover:border-primary/30 transition-all"
+                                                                disabled={isSearching || isCreatingStudy}
+                                                            >
+                                                                {TRANSLATIONS.map((t) => (
+                                                                    <option key={t.id} value={t.id}>{t.name}</option>
+                                                                ))}
+                                                            </select>
+
+                                                            <button
+                                                                type="submit"
+                                                                disabled={isSearching || isCreatingStudy || !query.trim()}
+                                                                className={cn(
+                                                                    "h-12 px-6 rounded-lg font-medium flex items-center justify-center gap-2 text-base transition-all whitespace-nowrap",
+                                                                    isAuthenticated
+                                                                        ? "bg-primary text-white disabled:opacity-50 hover:bg-primary/90"
+                                                                        : "bg-primary text-white disabled:opacity-50 hover:bg-primary/90"
+                                                                )}
+                                                            >
+                                                                {isSearching || isCreatingStudy ? (
+                                                                    <>
+                                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                                        <span>{isSearching ? 'Searching...' : 'Creating...'}</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        {isAuthenticated ? (
+                                                                            <>Generate Study</>
+                                                                        ) : (
+                                                                            <>Sign in to Generate</>
+                                                                        )}
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
+
+                                                {error && (
+                                                    <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+                                                        {error}
+                                                    </div>
+                                                )}
                                             </div>
-
-                                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                                                <button
-                                                    type="submit"
-                                                    disabled={isSearching || isCreatingStudy || !query.trim()}
-                                                    className={cn(
-                                                        "order-2 sm:order-1 flex-1 h-[52px] rounded-xl font-medium flex items-center justify-center gap-3 text-[15px] transition-all relative group overflow-hidden shadow-lg hover:shadow-xl",
-                                                        isAuthenticated
-                                                            ? "bg-primary text-white disabled:opacity-50"
-                                                            : "bg-primary text-white disabled:opacity-50"
-                                                    )}
-                                                >
-                                                    <span className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                    {isSearching || isCreatingStudy ? (
-                                                        <>
-                                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                                            <span>
-                                                                {isSearching ? 'Searching...' : 'Creating study...'}
-                                                            </span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            {isAuthenticated ? (
-                                                                <>
-                                                                    <Bot className="w-5 h-5" />
-                                                                    <span>Generate Study</span>
-                                                                    <Sparkles className="w-4 h-4 opacity-50" />
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <Lock className="w-5 h-5" />
-                                                                    <span>Sign in to Generate Study</span>
-                                                                </>
-                                                            )}
-                                                        </>
-                                                    )}
-                                                </button>
-
-                                                <div className="order-1 sm:order-2 relative">
-                                                    <select
-                                                        value={translation}
-                                                        onChange={(e) => setTranslation(e.target.value as Translation)}
-                                                        className="w-full sm:w-[240px] h-[52px] px-4 pr-10 rounded-xl bg-white text-[15px] appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 border border-border/5 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
-                                                        disabled={isSearching || isCreatingStudy}
-                                                    >
-                                                        {TRANSLATIONS.map((t) => (
-                                                            <option key={t.id} value={t.id}>{t.name}</option>
-                                                        ))}
-                                                    </select>
-                                                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 rotate-90 pointer-events-none" />
-                                                </div>
-                                            </div>
-
-                                            {error && (
-                                                <div className="p-4 rounded-xl bg-red-50/90 backdrop-blur-sm border border-red-200 text-red-600 text-sm">
-                                                    {error}
-                                                </div>
-                                            )}
                                         </form>
                                     </div>
 
-                                    {/* Secondary Content - Quick Ideas */}
-                                    <div className="border-t border-border/40">
-                                        <div className="px-8 sm:px-10 py-8 text-muted-foreground">
+                                    {/* Quick Ideas - More compact and integrated */}
+                                    <div className="border-t border-border/30 bg-slate-50">
+                                        <div className="p-8">
                                             <div className="flex items-center gap-2 mb-6">
                                                 <div className="p-2 rounded-lg bg-primary/10">
                                                     <Lightbulb className="w-4 h-4 text-primary" />
                                                 </div>
-                                                <h3 className="text-base font-medium text-foreground">Quick Ideas & Examples</h3>
+                                                <h3 className="text-base font-medium text-foreground">Quick Ideas</h3>
                                             </div>
                                             <div className="space-y-6">
                                                 <div>
+                                                    <div className="text-sm text-muted-foreground mb-3">Popular verses and topics</div>
                                                     <div className="flex flex-wrap gap-2">
                                                         {[
                                                             "John 3:16",
@@ -337,89 +298,46 @@ export default function BibleStudyPage() {
                                                             <button
                                                                 key={idea}
                                                                 onClick={() => setQuery(idea)}
-                                                                className="px-4 py-2 rounded-xl bg-primary/5 hover:bg-primary/10 text-sm transition-all hover:shadow-md relative group overflow-hidden"
+                                                                className="px-3 py-1.5 rounded-lg bg-white border border-border/20 text-sm hover:border-primary/30 hover:bg-white/80 transition-colors"
                                                             >
-                                                                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
-                                                                <span className="relative">{idea}</span>
+                                                                {idea}
                                                             </button>
                                                         ))}
                                                     </div>
                                                 </div>
 
-                                                <div className="grid sm:grid-cols-2 gap-4">
-                                                    {[
-                                                        {
-                                                            text: "What does Philippians 4:6-7 teach about anxiety and peace?",
-                                                            description: "Deep dive into specific verses",
-                                                            icon: BookOpen
-                                                        },
-                                                        {
-                                                            text: "Compare Jesus's parables about the Kingdom of Heaven",
-                                                            description: "Thematic analysis",
-                                                            icon: Filter
-                                                        }
-                                                    ].map((prompt) => (
-                                                        <button
-                                                            key={prompt.text}
-                                                            onClick={() => setQuery(prompt.text)}
-                                                            className="p-4 rounded-xl border border-border/40 hover:border-primary/30 hover:bg-primary/[0.02] text-left group transition-all hover:shadow-lg relative overflow-hidden"
-                                                        >
-                                                            <span className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                                                            <div className="relative flex gap-3">
-                                                                <div className="shrink-0 p-2 rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
-                                                                    <prompt.icon className="w-4 h-4 text-primary transition-transform group-hover:scale-110" />
+                                                <div>
+                                                    <div className="text-sm text-muted-foreground mb-3">Example studies</div>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                        {[
+                                                            {
+                                                                text: "What does Philippians 4:6-7 teach about anxiety and peace?",
+                                                                description: "Verse study",
+                                                                icon: BookOpen
+                                                            },
+                                                            {
+                                                                text: "Compare Jesus's parables about the Kingdom of Heaven",
+                                                                description: "Theme study",
+                                                                icon: Filter
+                                                            }
+                                                        ].map((prompt) => (
+                                                            <button
+                                                                key={prompt.text}
+                                                                onClick={() => setQuery(prompt.text)}
+                                                                className="flex items-center gap-3 p-3 rounded-lg border border-border/20 hover:border-primary/30 bg-white text-left group transition-all"
+                                                            >
+                                                                <div className="shrink-0 p-1.5 rounded-md bg-primary/10">
+                                                                    <prompt.icon className="w-4 h-4 text-primary" />
                                                                 </div>
-                                                                <div>
-                                                                    <p className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-2">{prompt.text}</p>
-                                                                    <p className="text-xs mt-1.5 text-muted-foreground/70">{prompt.description}</p>
+                                                                <div className="min-w-0">
+                                                                    <p className="text-sm font-medium truncate">{prompt.text}</p>
+                                                                    <p className="text-xs text-muted-foreground">{prompt.description}</p>
                                                                 </div>
-                                                            </div>
-                                                        </button>
-                                                    ))}
+                                                            </button>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Pro Tips Section - More sophisticated */}
-                                <div className="bg-white/90 backdrop-blur-xl border border-border/40 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                                    <div className="relative">
-                                        <h3 className="text-base font-medium text-foreground flex items-center gap-2 mb-6">
-                                            <div className="p-2 rounded-lg bg-primary/10">
-                                                <Sparkles className="w-4 h-4 text-primary" />
-                                            </div>
-                                            Pro Tips
-                                        </h3>
-                                        <div className="grid sm:grid-cols-2 gap-6">
-                                            {[
-                                                {
-                                                    tips: [
-                                                        "Be specific with your questions",
-                                                        "Include multiple verses for comparison"
-                                                    ],
-                                                    icon: Filter
-                                                },
-                                                {
-                                                    tips: [
-                                                        "Ask about historical context",
-                                                        "Request practical applications"
-                                                    ],
-                                                    icon: Globe
-                                                }
-                                            ].map((section, idx) => (
-                                                <div key={idx} className="space-y-3">
-                                                    {section.tips.map((tip, tipIdx) => (
-                                                        <div key={tipIdx} className="flex items-start gap-3">
-                                                            <div className="shrink-0 p-1.5 rounded-lg bg-primary/10 mt-0.5">
-                                                                <section.icon className="w-3 h-3 text-primary" />
-                                                            </div>
-                                                            <p className="text-sm text-muted-foreground">{tip}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ))}
                                         </div>
                                     </div>
                                 </div>
@@ -428,11 +346,11 @@ export default function BibleStudyPage() {
 
                         {activeTab === 'studies' && (
                             <div className="space-y-6">
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                    <h2 className="font-serif text-xl sm:text-2xl">My Bible Studies</h2>
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-border/20">
+                                    <h2 className="text-lg font-medium text-foreground/90">My Bible Studies</h2>
                                     <button
                                         onClick={() => setActiveTab('create')}
-                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-colors text-sm font-medium shadow-sm"
+                                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-900 transition-colors text-sm"
                                     >
                                         <PlusCircle className="w-4 h-4" />
                                         New Study
@@ -440,58 +358,64 @@ export default function BibleStudyPage() {
                                 </div>
 
                                 {isLoadingStudies ? (
-                                    <div className="flex items-center justify-center py-16">
-                                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                                    <div className="flex items-center justify-center py-12">
+                                        <Loader2 className="w-5 h-5 animate-spin text-foreground/50" />
                                     </div>
                                 ) : userStudies.length === 0 ? (
-                                    <div className="text-center py-16 px-4">
-                                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
-                                            <BookOpen className="w-6 h-6 text-primary" />
+                                    <div className="text-center py-12">
+                                        <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 mb-3">
+                                            <BookOpen className="w-5 h-5 text-slate-600" />
                                         </div>
-                                        <h3 className="font-serif text-lg mb-2">No studies yet</h3>
-                                        <p className="text-muted-foreground text-sm max-w-sm mx-auto">
+                                        <h3 className="text-base font-medium text-foreground/90 mb-1">No studies yet</h3>
+                                        <p className="text-sm text-foreground/60">
                                             Start your first Bible study by selecting "Create Study" above
                                         </p>
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="grid sm:grid-cols-2 gap-4">
+                                        <div className="divide-y divide-border/10">
                                             {userStudies.slice((currentPage - 1) * studiesPerPage, currentPage * studiesPerPage).map((study) => (
                                                 <button
                                                     key={study._id}
                                                     onClick={() => navigateWithTransition(`/study/bible-study/${study._id}`)}
-                                                    className="group relative p-5 rounded-xl border border-border/50 bg-white/90 backdrop-blur-sm hover:border-primary/50 transition-all text-left shadow-sm hover:shadow-lg"
+                                                    className="w-full group px-4 py-3 -mx-4 flex items-start gap-3 hover:bg-slate-50 transition-colors"
                                                 >
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                    <div className="relative flex items-start gap-3">
-                                                        <div className="shrink-0 p-2 rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
-                                                            <BookOpen className="w-5 h-5 text-primary transition-transform group-hover:scale-110" />
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <h3 className="font-serif group-hover:text-primary transition-colors line-clamp-2 mb-2">
-                                                                {study.query}
-                                                            </h3>
-                                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                                <Clock className="w-3 h-3" />
-                                                                <span className="truncate">{formatDate(study.createdAt)}</span>
+                                                    <div className="shrink-0 p-2 mt-0.5 rounded bg-slate-100 transition-colors">
+                                                        <BookOpen className="w-4 h-4 text-foreground/70" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0 text-left">
+                                                        <h3 className="text-base text-foreground/90 group-hover:text-foreground truncate mb-1">
+                                                            {study.query}
+                                                        </h3>
+                                                        <div className="flex items-center gap-3 text-xs text-foreground/50">
+                                                            <div className="flex items-center gap-1.5">
+                                                                <Clock className="w-3.5 h-3.5" />
+                                                                <span>{formatDate(study.createdAt)}</span>
                                                             </div>
+                                                            {study.verses?.length > 0 && (
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <BookOpen className="w-3.5 h-3.5" />
+                                                                    <span>{study.verses.length} verses</span>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
+                                                    <ChevronRight className="w-4 h-4 text-foreground/30 group-hover:text-foreground/50 transition-colors" />
                                                 </button>
                                             ))}
                                         </div>
 
                                         {userStudies.length > studiesPerPage && (
-                                            <div className="flex justify-center gap-1 mt-8">
+                                            <div className="flex justify-center gap-1 pt-4 border-t border-border/10">
                                                 {Array.from({ length: Math.ceil(userStudies.length / studiesPerPage) }).map((_, i) => (
                                                     <button
                                                         key={i}
                                                         onClick={() => setCurrentPage(i + 1)}
                                                         className={cn(
-                                                            "w-9 h-9 rounded-lg flex items-center justify-center text-sm transition-all",
+                                                            "w-8 h-8 rounded flex items-center justify-center text-sm transition-colors",
                                                             currentPage === i + 1
-                                                                ? "bg-primary text-white shadow-sm"
-                                                                : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
+                                                                ? "bg-slate-900 text-white"
+                                                                : "text-foreground/60 hover:text-foreground hover:bg-slate-100"
                                                         )}
                                                     >
                                                         {i + 1}
@@ -499,179 +423,6 @@ export default function BibleStudyPage() {
                                                 ))}
                                             </div>
                                         )}
-                                    </>
-                                )}
-                            </div>
-                        )}
-
-                        {activeTab === 'insights' && (
-                            <div className="space-y-8">
-                                <h2 className="font-serif text-2xl sm:text-3xl">Study Insights</h2>
-
-                                {isLoadingContext ? (
-                                    <div className="flex items-center justify-center py-16">
-                                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="grid sm:grid-cols-3 gap-4">
-                                            {[
-                                                {
-                                                    title: "Bible Coverage",
-                                                    value: `${Math.round(coverage)}%`,
-                                                    description: "of the Bible studied",
-                                                    icon: BookOpen
-                                                },
-                                                {
-                                                    title: "Study Streak",
-                                                    value: userContext?.studyStreak || "0",
-                                                    description: "days in a row",
-                                                    icon: Sparkles
-                                                },
-                                                {
-                                                    title: "Total Studies",
-                                                    value: userStudies.length.toString(),
-                                                    description: "studies completed",
-                                                    icon: Star
-                                                },
-                                            ].map((stat) => (
-                                                <div key={stat.title} className="group relative p-6 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm transition-all">
-                                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                    <div className="relative">
-                                                        <div className="flex items-center gap-2 mb-3">
-                                                            <div className="p-2 rounded-lg bg-primary/10">
-                                                                <stat.icon className="w-4 h-4 text-primary" />
-                                                            </div>
-                                                            <h3 className="text-sm font-medium text-muted-foreground font-serif">{stat.title}</h3>
-                                                        </div>
-                                                        <div className="flex items-baseline gap-2">
-                                                            <span className="text-2xl font-bold font-serif">{stat.value}</span>
-                                                            <span className="text-sm text-muted-foreground font-serif">{stat.description}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <div className="grid sm:grid-cols-2 gap-4">
-                                            {/* Reading Progress */}
-                                            <div className="group relative p-6 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm space-y-6">
-                                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                <div className="relative">
-                                                    <div className="flex items-center gap-2 mb-6">
-                                                        <div className="p-2 rounded-lg bg-primary/10">
-                                                            <BookOpen className="w-4 h-4 text-primary" />
-                                                        </div>
-                                                        <h3 className="font-serif text-lg">Reading Progress</h3>
-                                                    </div>
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <div className="flex justify-between text-sm mb-2">
-                                                                <span className="text-muted-foreground font-serif">Old Testament</span>
-                                                                <span className="font-medium font-serif">
-                                                                    {Math.round(userContext?.bibleCoverage
-                                                                        ?.filter((b: any) => b.book !== 'Matthew' &&
-                                                                            !b.book.startsWith('1') && !b.book.startsWith('2') &&
-                                                                            !b.book.startsWith('3'))
-                                                                        ?.reduce((acc: number, book: any) =>
-                                                                            acc + (book.chaptersRead.length / BIBLE_STRUCTURE[book.book as keyof typeof BIBLE_STRUCTURE].chapters), 0) * 100 / 39 || 0
-                                                                    )}%
-                                                                </span>
-                                                            </div>
-                                                            <div className="h-2 rounded-full bg-muted overflow-hidden">
-                                                                <div
-                                                                    className="h-full bg-primary rounded-full"
-                                                                    style={{
-                                                                        width: `${Math.round(userContext?.bibleCoverage
-                                                                            ?.filter((b: any) => b.book !== 'Matthew' &&
-                                                                                !b.book.startsWith('1') && !b.book.startsWith('2') &&
-                                                                                !b.book.startsWith('3'))
-                                                                            ?.reduce((acc: number, book: any) =>
-                                                                                acc + (book.chaptersRead.length / BIBLE_STRUCTURE[book.book as keyof typeof BIBLE_STRUCTURE].chapters), 0) * 100 / 39 || 0
-                                                                        )}%`
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <div className="flex justify-between text-sm mb-2">
-                                                                <span className="text-muted-foreground font-serif">New Testament</span>
-                                                                <span className="font-medium font-serif">
-                                                                    {Math.round(userContext?.bibleCoverage
-                                                                        ?.filter((b: any) => b.book === 'Matthew' ||
-                                                                            b.book.startsWith('1') || b.book.startsWith('2') ||
-                                                                            b.book.startsWith('3'))
-                                                                        ?.reduce((acc: number, book: any) =>
-                                                                            acc + (book.chaptersRead.length / BIBLE_STRUCTURE[book.book as keyof typeof BIBLE_STRUCTURE].chapters), 0) * 100 / 27 || 0
-                                                                    )}%
-                                                                </span>
-                                                            </div>
-                                                            <div className="h-2 rounded-full bg-muted overflow-hidden">
-                                                                <div
-                                                                    className="h-full bg-primary rounded-full"
-                                                                    style={{
-                                                                        width: `${Math.round(userContext?.bibleCoverage
-                                                                            ?.filter((b: any) => b.book === 'Matthew' ||
-                                                                                b.book.startsWith('1') || b.book.startsWith('2') ||
-                                                                                b.book.startsWith('3'))
-                                                                            ?.reduce((acc: number, book: any) =>
-                                                                                acc + (book.chaptersRead.length / BIBLE_STRUCTURE[book.book as keyof typeof BIBLE_STRUCTURE].chapters), 0) * 100 / 27 || 0
-                                                                        )}%`
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Study Focus */}
-                                            <div className="group relative p-6 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm">
-                                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                <div className="relative">
-                                                    <div className="flex items-center gap-2 mb-6">
-                                                        <div className="p-2 rounded-lg bg-primary/10">
-                                                            <Filter className="w-4 h-4 text-primary" />
-                                                        </div>
-                                                        <h3 className="font-serif text-lg">Recent Focus</h3>
-                                                    </div>
-                                                    <div className="space-y-4">
-                                                        <p className="text-sm text-muted-foreground font-serif">Most studied themes:</p>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {(userContext?.favoriteTopics || ["Wisdom", "Love", "Faith", "Prayer"]).slice(0, 6).map((theme: string) => (
-                                                                <span key={theme} className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-serif capitalize">
-                                                                    {theme}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-                                                        {userContext?.notes?.length > 0 && (
-                                                            <div className="mt-6">
-                                                                <p className="text-sm text-muted-foreground font-serif mb-3">Recent Notes:</p>
-                                                                <div className="space-y-2">
-                                                                    {userContext.notes.slice(-2).map((note: any, index: number) => (
-                                                                        <div key={index} className="text-sm bg-muted/50 rounded-lg p-3">
-                                                                            <p className="text-muted-foreground font-serif line-clamp-2">{note.content}</p>
-                                                                            <p className="text-xs text-muted-foreground/70 mt-1">
-                                                                                {formatDistanceToNow(new Date(note.timestamp), { addSuffix: true })}
-                                                                            </p>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                        <p className="text-sm text-muted-foreground font-serif mt-4">
-                                                            Suggestion: Consider exploring {
-                                                                userContext?.bibleCoverage?.length === 0
-                                                                    ? "the Gospels"
-                                                                    : userContext?.bibleCoverage?.some((b: any) => b.book === "Psalms")
-                                                                        ? "Prophetic books"
-                                                                        : "Psalms"
-                                                            } next
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </>
                                 )}
                             </div>
