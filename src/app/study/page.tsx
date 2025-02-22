@@ -48,30 +48,30 @@ export default function StudyPage() {
     return (
         <div className="min-h-screen bg-white">
             {/* Header */}
-            <section className="bg-[#0A1A3B] py-16">
-                <div className="container mx-auto px-4">
-                    <div className="max-w-[720px]">
+            <section className="bg-[#0A1A3B] py-8 sm:py-16">
+                <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
+                    <div className="w-full max-w-2xl">
                         {/* Badge */}
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 mb-6">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 mb-4 sm:mb-6">
                             <BookOpen className="w-3.5 h-3.5 text-white" />
                             <span className="text-sm text-white">Reformed Bible Study</span>
                         </div>
 
-                        <h1 className="font-serif text-4xl text-white mb-3">Study Dashboard</h1>
-                        <p className="text-white/80 text-lg">Track your progress and access powerful study tools</p>
+                        <h1 className="font-serif text-3xl sm:text-4xl text-white mb-2 sm:mb-3">Study Dashboard</h1>
+                        <p className="text-white/80 text-base sm:text-lg">Track your progress and access powerful study tools</p>
                     </div>
                 </div>
             </section>
 
-            <main className="container mx-auto px-4 -mt-8 relative z-10">
-                <div className="max-w-[1200px] mx-auto space-y-16">
+            <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 -mt-8 relative z-10">
+                <div className="w-full space-y-8 sm:space-y-16">
                     {/* Study Options */}
-                    <div className="grid sm:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <Link
                             href="/study/bible-study"
-                            className="group bg-white p-6 rounded-xl border border-border/20"
+                            className="group bg-white p-4 sm:p-6 rounded-xl border border-border/20"
                         >
-                            <div className="flex items-start gap-4">
+                            <div className="flex items-start gap-3 sm:gap-4">
                                 <div className="shrink-0 p-2 rounded-lg bg-slate-100">
                                     <BookOpen className="w-5 h-5 text-slate-600" />
                                 </div>
@@ -89,9 +89,9 @@ export default function StudyPage() {
 
                         <Link
                             href="/study/chat"
-                            className="group bg-white p-6 rounded-xl border border-border/20"
+                            className="group bg-white p-4 sm:p-6 rounded-xl border border-border/20"
                         >
-                            <div className="flex items-start gap-4">
+                            <div className="flex items-start gap-3 sm:gap-4">
                                 <div className="shrink-0 p-2 rounded-lg bg-slate-100">
                                     <MessageSquare className="w-5 h-5 text-slate-600" />
                                 </div>
@@ -109,17 +109,17 @@ export default function StudyPage() {
                     </div>
 
                     {/* Progress Section */}
-                    <div className="space-y-8">
-                        <h2 className="font-serif text-2xl text-foreground">Study Progress</h2>
+                    <div className="space-y-6 sm:space-y-8">
+                        <h2 className="font-serif text-xl sm:text-2xl text-foreground">Study Progress</h2>
 
                         {isLoadingContext ? (
                             <div className="flex items-center justify-center py-12">
                                 <Loader2 className="w-5 h-5 animate-spin text-foreground/50" />
                             </div>
                         ) : !isAuthenticated ? (
-                            <div className="text-center py-16 px-4">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
-                                    <BookOpen className="w-8 h-8 text-slate-600" />
+                            <div className="text-center py-12 sm:py-16 px-4">
+                                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-100 mb-4">
+                                    <BookOpen className="w-7 h-7 sm:w-8 sm:h-8 text-slate-600" />
                                 </div>
                                 <h3 className="text-lg font-medium text-foreground mb-2">Sign in to track progress</h3>
                                 <p className="text-base text-muted-foreground max-w-md mx-auto">
@@ -128,7 +128,7 @@ export default function StudyPage() {
                             </div>
                         ) : (
                             <>
-                                <div className="grid sm:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     {[
                                         {
                                             title: "Bible Coverage",
@@ -149,7 +149,7 @@ export default function StudyPage() {
                                             icon: Star
                                         },
                                     ].map((stat) => (
-                                        <div key={stat.title} className="bg-white p-6 rounded-xl border border-border/20">
+                                        <div key={stat.title} className="bg-white p-4 sm:p-6 rounded-xl border border-border/20">
                                             <div className="flex items-center gap-2 mb-3">
                                                 <div className="p-2 rounded-lg bg-slate-100">
                                                     <stat.icon className="w-4 h-4 text-slate-600" />
@@ -164,9 +164,9 @@ export default function StudyPage() {
                                     ))}
                                 </div>
 
-                                <div className="grid sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {/* Reading Progress */}
-                                    <div className="bg-white p-6 rounded-xl border border-border/20">
+                                    <div className="bg-white p-4 sm:p-6 rounded-xl border border-border/20">
                                         <div className="flex items-center gap-2 mb-6">
                                             <div className="p-2 rounded-lg bg-slate-100">
                                                 <BookOpen className="w-4 h-4 text-slate-600" />
@@ -234,7 +234,7 @@ export default function StudyPage() {
                                     </div>
 
                                     {/* Study Focus */}
-                                    <div className="bg-white p-6 rounded-xl border border-border/20">
+                                    <div className="bg-white p-4 sm:p-6 rounded-xl border border-border/20">
                                         <div className="flex items-center gap-2 mb-6">
                                             <div className="p-2 rounded-lg bg-slate-100">
                                                 <Filter className="w-4 h-4 text-slate-600" />
