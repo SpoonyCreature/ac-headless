@@ -191,7 +191,8 @@ export default function ChatPage() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    messages: messagesToSend
+                    messages: messagesToSend,
+                    threadId
                 }),
             });
 
@@ -234,6 +235,7 @@ export default function ChatPage() {
                 groundingSupports: data.groundingSupports,
                 public: data.public
             } satisfies Message;
+
             setMessages(prev => [...prev, aiMessage]);
 
             // Refresh chat lists

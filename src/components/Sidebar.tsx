@@ -82,20 +82,29 @@ export function Sidebar({ isOpen, onClose, isLoading = false }: SidebarProps) {
                         </Link>
 
                         {/* Study Section */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setIsStudyOpen(!isStudyOpen)}
-                                className="w-full flex items-center justify-between gap-3 px-4 py-3 text-base font-medium text-muted-foreground rounded-md hover:text-foreground hover:bg-muted/50 transition-colors group"
-                            >
-                                <span className="flex items-center gap-3">
+                        <div>
+                            <div className={cn(
+                                "flex items-center gap-3 w-full px-4 py-3 text-base font-medium text-muted-foreground rounded-md hover:text-foreground hover:bg-muted/50 transition-colors group",
+                                isStudyOpen && "text-foreground bg-muted/50"
+                            )}>
+                                <Link
+                                    href="/study"
+                                    className="flex items-center gap-3 flex-1"
+                                    onClick={onClose}
+                                >
                                     <BookOpen className="w-5 h-5" />
-                                    Study
-                                </span>
-                                <ChevronRight className={cn(
-                                    "w-5 h-5 text-muted-foreground/70 transition-transform duration-200",
-                                    isStudyOpen && "rotate-90"
-                                )} />
-                            </button>
+                                    <span className="flex-1 text-left">Study</span>
+                                </Link>
+                                <button
+                                    onClick={() => setIsStudyOpen(!isStudyOpen)}
+                                    className="p-1 -m-1 hover:bg-muted/80 rounded transition-colors"
+                                >
+                                    <ChevronRight className={cn(
+                                        "w-4 h-4 transition-transform",
+                                        isStudyOpen && "rotate-90"
+                                    )} />
+                                </button>
+                            </div>
 
                             <div className={cn(
                                 "overflow-hidden transition-all duration-200",

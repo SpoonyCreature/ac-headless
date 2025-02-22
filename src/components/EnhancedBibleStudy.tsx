@@ -23,7 +23,7 @@ interface EnhancedBibleStudyProps {
     crossReferences?: CrossReference[];
     explanation?: string;
     query?: string;
-    onGenerateCommentary: (verseRef: string, previousCommentaries: Commentary[]) => Promise<CommentaryResponse>;
+    onGenerateCommentary?: (verseRef: string, previousCommentaries: Commentary[]) => Promise<CommentaryResponse>;
     onGenerateCrossReferenceMap?: (verse: BibleVerse) => Promise<void>;
     onSaveCommentary?: (verseRef: string, commentary: CommentaryResponse) => Promise<void>;
     initialCommentaries?: Commentary[];
@@ -48,7 +48,7 @@ export function EnhancedBibleStudy({
     const [activeVerseTab, setActiveVerseTab] = useState<Record<number, string>>({});
 
     const handleGenerateCommentary = async (verseRef: string) => {
-        if (isLoading) return;
+        if (isLoading || !onGenerateCommentary) return;
 
         setIsLoading(verseRef);
         try {
@@ -520,39 +520,45 @@ export function EnhancedBibleStudy({
                                                                 {commentary.commentary.markdown}
                                                             </ReactMarkdown>
                                                         </div>
-                                                        <button
-                                                            onClick={() => handleGenerateCommentary(verseRef)}
-                                                            disabled={isGenerating}
-                                                            className="flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
-                                                        >
-                                                            <RefreshCw className={cn("w-4 h-4", isGenerating && "animate-spin")} />
-                                                            Regenerate Commentary
-                                                        </button>
+                                                        {onGenerateCommentary && (
+                                                            <button
+                                                                onClick={() => handleGenerateCommentary(verseRef)}
+                                                                disabled={isGenerating}
+                                                                className="flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                                                            >
+                                                                <RefreshCw className={cn("w-4 h-4", isGenerating && "animate-spin")} />
+                                                                Regenerate Commentary
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <div className="text-center py-4 sm:py-6">
                                                         <MessageSquare className="w-8 h-8 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
-                                                        <h3 className="text-base sm:text-lg font-medium mb-2">No Commentary Yet</h3>
+                                                        <h3 className="text-base sm:text-lg font-medium mb-2">No Commentary Available</h3>
                                                         <p className="text-sm text-muted-foreground mb-3 sm:mb-4 max-w-md mx-auto">
-                                                            Generate AI-powered commentary to explore deeper insights into this verse.
+                                                            {onGenerateCommentary
+                                                                ? "Generate AI-powered commentary to explore deeper insights into this verse."
+                                                                : "No commentary has been generated for this verse yet."}
                                                         </p>
-                                                        <button
-                                                            onClick={() => handleGenerateCommentary(verseRef)}
-                                                            disabled={isGenerating}
-                                                            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
-                                                        >
-                                                            {isGenerating ? (
-                                                                <>
-                                                                    <RefreshCw className="w-4 h-4 animate-spin" />
-                                                                    Generating...
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <MessageSquare className="w-4 h-4" />
-                                                                    Generate Commentary
-                                                                </>
-                                                            )}
-                                                        </button>
+                                                        {onGenerateCommentary && (
+                                                            <button
+                                                                onClick={() => handleGenerateCommentary(verseRef)}
+                                                                disabled={isGenerating}
+                                                                className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
+                                                            >
+                                                                {isGenerating ? (
+                                                                    <>
+                                                                        <RefreshCw className="w-4 h-4 animate-spin" />
+                                                                        Generating...
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <MessageSquare className="w-4 h-4" />
+                                                                        Generate Commentary
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>
@@ -564,7 +570,6 @@ export function EnhancedBibleStudy({
                                                     <>
                                                         {/* Timeline Section */}
                                                         <div className="bg-muted/30 rounded-xl p-3 sm:p-6 space-y-3 sm:space-y-4">
-                                                            <h5 className="text-sm font-medium text-primary/70">Biblical Timeline</h5>
                                                             <div className="max-w-3xl mx-auto overflow-x-auto">
                                                                 <VerseTimeline
                                                                     sourceReference={verseRef}
@@ -603,39 +608,45 @@ export function EnhancedBibleStudy({
                                                             ))}
                                                         </div>
 
-                                                        <button
-                                                            onClick={() => handleGenerateCrossRefs(verse)}
-                                                            disabled={generatingCrossRefs === verseRef}
-                                                            className="flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
-                                                        >
-                                                            <RefreshCw className={cn("w-4 h-4", generatingCrossRefs === verseRef && "animate-spin")} />
-                                                            Find More References
-                                                        </button>
+                                                        {onGenerateCrossReferenceMap && (
+                                                            <button
+                                                                onClick={() => handleGenerateCrossRefs(verse)}
+                                                                disabled={generatingCrossRefs === verseRef}
+                                                                className="flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                                                            >
+                                                                <RefreshCw className={cn("w-4 h-4", generatingCrossRefs === verseRef && "animate-spin")} />
+                                                                Find More References
+                                                            </button>
+                                                        )}
                                                     </>
                                                 ) : (
                                                     <div className="text-center py-4 sm:py-6">
                                                         <Network className="w-8 h-8 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
-                                                        <h3 className="text-base sm:text-lg font-medium mb-2">No Cross References Yet</h3>
+                                                        <h3 className="text-base sm:text-lg font-medium mb-2">No Cross References Available</h3>
                                                         <p className="text-sm text-muted-foreground mb-3 sm:mb-4 max-w-md mx-auto">
-                                                            Find connections between this verse and other parts of Scripture.
+                                                            {onGenerateCrossReferenceMap
+                                                                ? "Find connections between this verse and other parts of Scripture."
+                                                                : "No cross references have been generated for this verse yet."}
                                                         </p>
-                                                        <button
-                                                            onClick={() => handleGenerateCrossRefs(verse)}
-                                                            disabled={generatingCrossRefs === verseRef}
-                                                            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
-                                                        >
-                                                            {generatingCrossRefs === verseRef ? (
-                                                                <>
-                                                                    <RefreshCw className="w-4 h-4 animate-spin" />
-                                                                    Finding Connections...
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <Network className="w-4 h-4" />
-                                                                    Find Cross References
-                                                                </>
-                                                            )}
-                                                        </button>
+                                                        {onGenerateCrossReferenceMap && (
+                                                            <button
+                                                                onClick={() => handleGenerateCrossRefs(verse)}
+                                                                disabled={generatingCrossRefs === verseRef}
+                                                                className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
+                                                            >
+                                                                {generatingCrossRefs === verseRef ? (
+                                                                    <>
+                                                                        <RefreshCw className="w-4 h-4 animate-spin" />
+                                                                        Finding Connections...
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <Network className="w-4 h-4" />
+                                                                        Find Cross References
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>

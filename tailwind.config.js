@@ -52,6 +52,20 @@ module.exports = {
                 md: 'calc(var(--radius) - 2px)',
                 sm: 'calc(var(--radius) - 4px)',
             },
+            animation: {
+                'slow-pulse': 'slow-pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'gentle-bounce': 'gentle-bounce 2s ease-in-out infinite',
+            },
+            keyframes: {
+                'slow-pulse': {
+                    '0%, 100%': { opacity: '0.1' },
+                    '50%': { opacity: '0.15' }
+                },
+                'gentle-bounce': {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(5px)' }
+                }
+            }
         },
     },
     plugins: [],

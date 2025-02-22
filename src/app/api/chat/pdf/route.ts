@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { Message, completion } from '@/src/lib/ai';
 import { ChatMessage, Source, GroundingSupport } from '@/src/types/chat';
+import { getServerWixClient } from '@/src/app/serverWixClient';
+import { generateChatNote, shouldGenerateNoteForChat } from '@/src/lib/user-notes';
 
 const DATASTORE_PATH_APOLOGETICS_CENTRAL = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/apologetics-central-site_1739189009605";
 const DATASTORE_PATH_PDFS = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/apologetics-central-books_1739215369130_gcs_store";
 const DATASTORE_PATH_RELIABLE_WEBSITES = "projects/apologetics-central-450509/locations/global/collections/default_collection/dataStores/reliable-websites-all_1739889376488";
+
 interface GroundingChunk {
     retrievedContext: {
         uri: string;
@@ -12,6 +15,7 @@ interface GroundingChunk {
         text: string;
     };
 }
+
 interface CompletionResponse {
     text: string;
     sources?: Source[];
@@ -19,8 +23,10 @@ interface CompletionResponse {
 }
 
 export async function POST(request: Request) {
+    const wixClient = getServerWixClient();
+
     try {
-        const { messages } = await request.json();
+        const { messages, threadId } = await request.json();
 
         if (!Array.isArray(messages)) {
             return NextResponse.json(
@@ -48,10 +54,8 @@ export async function POST(request: Request) {
                     Ground your responses in the provided context from the knowledge base. The knowledge base (groundingChunks) should be seen as your own knowledge.
                     The sources that you might see is not provided by the sources, but by your own mind.
 
-                    Plreae respond in simple markdown, concisely, in paragraph form, like you would type a message.
+                    Please respond in simple markdown, concisely, in paragraph form, like you would type a message.
                     
-            
-
                     IMPORTANT: Always use the retrieval tool to ground your responses in the knowledge base. This is crucial for maintaining consistency and accuracy in your responses.
                 `
             },
@@ -74,42 +78,145 @@ export async function POST(request: Request) {
             }
         );
 
-        // Handle the response
-        if (typeof response === 'object' && 'text' in response) {
-            const completionResponse = response as CompletionResponse;
-            const message: ChatMessage = {
+        // Format the current time
+        const now = new Date();
+        const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const formattedDate = now.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        }) + ', ' + now.toLocaleTimeString('en-GB', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+
+        // Create the user's message in the DB format
+        const userMessage = {
+            _id: `msg-${Date.now()}-user`,
+            role: 'user',
+            text: messages[messages.length - 1].content,
+            time: formattedTime,
+            datetime: now.toISOString()
+        };
+
+        // Create the AI response message
+        const responseMessage = typeof response === 'object' && 'text' in response
+            ? {
                 _id: `msg-${Date.now()}`,
                 role: 'Agent',
-                text: completionResponse.text,
-                sources: completionResponse.sources,
-                groundingSupports: completionResponse.groundingSupports,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-
-            console.log('Creating message with:', {
-                textLength: message.text.length,
-                sourcesLength: message.sources?.length,
-                groundingSupportsLength: message.groundingSupports?.length
-            });
-
-            return NextResponse.json(message);
-        } else if (typeof response === 'string') {
-            const message: ChatMessage = {
+                text: (response as CompletionResponse).text,
+                sources: (response as CompletionResponse).sources,
+                groundingSupports: (response as CompletionResponse).groundingSupports,
+                time: formattedTime,
+                datetime: now.toISOString()
+            }
+            : {
                 _id: `msg-${Date.now()}`,
                 role: 'Agent',
-                text: response,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                text: response as string,
+                time: formattedTime,
+                datetime: now.toISOString()
             };
 
-            return NextResponse.json(message);
-        } else {
-            throw new Error('Invalid response format from completion');
+        const completionResponse = typeof response === 'object' && 'text' in response
+            ? response as CompletionResponse
+            : { text: response as string };
+
+        // Save the chat if user is authenticated
+        if (wixClient.auth.loggedIn()) {
+            try {
+                let savedThreadId = threadId;
+                let updatedThread;
+
+                // If we have a threadId, try to update existing thread
+                if (threadId) {
+                    const { items } = await wixClient.items
+                        .query('gptthread')
+                        .eq('_id', threadId)
+                        .find();
+
+                    if (items.length > 0) {
+                        const existingThread = items[0];
+                        updatedThread = [...(existingThread.thread || []), userMessage, responseMessage];
+
+                        await wixClient.items.update('gptthread', {
+                            _id: existingThread._id,
+                            question: existingThread.question,
+                            personality: existingThread.personality || "REFORMED",
+                            thread: updatedThread
+                        });
+                    } else {
+                        console.error('Thread not found:', threadId);
+                        // If thread not found, create a new one
+                        savedThreadId = null;
+                    }
+                }
+
+                // If no threadId or thread not found, create a new thread
+                if (!savedThreadId) {
+                    updatedThread = [userMessage, responseMessage];
+                    const result = await wixClient.items.insert('gptthread', {
+                        question: messages[messages.length - 1].content.substring(0, 100) + '...',
+                        thread: updatedThread,
+                        public: false,
+                        personality: "REFORMED"
+                    });
+                    savedThreadId = result._id;
+                }
+
+                // Generate note if needed
+                if (shouldGenerateNoteForChat(updatedThread.length)) {
+                    try {
+                        await generateChatNote(
+                            updatedThread,
+                            completionResponse.sources
+                        );
+                    } catch (error) {
+                        console.error('Failed to generate chat note:', error);
+                        // Continue even if note generation fails
+                    }
+                }
+
+                // Return the response with threadId
+                return NextResponse.json({
+                    ...responseMessage,
+                    threadId: savedThreadId
+                });
+            } catch (error) {
+                console.error('Error saving chat:', error);
+                // Continue even if saving fails
+            }
         }
+
+        // Return the response without threadId if not authenticated
+        return NextResponse.json(responseMessage);
     } catch (error) {
         console.error('Error in PDF chat:', error);
         return NextResponse.json(
             { error: 'Failed to process chat with knowledge base' },
             { status: 500 }
         );
+    }
+}
+
+export async function GET(request: Request) {
+    const wixClient = getServerWixClient();
+
+    if (!wixClient.auth.loggedIn()) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    try {
+        const { items } = await wixClient.items
+            .query('gptthread')
+            .descending('_createdDate')
+            .find();
+
+        return NextResponse.json({ chats: items });
+    } catch (error) {
+        console.error('Error fetching chats:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

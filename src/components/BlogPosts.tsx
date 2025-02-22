@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { getWixClient } from '../app/wixClient';
 import { BlogCard } from './BlogCard';
-import { NuggetCard } from './NuggetCard';
 import { Button } from './Button';
 import { Loader2 } from 'lucide-react';
 
@@ -15,6 +14,8 @@ interface BlogPost {
     content?: string;
     slug?: string;
     tags?: string[];
+    type?: 'article' | 'nugget';
+    readingTime?: string;
 }
 
 const ITEMS_TO_LOAD = 6;
@@ -22,13 +23,16 @@ const NUGGET_TAG = 'ea7588d3-9337-44c3-b989-0243d12c8441';
 
 export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
     const [posts, setPosts] = useState<BlogPost[]>(() => {
-        return initialPosts;
+        return initialPosts.map(post => ({
+            ...post,
+            type: post.tags?.includes(NUGGET_TAG) ? 'nugget' : 'article'
+        }));
     });
     const [nuggets, setNuggets] = useState<BlogPost[]>(() => {
-        return initialPosts.filter(post => post.tags?.includes(NUGGET_TAG)) || [];
+        return posts.filter(post => post.type === 'nugget');
     });
     const [regularPosts, setRegularPosts] = useState<BlogPost[]>(() => {
-        return initialPosts.filter(post => !post.tags?.includes(NUGGET_TAG)) || [];
+        return posts.filter(post => post.type === 'article');
     });
 
     const [postsLoading, setPostsLoading] = useState(false);
@@ -55,10 +59,14 @@ export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
                 .skip(currentOffset)
                 .find();
 
-            const items = response.items as BlogPost[];
+            const items = response.items.map(item => ({
+                ...item,
+                type: item.tags?.includes(NUGGET_TAG) ? 'nugget' : 'article'
+            })) as BlogPost[];
+
             const filteredItems = isNuggets
-                ? items.filter(item => item.tags?.includes(NUGGET_TAG))
-                : items.filter(item => !item.tags?.includes(NUGGET_TAG));
+                ? items.filter(item => item.type === 'nugget')
+                : items.filter(item => item.type === 'article');
 
             if (filteredItems.length > 0) {
                 setPosts(prev => [...prev, ...filteredItems]);
@@ -76,52 +84,56 @@ export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
     };
 
     return (
-        <div className="space-y-24">
+        <div className="space-y-16">
             {/* Regular Posts Section */}
-            <div>
-                <h2 className="font-serif text-3xl mb-12">Articles</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mb-12">
-                    {regularPosts.map((post) => (
-                        <BlogCard key={post._id} blog={post} />
-                    ))}
-                </div>
-                {hasMorePosts && (
-                    <div className="flex justify-center mt-8">
-                        <Button
-                            variant="outline"
-                            size="lg"
-                            onClick={() => loadMore('posts')}
-                            disabled={postsLoading}
-                        >
-                            {postsLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Load More Articles
-                        </Button>
+            {regularPosts.length > 0 && (
+                <div>
+                    <h2 className="font-serif text-2xl text-slate-900 mb-8">Articles</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        {regularPosts.map((post) => (
+                            <BlogCard key={post._id} blog={post} variant="default" />
+                        ))}
                     </div>
-                )}
-            </div>
+                    {hasMorePosts && (
+                        <div className="flex justify-center">
+                            <Button
+                                variant="outline"
+                                size="lg"
+                                onClick={() => loadMore('posts')}
+                                disabled={postsLoading}
+                            >
+                                {postsLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Load More Articles
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Nuggets Section */}
-            <div>
-                <h2 className="font-serif text-3xl mb-12">Nuggets</h2>
-                <div className="grid grid-cols-1 gap-6 mb-12">
-                    {nuggets.map((nugget) => (
-                        <NuggetCard key={nugget._id} blog={nugget} />
-                    ))}
-                </div>
-                {hasMoreNuggets && (
-                    <div className="flex justify-center mt-8">
-                        <Button
-                            variant="outline"
-                            size="lg"
-                            onClick={() => loadMore('nuggets')}
-                            disabled={nuggetsLoading}
-                        >
-                            {nuggetsLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Load More Nuggets
-                        </Button>
+            {nuggets.length > 0 && (
+                <div>
+                    <h2 className="font-serif text-2xl text-slate-900 mb-8">Nuggets</h2>
+                    <div className="grid grid-cols-1 gap-4 mb-8">
+                        {nuggets.map((nugget) => (
+                            <BlogCard key={nugget._id} blog={nugget} variant="compact" />
+                        ))}
                     </div>
-                )}
-            </div>
+                    {hasMoreNuggets && (
+                        <div className="flex justify-center">
+                            <Button
+                                variant="outline"
+                                size="lg"
+                                onClick={() => loadMore('nuggets')}
+                                disabled={nuggetsLoading}
+                            >
+                                {nuggetsLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Load More Nuggets
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 } 
