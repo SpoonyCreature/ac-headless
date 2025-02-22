@@ -124,71 +124,20 @@ const Sidebar = ({ books }: { books: Book[] }) => {
 
     return (
         <aside className="space-y-8">
-            {/* Recommended Books */}
-            {books.length > 0 && (
-                <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                    <div className="p-6">
-                        <div className="mb-4">
-                            <h3 className="font-serif text-xl font-bold text-gray-900 mb-2">Recommended Reading</h3>
-                            <p className="text-sm text-gray-600">Support our ministry by exploring these carefully selected books</p>
-                        </div>
-                        <div className="space-y-6">
-                            {books.slice(0, 3).map((book, index) => (
-                                <div key={index} className="group relative bg-gray-50 p-4 rounded-lg">
-                                    <div className="flex gap-4">
-                                        <div className="w-20 h-28 relative rounded-lg overflow-hidden shadow-sm flex-shrink-0">
-                                            <WixMediaImage
-                                                media={book.image}
-                                                width={80}
-                                                height={112}
-                                                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                                objectFit="cover"
-                                            />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="font-medium text-gray-900 mb-1 truncate">
-                                                {book.title}
-                                            </h4>
-                                            {book.displayPrice && (
-                                                <div className="text-sm text-gray-600 mb-3">
-                                                    Support us: {book.displayPrice}
-                                                </div>
-                                            )}
-                                            <a
-                                                href={book.link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center justify-center w-full px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors"
-                                            >
-                                                Purchase & Support
-                                                <svg className="w-4 h-4 ml-2 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="mt-6 pt-6 border-t border-gray-100">
-                            <p className="text-sm text-gray-500 mb-4 text-center">Your purchase helps us create more content and resources</p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* Newsletter */}
-            <div className="bg-gray-900 rounded-lg p-6 text-white">
-                <h3 className="font-serif text-lg font-semibold mb-3">Stay Updated</h3>
-                <p className="text-gray-300 text-sm mb-4">Get the latest insights delivered to your inbox.</p>
+            <div className="bg-primary/5 backdrop-blur-sm rounded-xl border border-primary/10 p-6">
+                <h3 className="font-serif text-xl text-foreground mb-3">Stay Updated</h3>
+                <p className="text-muted-foreground text-sm mb-4">Get the latest Reformed theological insights delivered to your inbox.</p>
                 <form onSubmit={handleSubscribe} className="space-y-3">
                     <input
                         type="email"
                         placeholder="Your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-2 text-sm bg-white/10 border border-white/20 rounded-lg 
-                                 placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2.5 text-sm bg-background border border-border rounded-lg 
+                                 placeholder:text-muted-foreground/70 text-foreground
+                                 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30
+                                 hover:border-primary/30 transition-colors"
                         required
                         pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                         disabled={isSubmitting}
@@ -196,7 +145,7 @@ const Sidebar = ({ books }: { books: Book[] }) => {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg 
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg 
                                  text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? (
@@ -207,7 +156,7 @@ const Sidebar = ({ books }: { books: Book[] }) => {
                     </button>
                 </form>
                 {subscribeStatus === 'success' && (
-                    <p className="mt-3 text-sm text-emerald-300 flex items-center justify-center gap-2">
+                    <p className="mt-3 text-sm text-emerald-600 flex items-center justify-center gap-2">
                         <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
@@ -215,7 +164,7 @@ const Sidebar = ({ books }: { books: Book[] }) => {
                     </p>
                 )}
                 {subscribeStatus === 'error' && (
-                    <p className="mt-3 text-sm text-red-300 flex items-center justify-center gap-2">
+                    <p className="mt-3 text-sm text-red-600 flex items-center justify-center gap-2">
                         <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                         </svg>
@@ -225,6 +174,52 @@ const Sidebar = ({ books }: { books: Book[] }) => {
                     </p>
                 )}
             </div>
+
+            {/* Recommended Books */}
+            {books.length > 0 && (
+                <div className="bg-primary/5 backdrop-blur-sm rounded-xl border border-primary/10 overflow-hidden">
+                    <div className="p-6">
+                        <div className="mb-6">
+                            <h3 className="font-serif text-xl text-foreground mb-2">Recommended Reading</h3>
+                            <p className="text-sm text-muted-foreground">Carefully selected books to deepen your understanding</p>
+                        </div>
+                        <div className="space-y-4">
+                            {books.slice(0, 3).map((book, index) => (
+                                <a
+                                    key={index}
+                                    href={book.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="group flex items-center gap-4 p-3 rounded-lg hover:bg-primary/10 transition-colors"
+                                >
+                                    <div className="w-16 h-20 relative rounded-md overflow-hidden flex-shrink-0 bg-muted">
+                                        <WixMediaImage
+                                            media={book.image}
+                                            width={64}
+                                            height={80}
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                            objectFit="cover"
+                                        />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="font-medium text-foreground mb-1 truncate group-hover:text-primary transition-colors">
+                                            {book.title}
+                                        </h4>
+                                        {book.displayPrice && (
+                                            <div className="text-sm text-muted-foreground group-hover:text-primary/70 transition-colors">
+                                                {book.displayPrice}
+                                            </div>
+                                        )}
+                                    </div>
+                                </a>
+                            ))}
+                        </div>
+                        <div className="mt-6 pt-6 border-t border-primary/10">
+                            <p className="text-sm text-muted-foreground text-center">Your purchase helps support our ministry</p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </aside>
     );
 };

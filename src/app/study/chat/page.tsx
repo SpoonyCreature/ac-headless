@@ -7,7 +7,7 @@ import { ChatInput } from '@/src/components/ChatInput';
 import { Chat as ChatType } from '@/src/types/chat';
 import { useRouter } from 'next/navigation';
 import { LoadingMessage } from '@/src/components/LoadingMessage';
-import { History } from 'lucide-react';
+import { History, Menu } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { usePageTransition } from '@/src/hooks/usePageTransition';
 
@@ -258,7 +258,7 @@ export default function ChatPage() {
                 }
             `}</style>
             <main className={cn(
-                "flex min-h-[calc(100vh-4rem)] bg-gradient-to-b from-background to-background/95",
+                "flex min-h-screen bg-gradient-to-b from-background to-background/95",
                 "transition-opacity duration-300",
                 isTransitioning ? "opacity-50" : "opacity-100"
             )}>
@@ -274,12 +274,27 @@ export default function ChatPage() {
                     onCloseSidebar={() => setShowSidebar(false)}
                 />
 
-                {/* Main Chat Area - No Nested Scrolling */}
+                {/* Main Chat Area */}
                 <div className="flex-1 flex flex-col">
+                    {/* Header */}
+                    <header className="bg-primary py-4 px-4 sm:px-6 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => setShowSidebar(true)}
+                                className="lg:hidden p-2 -m-2 text-primary-foreground/90 hover:text-primary-foreground transition-colors"
+                            >
+                                <Menu className="w-6 h-6" />
+                            </button>
+                            <div>
+                                <h1 className="font-serif text-2xl sm:text-3xl text-primary-foreground">Discussion</h1>
+                                <p className="text-primary-foreground/80 text-sm sm:text-base">Explore Reformed theology with source-grounded assistance</p>
+                            </div>
+                        </div>
+                    </header>
 
                     {/* Messages Container */}
                     <div className="flex-1 pb-40">
-                        <div className="max-w-3xl mx-auto">
+                        <div className="max-w-3xl mx-auto px-4">
                             {messages.map((message, index) => (
                                 <ChatMessage
                                     key={message._id}
@@ -291,16 +306,6 @@ export default function ChatPage() {
                             <div ref={messagesEndRef} />
                         </div>
                     </div>
-
-                    {/* Mobile Sidebar Toggle */}
-                    {isAuthenticated && (
-                        <button
-                            onClick={() => setShowSidebar(!showSidebar)}
-                            className="fixed lg:hidden bottom-32 right-4 p-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
-                        >
-                            <History className="h-4 w-4" />
-                        </button>
-                    )}
 
                     {/* Input Area - Fixed at Bottom */}
                     <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border/5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50">

@@ -49,7 +49,7 @@ export default function MobileMenu() {
                             <Link href="/study" className="mobile-nav-link" onClick={toggleMenu}>Study</Link>
                             <div className="pl-4 space-y-3">
                                 <Link href="/study/bible-study" className="mobile-nav-link text-sm" onClick={toggleMenu}>Bible Study</Link>
-                                <Link href="/study/chat" className="mobile-nav-link text-sm" onClick={toggleMenu}>Research Discussion</Link>
+                                <Link href="/study/chat" className="mobile-nav-link text-sm" onClick={toggleMenu}>Discussion</Link>
                             </div>
                         </div>
                         <Link href="/about" className="mobile-nav-link" onClick={toggleMenu}>About</Link>
