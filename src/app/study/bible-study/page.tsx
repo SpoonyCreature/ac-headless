@@ -368,7 +368,7 @@ export default function BibleStudyPage() {
                                         </div>
                                         <h3 className="text-base font-medium text-foreground/90 mb-1">No studies yet</h3>
                                         <p className="text-sm text-foreground/60">
-                                            Start your first Bible study by selecting "Create Study" above
+                                            Start your first Bible study by selecting &quot;Create Study&quot; above
                                         </p>
                                     </div>
                                 ) : (
