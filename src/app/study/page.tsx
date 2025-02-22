@@ -92,7 +92,7 @@ export default function StudyPage() {
                                     <MessageSquare className="w-5 h-5 text-primary" />
                                 </div>
                                 <div className="space-y-2 min-w-0">
-                                    <h2 className="font-medium text-lg group-hover:text-primary transition-colors">Research Discussion</h2>
+                                    <h2 className="font-medium text-lg group-hover:text-primary transition-colors">Discussion</h2>
                                     <p className="text-muted-foreground text-sm line-clamp-2">
                                         Engage in theological discussions with source-grounded assistance
                                     </p>
