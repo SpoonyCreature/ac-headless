@@ -29,15 +29,13 @@ interface CompletionResponse {
 
 export class GeminiProvider extends AIProvider {
     private vertexAI: VertexAI;
-    private textModel: string;
     private project: string;
     private location: string;
 
-    constructor(projectId: string, location: string = 'us-central1', modelName: string = 'gemini-1.5-flash-001') {
+    constructor(projectId: string, location: string = 'us-central1') {
         super('not-needed'); // API key not needed for Vertex AI as it uses GCP auth
         this.project = projectId;
         this.location = location;
-        this.textModel = modelName;
 
         if (!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
             throw new Error('Missing GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable');
@@ -134,7 +132,8 @@ export class GeminiProvider extends AIProvider {
             top_p,
             stop,
             response_format = 'text',
-            tools
+            tools,
+            modelName
         } = options;
         const generationConfig: any = {
             temperature,
@@ -150,7 +149,7 @@ export class GeminiProvider extends AIProvider {
 
         // Get the model
         const model = this.vertexAI.preview.getGenerativeModel({
-            model: "gemini-1.5-flash-001",
+            model: modelName || 'gemini-1.5-flash-001',
             generationConfig,
             systemInstruction: systemMessage?.content as string
         })

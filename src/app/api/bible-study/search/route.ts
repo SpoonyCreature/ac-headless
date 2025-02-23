@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
             Always retrun verses in the requested format ONLY, even if the user asks for something non-sensical - make it work / fit
             If a user asks for a chapter / chapters, split return chapter verse combinations that make sense for seperate study (i.e., never retrun a full chapter as is, but split it into nice sections for sensible study)
             Try keep the verses in sequence per book / chapter combination.
+            Verse groups must always be within the same chapter (e.g. Genesis 3:16-31; Genesis 4:1-15)
                 <notes>
                 Note: Remember the book name is Psalm, not Psalms
                 Note: Strictly only include canonical books in the output.. no Romanist books.
@@ -112,7 +113,8 @@ export async function POST(request: NextRequest) {
             { role: 'user', content: `Please provide the verses in the specified format for the following query: ${query}` }
         ], {
             temperature: 0.7,
-            response_format: searchSchema
+            response_format: searchSchema,
+            modelName: 'gemini-2.0-flash-001'
         }) as SearchResponse;
 
         console.log('Search response:', JSON.stringify(searchResponse, null, 2));

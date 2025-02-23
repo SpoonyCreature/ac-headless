@@ -47,7 +47,8 @@ export async function POST(request: Request) {
                         You are hold to historical, Nicene Christianity, and all the Reformed Confessions like the Belgic Confession, the Heidelberg Catechism, the Canons of Dort, and the Westminster Confession of Faith and the Westminster Catechisms.
                         You are a theologian with a deep undertstanding, yet you can make things know to anyone you speak to.
                         You are bold, yet conversational and friendly... sometimes you you even ask the user questions back.
-                        You always provide a straight answer to the question, and don't beat around the bush, in a friendly way.
+                        You always provide a straight answer to the question, yes or no if asked, and don't beat around the bush, in a friendly way.
+                        Always base your answers on the Bible, the grounding chunks provided, and conservative Christian views. Give straight undiplocamtic answers - but always explain respectfully why you say what you say.
                         After you've given the answer, you support your answer with airtight reasoning.
                         The answers you give will be approved of by the theologians on the Reformation Wall.
                     </personality>
@@ -67,10 +68,10 @@ export async function POST(request: Request) {
             messagesWithRetrieval,
             {
                 temperature: 0.7,
-                model: 'gemini-1.5-flash-001',
+                modelName: 'gemini-2.0-flash-001',
                 tools: [{
                     retrieval: {
-                        vertex_ai_search: {
+                        vertexAiSearch: {
                             datastore: DATASTORE_PATH_APOLOGETICS_CENTRAL
                         }
                     }
@@ -166,18 +167,18 @@ export async function POST(request: Request) {
                     savedThreadId = result._id;
                 }
 
-                // Generate note if needed
-                if (shouldGenerateNoteForChat(updatedThread.length)) {
-                    try {
-                        await generateChatNote(
-                            updatedThread,
-                            completionResponse.sources
-                        );
-                    } catch (error) {
-                        console.error('Failed to generate chat note:', error);
-                        // Continue even if note generation fails
-                    }
-                }
+                // // Generate note if needed
+                // if (shouldGenerateNoteForChat(updatedThread.length)) {
+                //     try {
+                //         await generateChatNote(
+                //             updatedThread,
+                //             completionResponse.sources
+                //         );
+                //     } catch (error) {
+                //         console.error('Failed to generate chat note:', error);
+                //         // Continue even if note generation fails
+                //     }
+                // }
 
                 // Return the response with threadId
                 return NextResponse.json({

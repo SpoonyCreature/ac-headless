@@ -133,7 +133,8 @@ export async function POST(request: Request) {
             }
         ], {
             temperature: 0.7,
-            response_format: commentarySchema
+            response_format: commentarySchema,
+            modelName: 'gemini-2.0-flash-001'
         });
 
         console.log("\n\n\n");

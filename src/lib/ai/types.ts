@@ -19,7 +19,7 @@ export interface JsonSchemaFormat {
 
 export interface CompletionOptions {
     temperature?: number;
-    model?: string;
+    modelName?: string;
     max_tokens?: number;
     top_p?: number;
     frequency_penalty?: number;
@@ -29,7 +29,7 @@ export interface CompletionOptions {
     stop?: string[];
     tools?: Array<{
         retrieval?: {
-            vertex_ai_search?: {
+            vertexAiSearch?: {
                 datastore: string;
             };
             disableAttribution?: boolean;

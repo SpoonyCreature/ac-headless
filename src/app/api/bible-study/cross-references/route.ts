@@ -104,7 +104,8 @@ export async function POST(request: NextRequest) {
             { role: 'user', content: 'Please provide the cross references in the specified format.' }
         ], {
             temperature: 0.7,
-            response_format: crossReferencesSchema
+            response_format: crossReferencesSchema,
+            modelName: 'gemini-2.0-flash-001'
         }) as CrossReferenceResponse;
 
         if (!crossRefResponse?.cross_references || !Array.isArray(crossRefResponse.cross_references)) {

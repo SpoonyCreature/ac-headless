@@ -21,8 +21,7 @@ export class AIProviderFactory {
                         throw new Error('Missing GOOGLE_CLOUD_PROJECT environment variable');
                     }
                     const location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
-                    const model = process.env.GEMINI_MODEL || 'gemini-1.5';
-                    this.providers.set(type, new GeminiProvider(process.env.GOOGLE_CLOUD_PROJECT, location, model));
+                    this.providers.set(type, new GeminiProvider(process.env.GOOGLE_CLOUD_PROJECT, location));
                     break;
                 default:
                     throw new Error(`Unsupported AI provider type: ${type}`);
