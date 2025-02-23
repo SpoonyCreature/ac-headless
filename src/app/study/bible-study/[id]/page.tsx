@@ -1,13 +1,18 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Bot, BookMarked, Globe, Lock, ChevronLeft, Share2, Plus, ArrowLeft, Link2, Twitter, Facebook, Check, EyeOff, Loader2 } from 'lucide-react';
+import { Bot, BookMarked, Globe, Lock, ChevronLeft, Share2, Plus, ArrowLeft, Link2, Twitter, Facebook, Check, EyeOff, Loader2, Pause, Play } from 'lucide-react';
 import Link from 'next/link';
 import { EnhancedBibleStudy } from '@/src/components/EnhancedBibleStudy';
-import { BibleStudy } from '@/src/types/bible';
+import { BibleStudy as BaseBibleStudy } from '@/src/types/bible';
 import { cn } from '@/src/lib/utils';
 import { usePageTransition } from '@/src/hooks/usePageTransition';
 import { formatDistanceToNow } from 'date-fns';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import { marked } from 'marked';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface CommentaryResponse {
     markdown: string;
@@ -19,12 +24,38 @@ interface Commentary {
     timestamp: number;
 }
 
+type BibleStudy = BaseBibleStudy & {
+    originalVerses?: {
+        language: string;
+        verses: {
+            text: string;
+            reference: string;
+        }[];
+    }[];
+    verses: any[];
+    crossReferences?: any[];
+    explanation?: string;
+    commentaries?: Commentary[];
+    content?: string;
+    speechContent?: string;
+}
+
+interface AudioChunk {
+    index: number;
+    buffer: AudioBuffer;
+}
+
 export default function BibleStudyDetailPage({
     params
 }: {
     params: { id: string }
 }) {
     const [study, setStudy] = useState<BibleStudy | null>(null);
+    const [activeTab, setActiveTab] = useState<'details' | 'content'>('details');
+    const [isGeneratingContent, setIsGeneratingContent] = useState(false);
+    const [studyContent, setStudyContent] = useState<string | null>(null);
+    const [speechContent, setSpeechContent] = useState<string | null>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showShareMenu, setShowShareMenu] = useState(false);
@@ -34,6 +65,13 @@ export default function BibleStudyDetailPage({
     const [isUpdatingPublic, setIsUpdatingPublic] = useState(false);
     const { isTransitioning, navigateWithTransition } = usePageTransition();
     const shareMenuRef = useRef<HTMLDivElement>(null);
+    const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
+    const audioBufferRef = useRef<AudioBuffer | null>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [audioUrl, setAudioUrl] = useState<string | null>(null);
+    const [isCheckingAudio, setIsCheckingAudio] = useState(false);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -358,6 +396,179 @@ export default function BibleStudyDetailPage({
         }
     };
 
+    const generateStudyContent = async () => {
+        if (!study) return;
+
+        setIsGeneratingContent(true);
+        try {
+            const response = await fetch('/api/bible-study/generate-content', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    verses: study.verses,
+                    originalVerses: study.originalVerses,
+                    query: study.query,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to generate study content');
+            }
+
+            const data = await response.json();
+            setStudyContent(data.content);
+            setSpeechContent(data.speechContent);
+
+            // Persist the content to the study
+            const updateResponse = await fetch(`/api/bible-study/${params.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: data.content,
+                    speechContent: data.speechContent
+                }),
+            });
+
+            if (!updateResponse.ok) {
+                throw new Error('Failed to persist study content');
+            }
+        } catch (error) {
+            console.error('Error generating study content:', error);
+        } finally {
+            setIsGeneratingContent(false);
+        }
+    };
+
+    // Function to play audio from URL
+    const playAudioFromUrl = (url: string) => {
+        const audio = new Audio(url);
+        audio.onplay = () => setIsPlaying(true);
+        audio.onpause = () => setIsPlaying(false);
+        audio.onended = () => setIsPlaying(false);
+        audio.play();
+        return audio;
+    };
+
+    // Add function to check for existing audio
+    const checkExistingAudio = async () => {
+        setIsCheckingAudio(true);
+        try {
+            const response = await fetch('/api/bible-study/text-to-speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: '', // Empty text indicates we're just checking for existing audio
+                    studyId: params.id,
+                    checkOnly: true
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.audioUrl) {
+                    setAudioUrl(data.audioUrl);
+                }
+            }
+        } catch (error) {
+            console.error('Error checking audio:', error);
+        } finally {
+            setIsCheckingAudio(false);
+        }
+    };
+
+    // Check for existing audio when study content is loaded
+    useEffect(() => {
+        if (study?.content) {
+            checkExistingAudio();
+        }
+    }, [study?.content]);
+
+    // Update handlePlayPause to use existing audioUrl
+    const handlePlayPause = async () => {
+        if (isPlaying && audioRef.current) {
+            audioRef.current.pause();
+            setIsPlaying(false);
+            return;
+        }
+
+        if (!studyContent) return;
+
+        if (audioUrl) {
+            audioRef.current = playAudioFromUrl(audioUrl);
+            return;
+        }
+
+        setIsLoadingAudio(true);
+        try {
+            const textToSpeak = speechContent || markdownToPlainText(studyContent);
+
+            const response = await fetch('/api/bible-study/text-to-speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: textToSpeak,
+                    studyId: params.id
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to generate audio');
+            }
+
+            const data = await response.json();
+
+            if (data.audioUrl) {
+                setAudioUrl(data.audioUrl);
+                audioRef.current = playAudioFromUrl(data.audioUrl);
+            }
+        } catch (error) {
+            console.error('Error handling audio:', error);
+        } finally {
+            setIsLoadingAudio(false);
+        }
+    };
+
+    // Clean up audio on unmount
+    useEffect(() => {
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+        };
+    }, []);
+
+    // Load persisted content when study is loaded
+    useEffect(() => {
+        if (study?.content) {
+            setStudyContent(study.content);
+        }
+        if (study?.speechContent) {
+            setSpeechContent(study.speechContent);
+        }
+    }, [study]);
+
+    // Function to convert markdown to plain text
+    const markdownToPlainText = (markdown: string): string => {
+        // Convert markdown to HTML and ensure it's a string
+        const html = String(marked.parse(markdown));
+        // Sanitize HTML
+        const sanitizedHtml = DOMPurify.sanitize(html);
+        // Create a temporary element to hold the HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = sanitizedHtml;
+        // Get text content and normalize whitespace
+        return tempDiv.textContent || tempDiv.innerText || '';
+    };
+
     if (isLoading) {
         return (
             <div className={cn(
@@ -577,19 +788,164 @@ export default function BibleStudyDetailPage({
                     </div>
                 </div>
 
-                {/* Study Content */}
+                {/* Tabs */}
+                <div className="max-w-4xl mx-auto sm:px-4 mt-4">
+                    <div className="flex space-x-4 border-b border-border/50">
+                        <button
+                            onClick={() => setActiveTab('details')}
+                            className={cn(
+                                "pb-2 px-1 text-sm font-medium border-b-2 transition-colors",
+                                activeTab === 'details'
+                                    ? "border-primary text-primary"
+                                    : "border-transparent text-muted-foreground hover:text-foreground"
+                            )}
+                        >
+                            Details
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('content')}
+                            className={cn(
+                                "pb-2 px-1 text-sm font-medium border-b-2 transition-colors",
+                                activeTab === 'content'
+                                    ? "border-primary text-primary"
+                                    : "border-transparent text-muted-foreground hover:text-foreground"
+                            )}
+                        >
+                            Bible Study Content
+                        </button>
+                    </div>
+                </div>
+
+                {/* Content */}
                 <div className="flex-1 overflow-y-auto py-4 sm:py-8">
                     <div className="max-w-4xl mx-auto sm:px-4">
-                        <EnhancedBibleStudy
-                            verses={study.verses}
-                            crossReferences={study.crossReferences}
-                            explanation={study.explanation}
-                            query={study.query}
-                            onGenerateCommentary={isOwner ? handleGenerateCommentary : undefined}
-                            onSaveCommentary={isOwner ? handleSaveCommentary : undefined}
-                            onGenerateCrossReferenceMap={isOwner ? handleGenerateCrossReferenceMap : undefined}
-                            initialCommentaries={study.commentaries || []}
-                        />
+                        {activeTab === 'details' ? (
+                            <EnhancedBibleStudy
+                                verses={study.verses}
+                                crossReferences={study.crossReferences}
+                                explanation={study.explanation}
+                                query={study.query}
+                                onGenerateCommentary={isOwner ? handleGenerateCommentary : undefined}
+                                onSaveCommentary={isOwner ? handleSaveCommentary : undefined}
+                                onGenerateCrossReferenceMap={isOwner ? handleGenerateCrossReferenceMap : undefined}
+                                initialCommentaries={study.commentaries || []}
+                            />
+                        ) : (
+                            <div className="space-y-6">
+                                {!studyContent && !isGeneratingContent && (
+                                    <div className="text-center py-12">
+                                        <h3 className="text-lg font-medium mb-2">No Bible Study Content Yet</h3>
+                                        <p className="text-muted-foreground mb-6">Generate an AI-powered Bible study guide for your group.</p>
+                                        <button
+                                            onClick={generateStudyContent}
+                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                                        >
+                                            <Bot className="w-4 h-4" />
+                                            Generate Bible Study
+                                        </button>
+                                    </div>
+                                )}
+
+                                {isGeneratingContent && (
+                                    <div className="text-center py-12">
+                                        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+                                        <h3 className="text-lg font-medium mb-2">Generating Bible Study Content</h3>
+                                        <p className="text-muted-foreground">This may take a minute...</p>
+                                    </div>
+                                )}
+
+                                {studyContent && !isGeneratingContent && (
+                                    <div className="space-y-6">
+                                        <div className="flex justify-between items-center">
+                                            <h2 className="text-2xl font-semibold">Bible Study Guide</h2>
+                                            <button
+                                                onClick={handlePlayPause}
+                                                disabled={isLoadingAudio || isCheckingAudio}
+                                                className={cn(
+                                                    "inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
+                                                    isPlaying
+                                                        ? "bg-primary/10 text-primary"
+                                                        : "bg-primary text-primary-foreground hover:bg-primary/90",
+                                                    (isLoadingAudio || isCheckingAudio) && "opacity-50 cursor-not-allowed"
+                                                )}
+                                            >
+                                                {isLoadingAudio ? (
+                                                    <>
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <span>Generating Audio...</span>
+                                                    </>
+                                                ) : isCheckingAudio ? (
+                                                    <>
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <span>Checking Audio...</span>
+                                                    </>
+                                                ) : isPlaying ? (
+                                                    <>
+                                                        <Pause className="w-4 h-4" />
+                                                        <span>Pause Study</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Play className="w-4 h-4" />
+                                                        <span>{audioUrl ? 'Play Study' : 'Generate Audio'}</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                        <div className="space-y-6">
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkGfm]}
+                                                rehypePlugins={[rehypeRaw]}
+                                                components={{
+                                                    p: ({ node, ...props }) => (
+                                                        <p className="leading-7 [&:not(:first-child)]:mt-6" {...props} />
+                                                    ),
+                                                    em: ({ node, ...props }) => (
+                                                        <em className="italic text-foreground font-normal" {...props} />
+                                                    ),
+                                                    strong: ({ node, ...props }) => (
+                                                        <strong className="font-semibold text-foreground" {...props} />
+                                                    ),
+                                                    h1: ({ node, ...props }) => (
+                                                        <h1 className="text-2xl font-semibold tracking-tight mt-8 mb-4" {...props} />
+                                                    ),
+                                                    h2: ({ node, ...props }) => (
+                                                        <h2 className="text-xl font-semibold tracking-tight mt-8 mb-4" {...props} />
+                                                    ),
+                                                    h3: ({ node, ...props }) => (
+                                                        <h3 className="text-lg font-semibold tracking-tight mt-8 mb-4" {...props} />
+                                                    ),
+                                                    blockquote: ({ node, ...props }) => (
+                                                        <blockquote className="mt-6 border-l-2 border-primary/50 pl-6 italic text-muted-foreground" {...props} />
+                                                    ),
+                                                    ul: ({ node, ...props }) => (
+                                                        <ul className="my-6 ml-6 list-disc [&>li]:mt-2" {...props} />
+                                                    ),
+                                                    ol: ({ node, ...props }) => (
+                                                        <ol className="my-6 ml-6 list-decimal [&>li]:mt-2" {...props} />
+                                                    ),
+                                                    code: ({ node, inline, className, children, ...props }: {
+                                                        node?: any;
+                                                        inline?: boolean;
+                                                        className?: string;
+                                                        children?: React.ReactNode;
+                                                    } & React.HTMLAttributes<HTMLElement>) =>
+                                                        inline ? (
+                                                            <code className="rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm" {...props}>{children}</code>
+                                                        ) : (
+                                                            <pre className="mt-6 mb-4 overflow-x-auto rounded-lg bg-muted p-4">
+                                                                <code className="relative rounded bg-muted font-mono text-sm" {...props}>{children}</code>
+                                                            </pre>
+                                                        )
+                                                }}
+                                            >
+                                                {studyContent}
+                                            </ReactMarkdown>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

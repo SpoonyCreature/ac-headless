@@ -3,14 +3,6 @@ import { AIProvider } from './base';
 import { CompletionOptions, Message, JsonSchemaFormat } from './types';
 import { Source } from '@/src/types/chat';
 
-interface GroundingChunk {
-    retrievedContext: {
-        uri: string;
-        title: string;
-        content: string;  // Gemini actually returns content, not text
-    };
-}
-
 interface GroundingSupport {
     segment: {
         startIndex: number;
