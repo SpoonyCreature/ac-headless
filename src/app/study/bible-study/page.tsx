@@ -156,7 +156,7 @@ export default function BibleStudyPage() {
                 onCloseSidebar={() => setShowSidebar(false)}
             />
 
-            <div className="flex-1">
+            <div className="flex-1 w-full">
                 {/* Header */}
                 <header className="bg-primary py-4 px-4 sm:px-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -173,11 +173,11 @@ export default function BibleStudyPage() {
                     </div>
                 </header>
 
-                <main className="container mx-auto px-4 sm:px-6 py-8">
+                <main className="w-full px-4 sm:px-6 py-8">
                     <div className="max-w-3xl mx-auto space-y-8">
                         {/* Bible Study Creation Card */}
                         <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
-                            <div className="p-8">
+                            <div className="p-4 sm:p-8">
                                 <form onSubmit={handleSearch} className="space-y-8">
                                     <div className="space-y-6">
                                         <div className="space-y-4">
@@ -207,11 +207,11 @@ export default function BibleStudyPage() {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center gap-3">
+                                                <div className="flex flex-col sm:flex-row gap-3">
                                                     <select
                                                         value={translation}
                                                         onChange={(e) => setTranslation(e.target.value as Translation)}
-                                                        className="flex-1 h-12 px-4 rounded-lg bg-white text-base appearance-none 
+                                                        className="w-full sm:w-auto flex-1 h-12 px-4 rounded-lg bg-white text-base appearance-none 
                                                             focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary
                                                             border-2 border-border/20 hover:border-primary/30 transition-all"
                                                         disabled={isSearching || isCreatingStudy}
@@ -225,7 +225,7 @@ export default function BibleStudyPage() {
                                                         type="submit"
                                                         disabled={isSearching || isCreatingStudy || !query.trim()}
                                                         className={cn(
-                                                            "h-12 px-6 rounded-lg font-medium flex items-center justify-center gap-2 text-base transition-all whitespace-nowrap",
+                                                            "h-12 px-6 rounded-lg font-medium flex items-center justify-center gap-2 text-base transition-all whitespace-nowrap w-full sm:w-auto",
                                                             isAuthenticated
                                                                 ? "bg-primary text-white disabled:opacity-50 hover:bg-primary/90"
                                                                 : "bg-primary text-white disabled:opacity-50 hover:bg-primary/90"

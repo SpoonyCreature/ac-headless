@@ -46,7 +46,7 @@ export default function StudyPage() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-slate-50">
             {/* Header */}
             <section className="bg-[#0A1A3B] py-8 sm:py-16">
                 <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
@@ -63,24 +63,24 @@ export default function StudyPage() {
                 </div>
             </section>
 
-            <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 -mt-8 relative z-10">
+            <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16">
                 <div className="w-full space-y-8 sm:space-y-16">
                     {/* Study Options */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <Link
                             href="/study/bible-study"
-                            className="group bg-white p-4 sm:p-6 rounded-xl border border-border/20"
+                            className="group bg-white p-6 rounded-xl border border-border/20 hover:border-primary/20 transition-all shadow-sm hover:shadow-md"
                         >
-                            <div className="flex items-start gap-3 sm:gap-4">
-                                <div className="shrink-0 p-2 rounded-lg bg-slate-100">
-                                    <BookOpen className="w-5 h-5 text-slate-600" />
+                            <div className="flex items-start gap-4">
+                                <div className="shrink-0 p-2.5 rounded-lg bg-primary/5">
+                                    <BookOpen className="w-5 h-5 text-primary/70" />
                                 </div>
-                                <div className="space-y-2 min-w-0">
+                                <div className="space-y-2.5 min-w-0">
                                     <h2 className="font-medium text-lg">Bible Study</h2>
-                                    <p className="text-muted-foreground text-sm">
+                                    <p className="text-muted-foreground text-sm leading-relaxed">
                                         Study Scripture with verse analysis, cross-references, and advanced commentary
                                     </p>
-                                    <div className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+                                    <div className="inline-flex items-center gap-2 text-sm font-medium text-primary group-hover:gap-3 transition-all">
                                         Start Study <ArrowRight className="w-4 h-4" />
                                     </div>
                                 </div>
@@ -89,18 +89,18 @@ export default function StudyPage() {
 
                         <Link
                             href="/study/chat"
-                            className="group bg-white p-4 sm:p-6 rounded-xl border border-border/20"
+                            className="group bg-white p-6 rounded-xl border border-border/20 hover:border-primary/20 transition-all shadow-sm hover:shadow-md"
                         >
-                            <div className="flex items-start gap-3 sm:gap-4">
-                                <div className="shrink-0 p-2 rounded-lg bg-slate-100">
-                                    <MessageSquare className="w-5 h-5 text-slate-600" />
+                            <div className="flex items-start gap-4">
+                                <div className="shrink-0 p-2.5 rounded-lg bg-primary/5">
+                                    <MessageSquare className="w-5 h-5 text-primary/70" />
                                 </div>
-                                <div className="space-y-2 min-w-0">
+                                <div className="space-y-2.5 min-w-0">
                                     <h2 className="font-medium text-lg">Discussion</h2>
-                                    <p className="text-muted-foreground text-sm">
+                                    <p className="text-muted-foreground text-sm leading-relaxed">
                                         Engage in theological discussions with source-grounded assistance
                                     </p>
-                                    <div className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+                                    <div className="inline-flex items-center gap-2 text-sm font-medium text-primary group-hover:gap-3 transition-all">
                                         Start Discussion <ArrowRight className="w-4 h-4" />
                                     </div>
                                 </div>
@@ -109,17 +109,17 @@ export default function StudyPage() {
                     </div>
 
                     {/* Progress Section */}
-                    <div className="space-y-6 sm:space-y-8">
-                        <h2 className="font-serif text-xl sm:text-2xl text-foreground">Study Progress</h2>
+                    <div className="space-y-6">
+                        <h2 className="font-serif text-2xl text-foreground">Study Progress</h2>
 
                         {isLoadingContext ? (
                             <div className="flex items-center justify-center py-12">
-                                <Loader2 className="w-5 h-5 animate-spin text-foreground/50" />
+                                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                             </div>
                         ) : !isAuthenticated ? (
-                            <div className="text-center py-12 sm:py-16 px-4">
-                                <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-100 mb-4">
-                                    <BookOpen className="w-7 h-7 sm:w-8 sm:h-8 text-slate-600" />
+                            <div className="text-center py-12 sm:py-16 px-4 bg-white rounded-xl border border-border/20 shadow-sm">
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/5 mb-4">
+                                    <BookOpen className="w-8 h-8 text-primary/70" />
                                 </div>
                                 <h3 className="text-lg font-medium text-foreground mb-2">Sign in to track progress</h3>
                                 <p className="text-base text-muted-foreground max-w-md mx-auto">
@@ -127,7 +127,7 @@ export default function StudyPage() {
                                 </p>
                             </div>
                         ) : (
-                            <>
+                            <div className="space-y-6">
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     {[
                                         {
@@ -149,16 +149,16 @@ export default function StudyPage() {
                                             icon: Star
                                         },
                                     ].map((stat) => (
-                                        <div key={stat.title} className="bg-white p-4 sm:p-6 rounded-xl border border-border/20">
-                                            <div className="flex items-center gap-2 mb-3">
-                                                <div className="p-2 rounded-lg bg-slate-100">
-                                                    <stat.icon className="w-4 h-4 text-slate-600" />
+                                        <div key={stat.title} className="bg-white p-6 rounded-xl border border-border/20 shadow-sm">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="p-2.5 rounded-xl bg-primary/5">
+                                                    <stat.icon className="w-5 h-5 text-primary/70" />
                                                 </div>
-                                                <h3 className="text-sm font-medium text-foreground/70">{stat.title}</h3>
+                                                <h3 className="text-base font-medium text-foreground">{stat.title}</h3>
                                             </div>
                                             <div className="flex items-baseline gap-2">
-                                                <span className="text-2xl font-bold">{stat.value}</span>
-                                                <span className="text-sm text-foreground/60">{stat.description}</span>
+                                                <span className="text-3xl font-bold">{stat.value}</span>
+                                                <span className="text-sm text-muted-foreground">{stat.description}</span>
                                             </div>
                                         </div>
                                     ))}
@@ -166,17 +166,17 @@ export default function StudyPage() {
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {/* Reading Progress */}
-                                    <div className="bg-white p-4 sm:p-6 rounded-xl border border-border/20">
-                                        <div className="flex items-center gap-2 mb-6">
-                                            <div className="p-2 rounded-lg bg-slate-100">
-                                                <BookOpen className="w-4 h-4 text-slate-600" />
+                                    <div className="bg-white p-6 rounded-xl border border-border/20 shadow-sm">
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <div className="p-2.5 rounded-xl bg-primary/5">
+                                                <BookOpen className="w-5 h-5 text-primary/70" />
                                             </div>
                                             <h3 className="text-lg font-medium">Reading Progress</h3>
                                         </div>
-                                        <div className="space-y-4">
+                                        <div className="space-y-6">
                                             <div>
                                                 <div className="flex justify-between text-sm mb-2">
-                                                    <span className="text-foreground/70">Old Testament</span>
+                                                    <span className="text-muted-foreground">Old Testament</span>
                                                     <span className="font-medium">
                                                         {Math.round(userContext?.bibleCoverage
                                                             ?.filter((b: any) => b.book !== 'Matthew' &&
@@ -189,7 +189,7 @@ export default function StudyPage() {
                                                 </div>
                                                 <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
                                                     <div
-                                                        className="h-full bg-primary rounded-full"
+                                                        className="h-full bg-primary rounded-full transition-all duration-500"
                                                         style={{
                                                             width: `${Math.round(userContext?.bibleCoverage
                                                                 ?.filter((b: any) => b.book !== 'Matthew' &&
@@ -204,7 +204,7 @@ export default function StudyPage() {
                                             </div>
                                             <div>
                                                 <div className="flex justify-between text-sm mb-2">
-                                                    <span className="text-foreground/70">New Testament</span>
+                                                    <span className="text-muted-foreground">New Testament</span>
                                                     <span className="font-medium">
                                                         {Math.round(userContext?.bibleCoverage
                                                             ?.filter((b: any) => b.book === 'Matthew' ||
@@ -217,7 +217,7 @@ export default function StudyPage() {
                                                 </div>
                                                 <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
                                                     <div
-                                                        className="h-full bg-primary rounded-full"
+                                                        className="h-full bg-primary rounded-full transition-all duration-500"
                                                         style={{
                                                             width: `${Math.round(userContext?.bibleCoverage
                                                                 ?.filter((b: any) => b.book === 'Matthew' ||
@@ -234,23 +234,23 @@ export default function StudyPage() {
                                     </div>
 
                                     {/* Study Focus */}
-                                    <div className="bg-white p-4 sm:p-6 rounded-xl border border-border/20">
-                                        <div className="flex items-center gap-2 mb-6">
-                                            <div className="p-2 rounded-lg bg-slate-100">
-                                                <Filter className="w-4 h-4 text-slate-600" />
+                                    <div className="bg-white p-6 rounded-xl border border-border/20 shadow-sm">
+                                        <div className="flex items-center gap-3 mb-6">
+                                            <div className="p-2.5 rounded-xl bg-primary/5">
+                                                <Filter className="w-5 h-5 text-primary/70" />
                                             </div>
                                             <h3 className="text-lg font-medium">Recent Focus</h3>
                                         </div>
                                         <div className="space-y-4">
-                                            <p className="text-sm text-foreground/70">Most studied themes:</p>
+                                            <p className="text-sm text-muted-foreground">Most studied themes:</p>
                                             <div className="flex flex-wrap gap-2">
                                                 {(userContext?.favoriteTopics || ["Wisdom", "Love", "Faith", "Prayer"]).slice(0, 6).map((theme: string) => (
-                                                    <span key={theme} className="px-3 py-1.5 rounded-lg bg-slate-100 text-foreground/90 text-sm capitalize">
+                                                    <span key={theme} className="px-3 py-1.5 rounded-lg bg-primary/5 text-primary/90 text-sm capitalize">
                                                         {theme}
                                                     </span>
                                                 ))}
                                             </div>
-                                            <p className="text-sm text-foreground/70 mt-4">
+                                            <p className="text-sm text-muted-foreground mt-4">
                                                 Suggestion: Consider exploring {
                                                     userContext?.bibleCoverage?.length === 0
                                                         ? "the Gospels"
@@ -262,7 +262,7 @@ export default function StudyPage() {
                                         </div>
                                     </div>
                                 </div>
-                            </>
+                            </div>
                         )}
                     </div>
                 </div>
