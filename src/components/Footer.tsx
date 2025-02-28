@@ -66,10 +66,10 @@ export function Footer() {
                     <div className="py-16 border-b border-white/10">
                         <div className="flex flex-col items-center text-center">
                             <h3 className="text-lg font-medium text-white mb-3">
-                                Join Our Community
+                                Grow in Knowledge
                             </h3>
                             <p className="text-sm text-slate-300 max-w-md mb-6">
-                                Get weekly insights on Reformed Apologetics and exclusive resources.
+                                Get weekly theological insights and updates on new study resources to deepen your understanding.
                             </p>
                             <form onSubmit={handleSubscribe} className="w-full max-w-md">
                                 <div className="flex gap-2">
@@ -133,7 +133,7 @@ export function Footer() {
                                 Apologetics Central
                             </h3>
                             <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                                Dedicated to equipping Christians with Reformed Presuppositional Apologetics through scholarly resources and biblical wisdom.
+                                Helping Christians grow in their understanding of Scripture through comprehensive Reformed study tools and trusted theological resources.
                             </p>
                             <div className="flex gap-4">
                                 <a
@@ -226,7 +226,7 @@ export function Footer() {
                                         href="/blog"
                                         className="text-sm text-slate-300 hover:text-primary transition-colors duration-300 block"
                                     >
-                                        Latest Articles
+                                        Library
                                     </Link>
                                 </li>
                             </ul>

@@ -1,6 +1,6 @@
 import { getServerWixClient } from "./serverWixClient";
 import { BlogPosts } from '../components/BlogPosts';
-import { ArrowRight, BookOpen, MessageSquare, Shield, Book, Users, Sparkles, Globe, Brain, Cross, ChevronDown, ArrowUpRight, Check, Image as ImageIcon, User } from 'lucide-react';
+import { ArrowRight, BookOpen, MessageSquare, Shield, Book, Users, Sparkles, Globe, Brain, Cross, ChevronDown, ArrowUpRight, Check, Image as ImageIcon, User, Search } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/src/lib/utils';
 import { WixMediaImage } from '@/src/components/WixMediaImage';
@@ -47,13 +47,13 @@ export default async function Home() {
                         <div className="flex-1 text-left">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-6 sm:mb-8">
                                 <Brain className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white" />
-                                <span className="text-base sm:text-sm text-white">Reformed Bible Study & Resources</span>
+                                <span className="text-base sm:text-sm text-white">Grounded in Reformed Theology</span>
                             </div>
                             <h1 className="font-serif text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white font-medium tracking-[-0.02em] leading-[1.1] mb-8 sm:mb-8">
-                                Biblical Truth for the Digital Age
+                                Deepen Your Understanding of God's Word
                             </h1>
                             <p className="text-lg sm:text-lg md:text-xl text-white/80 leading-relaxed mb-10 sm:mb-10 max-w-2xl">
-                                Explore reformed perspectives on Scripture and engage in meaningful theological discussions guided by historical Christian thought.
+                                Elevate your theological knowledge and biblical understanding through trusted Reformed resources and AI-powered study tools.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-5 sm:gap-4 justify-start">
                                 <Link
@@ -61,7 +61,7 @@ export default async function Home() {
                                     className="group inline-flex items-center justify-center h-14 sm:h-14 px-6 sm:px-8 font-medium text-[#0A1A3B] bg-white rounded-xl hover:bg-white/90 transition-all hover:scale-[1.02] hover:shadow-lg text-lg sm:text-base"
                                 >
                                     <BookOpen className="w-6 h-6 sm:w-5 sm:h-5 mr-3 text-primary" />
-                                    <span>Study Scripture</span>
+                                    <span>Bible Study</span>
                                     <ArrowRight className="ml-2 h-5 w-5 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-1" />
                                 </Link>
                                 <Link
@@ -69,22 +69,22 @@ export default async function Home() {
                                     className="group inline-flex items-center justify-center h-14 sm:h-14 px-6 sm:px-8 font-medium text-white bg-white/10 rounded-xl hover:bg-white/15 transition-all hover:scale-[1.02] border border-white/10 hover:border-white/20 hover:shadow-lg shadow-white/5 text-lg sm:text-base"
                                 >
                                     <MessageSquare className="w-6 h-6 sm:w-5 sm:h-5 mr-3 text-white/70" />
-                                    <span>Grounded Q&A</span>
+                                    <span>Ask Questions</span>
                                     <ArrowRight className="ml-2 h-5 w-5 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-1" />
                                 </Link>
                             </div>
                             <div className="mt-12 sm:mt-12 pt-12 sm:pt-12 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-8">
                                 <div className="text-left">
                                     <div className="text-base sm:text-sm uppercase tracking-wider text-white/60 mb-2 sm:mb-1">Study</div>
-                                    <div className="text-lg sm:text-base text-white/90">Commentary & Cross-References</div>
+                                    <div className="text-lg sm:text-base text-white/90">Verse-by-Verse Insights</div>
                                 </div>
                                 <div className="text-left">
-                                    <div className="text-base sm:text-sm uppercase tracking-wider text-white/60 mb-2 sm:mb-1">Discuss</div>
-                                    <div className="text-lg sm:text-base text-white/90">Theological Discourse</div>
+                                    <div className="text-base sm:text-sm uppercase tracking-wider text-white/60 mb-2 sm:mb-1">Ask</div>
+                                    <div className="text-lg sm:text-base text-white/90">Reformed Answers</div>
                                 </div>
                                 <div className="text-left">
                                     <div className="text-base sm:text-sm uppercase tracking-wider text-white/60 mb-2 sm:mb-1">Learn</div>
-                                    <div className="text-lg sm:text-base text-white/90">Reformed Resources</div>
+                                    <div className="text-lg sm:text-base text-white/90">Trusted Resources</div>
                                 </div>
                             </div>
                         </div>
@@ -103,14 +103,14 @@ export default async function Home() {
                         {/* Header */}
                         <div className="text-left mb-12">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 mb-6">
-                                <Users className="w-4 h-4 text-primary" />
-                                <span className="text-sm font-medium text-primary">Join 2,400+ Members</span>
+                                <Brain className="w-4 h-4 text-primary" />
+                                <span className="text-sm font-medium text-primary">Advanced Study Tools</span>
                             </div>
                             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-slate-900 mb-4">
-                                Join Our Community
+                                Take Your Bible Study to the Next Level
                             </h2>
                             <p className="text-lg text-slate-600 max-w-2xl">
-                                Access premium theological resources and engage in meaningful discussions with fellow believers.
+                                Access comprehensive study tools and AI-powered insights grounded in Reformed theology to deepen your understanding of Scripture.
                             </p>
                         </div>
 
@@ -119,18 +119,18 @@ export default async function Home() {
                             {[
                                 {
                                     icon: BookOpen,
-                                    title: 'Bible Study',
-                                    description: 'In-depth commentary'
+                                    title: 'In-Depth Study',
+                                    description: 'Comprehensive verse analysis and cross-references'
                                 },
                                 {
                                     icon: MessageSquare,
-                                    title: 'Discussion',
-                                    description: 'Theological discourse'
+                                    title: 'Reformed Q&A',
+                                    description: 'Get answers grounded in sound doctrine'
                                 },
                                 {
                                     icon: Book,
-                                    title: 'Resources',
-                                    description: 'Study materials'
+                                    title: 'Study Library',
+                                    description: 'Curated Reformed theological resources'
                                 }
                             ].map((feature, index) => (
                                 <div key={index} className="group p-4 rounded-xl bg-white border border-slate-200 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 transition-all">
@@ -170,14 +170,14 @@ export default async function Home() {
                 </div>
             </section>
 
-            {/* More Articles Section */}
+            {/* Library Section */}
             <section className="py-20 bg-white">
                 <div className="container mx-auto px-4">
                     <div className="max-w-[1200px] mx-auto">
                         {blogs.length > 0 && (
                             <div>
                                 <div className="text-left mb-12">
-                                    <h2 className="font-serif text-3xl sm:text-4xl text-slate-900 mb-4">Latest Articles</h2>
+                                    <h2 className="font-serif text-3xl sm:text-4xl text-slate-900 mb-4">Library</h2>
                                     <p className="text-lg text-slate-600 max-w-2xl">
                                         Dive deeper into our collection of theological insights, biblical interpretations, and contemporary analysis.
                                     </p>

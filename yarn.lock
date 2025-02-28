@@ -3336,6 +3336,36 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wix/search@npm:^1.0.48":
+  version: 1.0.48
+  resolution: "@wix/search@npm:1.0.48"
+  dependencies:
+    "@wix/search_site-search": "npm:1.0.31"
+    "@wix/search_wix-site-search": "npm:1.0.23"
+  checksum: 10c0/d71b3759e9c52e281b3eab740a3a7683827aeb8027c4bbd5d550fd9927312d082f95ffbd9e6d961b4daa3b0d2ed592f27f14faa4c38ac884fc98e75b5b0142be
+  languageName: node
+  linkType: hard
+
+"@wix/search_site-search@npm:1.0.31":
+  version: 1.0.31
+  resolution: "@wix/search_site-search@npm:1.0.31"
+  dependencies:
+    "@wix/sdk-runtime": "npm:^0.3.22"
+    "@wix/sdk-types": "npm:^1.12.4"
+  checksum: 10c0/920deb06748f3f71cde23f72b251e110f9be1c353f43f88e4ad86d065f77696189d5dc48ea910ebde22cecb675e23191b6ee40b059043b1264adb82624d0f89f
+  languageName: node
+  linkType: hard
+
+"@wix/search_wix-site-search@npm:1.0.23":
+  version: 1.0.23
+  resolution: "@wix/search_wix-site-search@npm:1.0.23"
+  dependencies:
+    "@wix/sdk-runtime": "npm:^0.3.22"
+    "@wix/sdk-types": "npm:^1.12.4"
+  checksum: 10c0/d0ab99386f1e0bd95ba8020ca6a73d5428549cb656a37dab0a3e555b199859c1479029c0a504f09fe82c8bda0a1aeb4658c6abbc769b0017dbbee3b27f84c008
+  languageName: node
+  linkType: hard
+
 "@wix/stores@npm:^1.0.60":
   version: 1.0.361
   resolution: "@wix/stores@npm:1.0.361"
@@ -3647,6 +3677,7 @@ __metadata:
     "@wix/redirects": "npm:^1.0.12"
     "@wix/ricos": "npm:^10.116.1"
     "@wix/sdk": "npm:^1.5.0"
+    "@wix/search": "npm:^1.0.48"
     "@wix/stores": "npm:^1.0.60"
     ai: "npm:^2.2.36"
     autoprefixer: "npm:10.4.14"

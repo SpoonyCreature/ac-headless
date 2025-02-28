@@ -5,6 +5,7 @@ import { members } from "@wix/members";
 import { items } from "@wix/data";
 import { comments } from "@wix/comments";
 import { contacts } from "@wix/crm";
+import { wixSiteSearch as siteSearch } from '@wix/search';
 
 export function getServerWixClient() {
     const wixSessionCookie = cookies().get(WIX_SESSION_COOKIE_NAME);
@@ -22,6 +23,7 @@ export function getServerWixClient() {
             items,
             comments,
             contacts,
+            siteSearch,
         },
     });
 }

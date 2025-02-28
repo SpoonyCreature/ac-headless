@@ -2,6 +2,7 @@ import { createClient, OAuthStrategy } from '@wix/sdk';
 import { items } from '@wix/data';
 import { members } from '@wix/members';
 import { comments } from '@wix/comments';
+import { siteSearch } from '@wix/search';
 import Cookies from 'js-cookie';
 import { WIX_SESSION_COOKIE_NAME } from '../constants/constants';
 import { refreshTokensIfNeeded } from '../lib/auth';
@@ -18,7 +19,8 @@ export const getWixClient = async () => {
         modules: {
             items,
             members,
-            comments
+            comments,
+            siteSearch
         },
         auth: OAuthStrategy({
             clientId: process.env.NEXT_PUBLIC_WIX_CLIENT_ID!,

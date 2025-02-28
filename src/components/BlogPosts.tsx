@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { getWixClient } from '../app/wixClient';
 import { BlogCard } from './BlogCard';
-import { Search, BookOpen, LayoutGrid, Rows } from 'lucide-react';
+import { BookOpen, LayoutGrid, Rows } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { SearchLibrary } from './SearchLibrary';
 
 interface BlogPost {
     _id: string;
@@ -13,44 +14,51 @@ interface BlogPost {
     excerpt?: string;
     content?: string;
     slug?: string;
-    tags?: string[];
+    author?: {
+        _id: string;
+        name: string;
+        image?: string;
+    };
     type?: 'article' | 'nugget';
+    tags?: string[];
     readingTime?: string;
     publishedDate?: string;
 }
 
-const ITEMS_TO_LOAD = 6;
 const NUGGET_TAG = 'ea7588d3-9337-44c3-b989-0243d12c8441';
 
-export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
-    const [posts] = useState<BlogPost[]>(() => {
-        return initialPosts.map(post => ({
-            ...post,
-            type: post.tags?.includes(NUGGET_TAG) ? 'nugget' : 'article'
-        }));
-    });
+interface BlogPostsProps {
+    initialPosts: BlogPost[];
+}
 
+export function BlogPosts({ initialPosts }: BlogPostsProps) {
+    const [posts, setPosts] = useState<BlogPost[]>(initialPosts);
     const [activeFilter, setActiveFilter] = useState<'articles' | 'nuggets'>('articles');
-    const [searchQuery, setSearchQuery] = useState('');
     const [layout, setLayout] = useState<'grid' | 'rows'>('grid');
 
+    const handleSearch = (searchResults: BlogPost[]) => {
+        // Ensure search results have the correct type property
+        console.log("TESTING");
+        console.log(searchResults);
+        const processedResults = searchResults.map(post => ({
+            ...post,
+            type: post.tags?.includes(NUGGET_TAG) ? 'nugget' : 'article'
+        })) as BlogPost[];
+        setPosts(processedResults);
+    };
+
     const filteredPosts = posts.filter(post => {
-        const matchesFilter =
-            (activeFilter === 'articles' && post.type === 'article') ||
-            (activeFilter === 'nuggets' && post.type === 'nugget');
+        if (!post) return false;
 
-        const matchesSearch =
-            searchQuery === '' ||
-            post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-
-        return matchesFilter && matchesSearch;
+        const postType = post.tags?.includes(NUGGET_TAG) ? 'nugget' : 'article';
+        return (activeFilter === 'articles' && postType === 'article') ||
+            (activeFilter === 'nuggets' && postType === 'nugget');
     });
 
     return (
         <div className="space-y-8">
-            {/* Filters and Search */}
+            <SearchLibrary onSearch={handleSearch} />
+            {/* Filters */}
             <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-slate-200">
                 <div className="flex flex-col gap-6 py-4">
                     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -106,17 +114,6 @@ export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
                                 </div>
                             )}
                         </div>
-
-                        <div className="relative w-full sm:w-72">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input
-                                type="text"
-                                placeholder="Search posts..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-9 pr-4 py-2.5 rounded-lg bg-slate-100 border-transparent focus:bg-white focus:border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                            />
-                        </div>
                     </div>
                 </div>
             </div>
@@ -159,9 +156,6 @@ export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
             {/* Empty State */}
             {filteredPosts.length === 0 && (
                 <div className="text-center py-12">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-4">
-                        <Search className="w-6 h-6 text-slate-400" />
-                    </div>
                     <h3 className="text-lg font-medium text-slate-900 mb-2">No posts found</h3>
                     <p className="text-slate-600">Try adjusting your search or filter to find what you&apos;re looking for.</p>
                 </div>

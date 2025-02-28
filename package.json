@@ -35,6 +35,7 @@
     "@wix/redirects": "^1.0.12",
     "@wix/ricos": "^10.116.1",
     "@wix/sdk": "^1.5.0",
+    "@wix/search": "^1.0.48",
     "@wix/stores": "^1.0.60",
     "ai": "^2.2.36",
     "class-variance-authority": "^0.7.1",
