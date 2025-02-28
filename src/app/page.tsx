@@ -50,7 +50,7 @@ export default async function Home() {
                                 <span className="text-base sm:text-sm text-white">Grounded in Reformed Theology</span>
                             </div>
                             <h1 className="font-serif text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white font-medium tracking-[-0.02em] leading-[1.1] mb-8 sm:mb-8">
-                                Deepen Your Understanding of God's Word
+                                Deepen Your Understanding of God&apos;s Word
                             </h1>
                             <p className="text-lg sm:text-lg md:text-xl text-white/80 leading-relaxed mb-10 sm:mb-10 max-w-2xl">
                                 Elevate your theological knowledge and biblical understanding through trusted Reformed resources and AI-powered study tools.
