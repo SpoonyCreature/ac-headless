@@ -1,9 +1,10 @@
 import { getServerWixClient } from "./serverWixClient";
 import { BlogPosts } from '../components/BlogPosts';
-import { ArrowRight, BookOpen, MessageSquare, Shield, Book, Users, Sparkles, Globe, Brain, Cross, ChevronDown, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, BookOpen, MessageSquare, Shield, Book, Users, Sparkles, Globe, Brain, Cross, ChevronDown, ArrowUpRight, Check, Image as ImageIcon, User } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/src/lib/utils';
 import { WixMediaImage } from '@/src/components/WixMediaImage';
+import React from 'react';
 
 interface BlogPost {
     _id: string;
@@ -12,7 +13,15 @@ interface BlogPost {
     excerpt?: string;
     content?: string;
     slug?: string;
+    author?: {
+        _id: string;
+        name: string;
+        image?: string;
+    };
+    type?: 'article' | 'nugget';
     tags?: string[];
+    readingTime?: string;
+    publishedDate?: string;
 }
 
 // Keep the main page as a server component
@@ -20,142 +29,170 @@ export default async function Home() {
     const wixClient = getServerWixClient();
     const response = await wixClient.items
         .query('Blog/Posts')
-        .limit(6)
+        .limit(12)
         .find();
 
     const blogs = response.items as BlogPost[];
 
     return (
         <main className="min-h-screen bg-white antialiased">
-            {/* Hero Section - Focused value proposition */}
-            <section className="relative bg-[#0A1A3B] overflow-hidden px-4">
-                {/* Subtle animated gradient background */}
+            {/* Introductory Header */}
+            <section className="relative bg-[#0A1A3B] overflow-hidden">
                 <div className="absolute inset-0">
                     <div className="absolute inset-0 bg-gradient-to-br from-[#0A1A3B] via-[#132B5F] to-[#1E3A7B] opacity-90" />
                     <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.015]" />
                 </div>
-
-                <div className="container mx-auto px-4 py-16 sm:py-24">
-                    <div className="relative max-w-[720px] mx-auto">
-                        {/* Premium badge */}
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-6 sm:mb-8">
-                            <Brain className="w-3.5 h-3.5 text-white" />
-                            <span className="text-sm text-white">Reformed Bible Study & Resources</span>
+                <div className="container mx-auto px-4 py-16 sm:py-20 md:py-28">
+                    <div className="relative max-w-[1200px] mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-20">
+                        <div className="flex-1 text-left">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-6 sm:mb-8">
+                                <Brain className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white" />
+                                <span className="text-base sm:text-sm text-white">Reformed Bible Study & Resources</span>
+                            </div>
+                            <h1 className="font-serif text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white font-medium tracking-[-0.02em] leading-[1.1] mb-8 sm:mb-8">
+                                Biblical Truth for the Digital Age
+                            </h1>
+                            <p className="text-lg sm:text-lg md:text-xl text-white/80 leading-relaxed mb-10 sm:mb-10 max-w-2xl">
+                                Explore reformed perspectives on Scripture and engage in meaningful theological discussions guided by historical Christian thought.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-5 sm:gap-4 justify-start">
+                                <Link
+                                    href="/study/bible-study"
+                                    className="group inline-flex items-center justify-center h-14 sm:h-14 px-6 sm:px-8 font-medium text-[#0A1A3B] bg-white rounded-xl hover:bg-white/90 transition-all hover:scale-[1.02] hover:shadow-lg text-lg sm:text-base"
+                                >
+                                    <BookOpen className="w-6 h-6 sm:w-5 sm:h-5 mr-3 text-primary" />
+                                    <span>Study Scripture</span>
+                                    <ArrowRight className="ml-2 h-5 w-5 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                                <Link
+                                    href="/study/chat"
+                                    className="group inline-flex items-center justify-center h-14 sm:h-14 px-6 sm:px-8 font-medium text-white bg-white/10 rounded-xl hover:bg-white/15 transition-all hover:scale-[1.02] border border-white/10 hover:border-white/20 hover:shadow-lg shadow-white/5 text-lg sm:text-base"
+                                >
+                                    <MessageSquare className="w-6 h-6 sm:w-5 sm:h-5 mr-3 text-white/70" />
+                                    <span>Grounded Q&A</span>
+                                    <ArrowRight className="ml-2 h-5 w-5 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-1" />
+                                </Link>
+                            </div>
+                            <div className="mt-12 sm:mt-12 pt-12 sm:pt-12 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-8">
+                                <div className="text-left">
+                                    <div className="text-base sm:text-sm uppercase tracking-wider text-white/60 mb-2 sm:mb-1">Study</div>
+                                    <div className="text-lg sm:text-base text-white/90">Commentary & Cross-References</div>
+                                </div>
+                                <div className="text-left">
+                                    <div className="text-base sm:text-sm uppercase tracking-wider text-white/60 mb-2 sm:mb-1">Discuss</div>
+                                    <div className="text-lg sm:text-base text-white/90">Theological Discourse</div>
+                                </div>
+                                <div className="text-left">
+                                    <div className="text-base sm:text-sm uppercase tracking-wider text-white/60 mb-2 sm:mb-1">Learn</div>
+                                    <div className="text-lg sm:text-base text-white/90">Reformed Resources</div>
+                                </div>
+                            </div>
                         </div>
-
-                        {/* Main heading with optimized typography */}
-                        <h1 className="font-serif text-5xl text-white font-medium tracking-[-0.02em] leading-[1.2] mb-4 sm:mb-6">
-                            Biblical Truth in a Skeptical Age
-                        </h1>
-
-                        {/* Enhanced subheading - accurate description */}
-                        <p className="text-lg sm:text-xl text-white/90 leading-relaxed mb-8 sm:mb-10">
-                            Source-grounded theological assistance, advanced commentary with cross-references, and visual Bible study tools
-                        </p>
-
-                        {/* Enhanced CTA section */}
-                        <div className="flex flex-col sm:flex-row gap-3 mb-10 sm:mb-12">
-                            <Link
-                                href="/study/bible-study"
-                                className="group flex items-center justify-center gap-2 px-6 h-12 bg-white text-[#0A1A3B] rounded-lg font-medium hover:bg-white/95 transition-all"
-                            >
-                                Try Bible Study
-                                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                            </Link>
-                            <Link
-                                href="/study/chat"
-                                className="group flex items-center justify-center gap-2 px-6 h-12 bg-white/10 text-white rounded-lg font-medium hover:bg-white/15 transition-all border border-white/10"
-                            >
-                                Start Discussion
-                                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                            </Link>
-                        </div>
-
                     </div>
                 </div>
             </section>
 
-            {/* Main content - Clear sections with progressive disclosure */}
-            <section className="py-16">
-                <div className="container mx-auto px-4">
+            {/* Subscription Section */}
+            <section className="relative py-20 sm:py-24 bg-gradient-to-b from-white to-slate-50 overflow-hidden">
+                {/* Background decoration */}
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.015]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,theme(colors.primary/0.05),transparent)]" />
+
+                <div className="relative container mx-auto px-4">
                     <div className="max-w-[1200px] mx-auto">
-                        {/* Core Features */}
-                        <div className="grid md:grid-cols-3 gap-8 mb-16">
-                            <div className="bg-slate-50 rounded-xl p-6">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="p-2 rounded-lg bg-primary/10">
-                                        <Brain className="w-5 h-5 text-primary" />
-                                    </div>
-                                    <h2 className="font-medium text-lg">Research Assistant</h2>
-                                </div>
-                                <p className="text-slate-600 mb-4">
-                                    Engage in theological discussions with an intelligent assistant that grounds answers in reliable sources. Share interesting conversations.
-                                </p>
-                                <Link
-                                    href="/study/chat"
-                                    className="inline-flex items-center gap-2 text-primary hover:gap-3 transition-all"
-                                >
-                                    <span>Start Discussion</span>
-                                    <ArrowRight className="w-4 h-4" />
-                                </Link>
+                        {/* Header */}
+                        <div className="text-left mb-12">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 mb-6">
+                                <Users className="w-4 h-4 text-primary" />
+                                <span className="text-sm font-medium text-primary">Join 2,400+ Members</span>
                             </div>
-
-                            <div className="bg-slate-50 rounded-xl p-6">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="p-2 rounded-lg bg-primary/10">
-                                        <BookOpen className="w-5 h-5 text-primary" />
-                                    </div>
-                                    <h2 className="font-medium text-lg">Bible Study</h2>
-                                </div>
-                                <p className="text-slate-600 mb-4">
-                                    Advanced commentary, cross-references, and visual study tools including Sankey diagrams for deeper understanding.
-                                </p>
-                                <Link
-                                    href="/study/bible-study"
-                                    className="inline-flex items-center gap-2 text-primary hover:gap-3 transition-all"
-                                >
-                                    <span>Study Scripture</span>
-                                    <ArrowRight className="w-4 h-4" />
-                                </Link>
-                            </div>
-
-                            <div className="bg-slate-50 rounded-xl p-6">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="p-2 rounded-lg bg-primary/10">
-                                        <Book className="w-5 h-5 text-primary" />
-                                    </div>
-                                    <h2 className="font-medium text-lg">Articles</h2>
-                                </div>
-                                <p className="text-slate-600 mb-4">
-                                    Reformed theological articles and insights on Scripture, doctrine, and contemporary issues.
-                                </p>
-                                <Link
-                                    href="/blog"
-                                    className="inline-flex items-center gap-2 text-primary hover:gap-3 transition-all"
-                                >
-                                    <span>Read Articles</span>
-                                    <ArrowRight className="w-4 h-4" />
-                                </Link>
-                            </div>
+                            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-slate-900 mb-4">
+                                Join Our Community
+                            </h2>
+                            <p className="text-lg text-slate-600 max-w-2xl">
+                                Access premium theological resources and engage in meaningful discussions with fellow believers.
+                            </p>
                         </div>
 
-                        {/* Featured Articles */}
+                        {/* Feature Grid */}
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+                            {[
+                                {
+                                    icon: BookOpen,
+                                    title: 'Bible Study',
+                                    description: 'In-depth commentary'
+                                },
+                                {
+                                    icon: MessageSquare,
+                                    title: 'Discussion',
+                                    description: 'Theological discourse'
+                                },
+                                {
+                                    icon: Book,
+                                    title: 'Resources',
+                                    description: 'Study materials'
+                                }
+                            ].map((feature, index) => (
+                                <div key={index} className="group p-4 rounded-xl bg-white border border-slate-200 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 transition-all">
+                                    <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                        {React.createElement(feature.icon, {
+                                            className: "h-5 w-5 text-primary"
+                                        })}
+                                    </div>
+                                    <h3 className="font-medium text-slate-900 mb-1">
+                                        {feature.title}
+                                    </h3>
+                                    <p className="text-sm text-slate-600">
+                                        {feature.description}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* CTA */}
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <Link
+                                href="/pricing"
+                                className="inline-flex items-center justify-center h-12 px-8 font-medium text-white bg-primary rounded-xl hover:bg-primary/90 transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/25"
+                            >
+                                Start Free Trial
+                                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            </Link>
+                            <Link
+                                href="/pricing"
+                                className="inline-flex items-center justify-center h-12 px-8 font-medium text-slate-700 bg-slate-100 rounded-xl hover:bg-slate-200 transition-all hover:scale-[1.02]"
+                            >
+                                View Plans
+                                <ArrowUpRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* More Articles Section */}
+            <section className="py-20 bg-white">
+                <div className="container mx-auto px-4">
+                    <div className="max-w-[1200px] mx-auto">
                         {blogs.length > 0 && (
                             <div>
-                                <div className="flex items-end justify-between mb-8">
-                                    <div>
-                                        <h2 className="font-serif text-2xl text-slate-900 mb-2">Featured Articles</h2>
-                                        <p className="text-slate-600">Latest theological insights and commentary</p>
-                                    </div>
+                                <div className="text-left mb-12">
+                                    <h2 className="font-serif text-3xl sm:text-4xl text-slate-900 mb-4">Latest Articles</h2>
+                                    <p className="text-lg text-slate-600 max-w-2xl">
+                                        Dive deeper into our collection of theological insights, biblical interpretations, and contemporary analysis.
+                                    </p>
+                                </div>
+                                <div className="grid gap-8">
+                                    <BlogPosts initialPosts={blogs} />
+                                </div>
+                                <div className="mt-12">
                                     <Link
                                         href="/blog"
-                                        className="text-primary hover:text-primary/80 transition-colors"
+                                        className="inline-flex items-center justify-center h-12 px-8 font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors group"
                                     >
-                                        View All
+                                        Browse All Articles
+                                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                                     </Link>
-                                </div>
-                                <div className="grid gap-6">
-                                    <BlogPosts initialPosts={blogs} />
                                 </div>
                             </div>
                         )}
