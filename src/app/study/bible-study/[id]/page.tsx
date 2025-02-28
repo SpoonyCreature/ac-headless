@@ -13,6 +13,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
+import { BibleStudyDetailSkeleton } from '@/src/components/Skeletons';
 
 interface CommentaryResponse {
     markdown: string;
@@ -570,29 +571,7 @@ export default function BibleStudyDetailPage({
     };
 
     if (isLoading) {
-        return (
-            <div className={cn(
-                "flex min-h-screen bg-gradient-to-b from-background to-background/95",
-                "transition-opacity duration-300",
-                isTransitioning ? "opacity-50" : "opacity-100"
-            )}>
-                <div className="flex-1">
-                    <div className="p-4 border-t border-border border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
-                        <div className="max-w-4xl mx-auto">
-                            <div className="h-6 w-48 bg-muted-foreground/20 rounded animate-pulse" />
-                        </div>
-                    </div>
-                    <div className="flex-1 overflow-y-auto py-5">
-                        <div className="max-w-4xl mx-auto">
-                            <div className="animate-pulse space-y-4">
-                                <div className="h-4 bg-muted-foreground/20 rounded w-3/4" />
-                                <div className="h-4 bg-muted-foreground/20 rounded w-1/2" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+        return <BibleStudyDetailSkeleton />;
     }
 
     if (error) {

@@ -10,6 +10,7 @@ import { LoadingMessage } from '@/src/components/LoadingMessage';
 import { History, Menu } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { usePageTransition } from '@/src/hooks/usePageTransition';
+import { ChatSkeleton } from '@/src/components/Skeletons';
 
 interface Message {
     _id: string;
@@ -276,53 +277,59 @@ export default function ChatPage() {
 
                 {/* Main Chat Area */}
                 <div className="flex-1 flex flex-col">
-                    {/* Header */}
-                    <header className="bg-primary py-4 px-4 sm:px-6 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => setShowSidebar(true)}
-                                className="lg:hidden p-2 -m-2 text-primary-foreground/90 hover:text-primary-foreground transition-colors"
-                            >
-                                <Menu className="w-6 h-6" />
-                            </button>
-                            <div>
-                                <h1 className="font-serif text-2xl sm:text-3xl text-primary-foreground">Discussion</h1>
-                                <p className="text-primary-foreground/80 text-sm sm:text-base">Explore Reformed theology with source-grounded assistance</p>
-                            </div>
-                        </div>
-                    </header>
-
-                    {/* Messages Container */}
-                    <div className="flex-1 pb-40">
-                        <div className="max-w-3xl mx-auto px-4">
-                            {messages.map((message, index) => (
-                                <ChatMessage
-                                    key={message._id}
-                                    message={message}
-                                    isLastMessage={index === messages.length - 1}
-                                />
-                            ))}
-                            {isLoading && <LoadingMessage />}
-                            <div ref={messagesEndRef} />
-                        </div>
-                    </div>
-
-                    {/* Input Area - Fixed at Bottom */}
-                    <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border/5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50">
-                        <div className="max-w-3xl mx-auto p-4">
-                            {isAuthLoading ? (
-                                <div className="rounded-2xl bg-muted/50 border border-border/50 p-6 backdrop-blur-sm">
-                                    <div className="h-8 bg-muted animate-pulse rounded-lg w-48 mx-auto" />
+                    {isInitialLoad ? (
+                        <ChatSkeleton />
+                    ) : (
+                        <>
+                            {/* Header */}
+                            <header className="bg-primary py-4 px-4 sm:px-6 flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={() => setShowSidebar(true)}
+                                        className="lg:hidden p-2 -m-2 text-primary-foreground/90 hover:text-primary-foreground transition-colors"
+                                    >
+                                        <Menu className="w-6 h-6" />
+                                    </button>
+                                    <div>
+                                        <h1 className="font-serif text-2xl sm:text-3xl text-primary-foreground">Discussion</h1>
+                                        <p className="text-primary-foreground/80 text-sm sm:text-base">Explore Reformed theology with source-grounded assistance</p>
+                                    </div>
                                 </div>
-                            ) : (
-                                <ChatInput
-                                    onSend={handleSend}
-                                    disabled={isLoading}
-                                    isAuthenticated={isAuthenticated}
-                                />
-                            )}
-                        </div>
-                    </div>
+                            </header>
+
+                            {/* Messages Container */}
+                            <div className="flex-1 pb-40">
+                                <div className="max-w-3xl mx-auto px-4">
+                                    {messages.map((message, index) => (
+                                        <ChatMessage
+                                            key={message._id}
+                                            message={message}
+                                            isLastMessage={index === messages.length - 1}
+                                        />
+                                    ))}
+                                    {isLoading && <LoadingMessage />}
+                                    <div ref={messagesEndRef} />
+                                </div>
+                            </div>
+
+                            {/* Input Area - Fixed at Bottom */}
+                            <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border/5 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50">
+                                <div className="max-w-3xl mx-auto p-4">
+                                    {isAuthLoading ? (
+                                        <div className="rounded-2xl bg-muted/50 border border-border/50 p-6 backdrop-blur-sm">
+                                            <div className="h-8 bg-muted animate-pulse rounded-lg w-48 mx-auto" />
+                                        </div>
+                                    ) : (
+                                        <ChatInput
+                                            onSend={handleSend}
+                                            disabled={isLoading}
+                                            isAuthenticated={isAuthenticated}
+                                        />
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </main>
         </>

@@ -110,29 +110,56 @@ export const CommentsSkeleton = () => (
 
 export function ChatSkeleton() {
     return (
-        <div className="flex h-screen bg-background">
+        <div className="flex min-h-screen bg-gradient-to-b from-background to-background/95">
             <div className="flex-1 flex flex-col">
-                <div className="p-4">
-                    <div className="max-w-4xl mx-auto flex items-center justify-center gap-4">
-                        <div className="h-4 bg-muted rounded animate-pulse w-48" />
-                        <div className="h-10 bg-muted rounded animate-pulse w-32" />
+                {/* Header */}
+                <header className="bg-primary py-4 px-4 sm:px-6 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="lg:hidden p-2 -m-2 rounded-full bg-primary-foreground/10 animate-pulse">
+                            <div className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <div className="h-8 bg-primary-foreground/10 rounded w-48 animate-pulse" />
+                            <div className="h-5 bg-primary-foreground/10 rounded w-64 mt-1 animate-pulse" />
+                        </div>
                     </div>
-                </div>
-                <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                    {[...Array(5)].map((_, i) => (
-                        <div key={i} className="flex items-start gap-6 max-w-4xl mx-auto">
-                            <div className="h-10 w-10 rounded-full bg-muted animate-pulse flex-shrink-0" />
-                            <div className="flex-1 space-y-3">
-                                <div className="h-5 bg-muted rounded animate-pulse w-32" />
-                                <div className="space-y-2">
-                                    <div className="h-4 bg-muted rounded animate-pulse w-full" />
-                                    <div className="h-4 bg-muted rounded animate-pulse w-[95%]" />
-                                    <div className="h-4 bg-muted rounded animate-pulse w-[85%]" />
-                                    <div className="h-4 bg-muted rounded animate-pulse w-[70%]" />
+                </header>
+
+                {/* Messages Container */}
+                <div className="flex-1 pb-40">
+                    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="flex items-start gap-4">
+                                <div className="h-10 w-10 rounded-full bg-muted-foreground/10 animate-pulse flex-shrink-0" />
+                                <div className="flex-1 space-y-2 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-5 bg-muted-foreground/10 rounded w-24 animate-pulse" />
+                                        <div className="h-4 bg-muted-foreground/10 rounded w-16 animate-pulse" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="h-4 bg-muted-foreground/10 rounded w-full animate-pulse" />
+                                        <div className="h-4 bg-muted-foreground/10 rounded w-[95%] animate-pulse" />
+                                        <div className="h-4 bg-muted-foreground/10 rounded w-[85%] animate-pulse" />
+                                    </div>
                                 </div>
                             </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Input Area */}
+                <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <div className="max-w-3xl mx-auto p-4">
+                        <div className="relative">
+                            <div className="h-[52px] bg-muted-foreground/10 rounded-xl animate-pulse" />
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                <div className="w-9 h-9 rounded-lg bg-muted-foreground/10 animate-pulse" />
+                            </div>
                         </div>
-                    ))}
+                        <div className="mt-2 text-center">
+                            <div className="h-4 bg-muted-foreground/10 rounded w-48 mx-auto animate-pulse" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -190,6 +217,53 @@ export function SidebarSkeleton() {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export function BibleStudyDetailSkeleton() {
+    return (
+        <div className="flex min-h-screen bg-gradient-to-b from-background to-background/95">
+            <div className="flex-1">
+                {/* Header */}
+                <div className="p-4 border-t border-border border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="bg-card text-card-foreground rounded-2xl border shadow-sm">
+                            <div className="p-4 sm:p-6 pb-3 sm:pb-4">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-3 min-w-0">
+                                        <div className="p-2 -ml-2 rounded-full bg-muted/5 animate-pulse">
+                                            <div className="w-5 h-5 bg-muted-foreground/10 rounded" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <div className="h-5 bg-muted-foreground/10 rounded w-48 animate-pulse" />
+                                            <div className="h-4 bg-muted-foreground/10 rounded w-32 mt-1 animate-pulse" />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-9 w-9 rounded-lg bg-muted-foreground/10 animate-pulse" />
+                                        <div className="h-9 w-24 rounded-lg bg-muted-foreground/10 animate-pulse hidden sm:block" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="px-4 sm:px-6 py-2 border-t flex items-center gap-2 justify-between">
+                                <div className="h-8 w-24 rounded-lg bg-muted-foreground/10 animate-pulse" />
+                                <div className="h-8 w-32 rounded-lg bg-muted-foreground/10 animate-pulse" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="max-w-4xl mx-auto px-4 py-6">
+                    <div className="space-y-4">
+                        <div className="h-4 bg-muted-foreground/10 rounded w-3/4 animate-pulse" />
+                        <div className="h-4 bg-muted-foreground/10 rounded w-1/2 animate-pulse" />
+                        <div className="h-4 bg-muted-foreground/10 rounded w-5/6 animate-pulse" />
+                        <div className="h-4 bg-muted-foreground/10 rounded w-2/3 animate-pulse" />
                     </div>
                 </div>
             </div>
