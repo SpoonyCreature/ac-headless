@@ -163,7 +163,7 @@ export function BlogPosts({ initialPosts }: { initialPosts: BlogPost[] }) {
                         <Search className="w-6 h-6 text-slate-400" />
                     </div>
                     <h3 className="text-lg font-medium text-slate-900 mb-2">No posts found</h3>
-                    <p className="text-slate-600">Try adjusting your search or filter to find what you're looking for.</p>
+                    <p className="text-slate-600">Try adjusting your search or filter to find what you&apos;re looking for.</p>
                 </div>
             )}
         </div>
